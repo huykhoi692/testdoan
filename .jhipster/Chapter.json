@@ -1,0 +1,32 @@
+{
+  "annotations": {
+    "changelogDate": "20251021152343"
+  },
+  "applications": ["Langleague"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "title",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "maxlength"],
+      "fieldValidateRulesMaxlength": "255"
+    },
+    {
+      "fieldName": "orderIndex",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "name": "Chapter",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "lesson",
+      "relationshipName": "lesson",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

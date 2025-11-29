@@ -1,0 +1,17 @@
+{
+  "vocabularyList": {
+    "vocabularyListTitle": "Vocabulary List",
+    "vocabularyListSubtitle": "Explore and learn new words",
+    "totalWords": "Total Words",
+    "favorites": "Favorites",
+    "searchPlaceholder": "Search by Korean, Romanization, or English...",
+    "allCategories": "All Categories",
+    "allWords": "All Words",
+    "noAudioAvailable": "No audio available for this word.",
+    "defaultCategory": "General",
+    "error": {
+      "chapterIdMissing": "Chapter ID is missing in the URL.",
+      "loadFailed": "Failed to load vocabulary. Please try again later."
+    }
+  }
+}

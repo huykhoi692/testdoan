@@ -1,0 +1,64 @@
+{
+  "dashboard": {
+    "title": "Dashboard",
+    "greeting": {
+      "morning": "Good Morning",
+      "afternoon": "Good Afternoon",
+      "evening": "Good Evening"
+    },
+    "welcome": "Hi {{name}}, {{greeting}}!",
+    "subtitle": "Ready to start learning today?",
+    "newLessons": "You have <b>{{count}}</b> new lessons waiting for you",
+    "stats": {
+      "wordLearned": "Word Learned",
+      "quiz": "Quiz",
+      "courseProgress": "Course Progress",
+      "language": "Language"
+    },
+    "sections": {
+      "courseOfProgress": "Course of Progress",
+      "dailyHours": "Daily Hours",
+      "myProgress": "My Progress",
+      "languageProgress": "Language Progress"
+    }
+  },
+  "menu": {
+    "dashboard": "Dashboard",
+    "bookLibrary": "Book Library",
+    "myProfile": "My Profile",
+    "settings": "Settings"
+  },
+  "profile": {
+    "title": "Account Information",
+    "fullName": "Full Name",
+    "email": "Email",
+    "gender": "Gender",
+    "birthDate": "Birth Date",
+    "save": "Save",
+    "male": "Male",
+    "female": "Female",
+    "other": "Other"
+  },
+  "settings": {
+    "title": "Account Information",
+    "username": "Username",
+    "email": "Email",
+    "changePassword": "Change password",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "confirmPassword": "Re-enter new password",
+    "interfaceLanguage": "Interface language",
+    "theme": "Theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeAuto": "Auto (System)",
+    "notifications": "Notifications",
+    "enableNotifications": "Enable notifications",
+    "dailyNotifications": "Daily notifications",
+    "save": "Save"
+  },
+  "common": {
+    "search": "Search...",
+    "logout": "Logout"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "bookLessons": {
+    "overallProgress": "Overall Progress",
+    "chapters": "Chapters",
+    "searchChapters": "Search chapters...",
+    "allChapters": "All Chapters",
+    "chapter": "Chapter",
+    "progress": "Progress",
+    "continue": "Continue",
+    "error": {
+      "bookIdMissing": "Book ID is missing in the URL.",
+      "loadFailed": "Failed to load book or chapters. Please try again later.",
+      "bookNotFound": "Book not found."
+    }
+  }
+}

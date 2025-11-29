@@ -1,0 +1,671 @@
+// ============================================
+// LangLeague App Styles
+// ============================================
+
+// Override Bootstrap variables
+@import 'bootstrap-variables';
+// Import Bootstrap source files from node_modules
+@import 'bootstrap/scss/bootstrap';
+
+// Import Design System
+@import 'shared/theme/variables.scss';
+@import 'shared/theme/mixins.scss';
+
+// Import Layout Components
+@import 'shared/layout/header/header.scss';
+@import 'shared/layout/footer/footer.scss';
+
+// Global Reset & Base Styles
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+
+  &:after,
+  &::before {
+    box-sizing: border-box;
+  }
+}
+
+html,
+body {
+  height: 100%;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  background: #f9fafb;
+  color: #1f2937;
+  line-height: 1.6;
+  margin: 0;
+  overflow-x: hidden;
+}
+
+// ============================================
+// App Layout Structure (3 Sections)
+// ============================================
+
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #f9fafb;
+
+  // Main Content Section
+  .main-content {
+    flex: 1;
+    padding-top: 80px; // Space for fixed header
+    min-height: calc(100vh - 80px - 100px); // viewport - header - footer
+    background: #ffffff;
+
+    // Container for content
+    .container,
+    .container-fluid {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+  }
+}
+
+// ============================================
+// Typography & Links
+// ============================================
+
+a {
+  color: #667eea;
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #5568d3;
+    text-decoration: none;
+  }
+
+  &:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+  }
+}
+
+button {
+  font-family: inherit;
+  border-radius: 8px; // Bo tròn mặc định cho button
+}
+
+// ============================================
+// Global Border Radius - Soft & Modern UI
+// ============================================
+
+// Tất cả các card, container, input, button đều bo tròn mềm mại
+.card,
+.ant-card {
+  border-radius: 16px !important;
+  overflow: hidden;
+}
+
+.ant-modal-content {
+  border-radius: 16px !important;
+}
+
+.ant-drawer-content {
+  border-radius: 16px 0 0 16px !important;
+}
+
+input,
+textarea,
+select,
+.ant-input,
+.ant-select-selector,
+.ant-picker {
+  border-radius: 8px !important;
+}
+
+.ant-btn {
+  border-radius: 8px !important;
+}
+
+.ant-btn-lg {
+  border-radius: 12px !important;
+}
+
+.ant-table {
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+
+.ant-avatar {
+  border-radius: 50% !important;
+}
+
+img {
+  border-radius: 8px;
+}
+
+.ant-tag {
+  border-radius: 20px !important;
+}
+
+.ant-badge {
+  border-radius: 20px !important;
+}
+
+// ============================================
+// Custom Scrollbar
+// ============================================
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 8px;
+
+  &:hover {
+    background: #9ca3af;
+  }
+}
+
+// ============================================
+// Utility Classes
+// ============================================
+
+.text-center {
+  text-align: center;
+}
+
+.text-muted {
+  color: #6b7280;
+}
+
+.mt-5 {
+  margin-top: 3rem;
+}
+
+.mb-0 {
+  margin-bottom: 0;
+}
+
+// Responsive Utilities
+.mobile-only {
+  display: none !important;
+  @media (max-width: 767px) {
+    display: block !important;
+  }
+}
+
+.tablet-only {
+  display: none !important;
+  @media (min-width: 768px) and (max-width: 1023px) {
+    display: block !important;
+  }
+}
+
+.desktop-only {
+  display: none !important;
+  @media (min-width: 1024px) {
+    display: block !important;
+  }
+}
+
+.hide-mobile {
+  @media (max-width: 767px) {
+    display: none !important;
+  }
+}
+
+.hide-tablet {
+  @media (min-width: 768px) and (max-width: 1023px) {
+    display: none !important;
+  }
+}
+
+.hide-desktop {
+  @media (min-width: 1024px) {
+    display: none !important;
+  }
+}
+
+// Flexible Containers
+.container-responsive {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
+
+  @media (max-width: 480px) {
+    padding: 0 0.75rem;
+  }
+
+  @media (min-width: 768px) {
+    padding: 0 2rem;
+  }
+
+  @media (min-width: 1200px) {
+    padding: 0 3rem;
+  }
+}
+
+// ============================================
+// Responsive Adjustments
+// ============================================
+
+// Mobile Small (320px - 480px)
+@media (max-width: 480px) {
+  html {
+    font-size: 14px; // Smaller base font for tiny screens
+  }
+
+  .app-wrapper {
+    .main-content {
+      padding-top: 70px;
+
+      .container,
+      .container-fluid {
+        padding: 0.75rem;
+      }
+    }
+  }
+}
+
+// Mobile Medium (481px - 768px)
+@media (min-width: 481px) and (max-width: 768px) {
+  html {
+    font-size: 15px;
+  }
+
+  .app-wrapper {
+    .main-content {
+      padding-top: 75px;
+
+      .container,
+      .container-fluid {
+        padding: 1rem;
+      }
+    }
+  }
+}
+
+// Tablet (769px - 1024px)
+@media (min-width: 769px) and (max-width: 1024px) {
+  .app-wrapper {
+    .main-content {
+      .container,
+      .container-fluid {
+        max-width: 960px;
+        padding: 1.5rem;
+      }
+    }
+  }
+}
+
+// Desktop Small (1025px - 1366px)
+@media (min-width: 1025px) and (max-width: 1366px) {
+  .app-wrapper {
+    .main-content {
+      .container,
+      .container-fluid {
+        max-width: 1200px;
+      }
+    }
+  }
+}
+
+// Desktop Large (1367px+)
+@media (min-width: 1367px) {
+  .app-wrapper {
+    .main-content {
+      .container,
+      .container-fluid {
+        max-width: 1400px;
+      }
+    }
+  }
+}
+
+// Landscape Orientation (Mobile/Tablet)
+@media (max-height: 600px) and (orientation: landscape) {
+  .app-wrapper {
+    .main-content {
+      padding-top: 60px; // Reduce header space in landscape
+    }
+  }
+}
+
+// Ultra Wide Screens (1920px+)
+@media (min-width: 1920px) {
+  .app-wrapper {
+    .main-content {
+      .container,
+      .container-fluid {
+        max-width: 1600px; // Allow wider content on ultra-wide screens
+      }
+    }
+  }
+}
+
+// ============================================
+// Dark Mode Support
+// ============================================
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #111827;
+    color: #f9fafb;
+  }
+
+  .app-wrapper {
+    background: #111827;
+
+    .main-content {
+      background: #1f2937;
+    }
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #374151;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #4b5563;
+
+    &:hover {
+      background: #6b7280;
+    }
+  }
+
+  a {
+    color: #93c5fd;
+
+    &:hover {
+      color: #bfdbfe;
+    }
+  }
+}
+
+.fullscreen {
+  position: fixed;
+  top: 100px;
+  left: 0;
+  width: 99% !important;
+  height: calc(100vh - 110px) !important;
+  margin: 5px;
+  z-index: 1000;
+  padding: 5px 25px 50px 25px !important;
+}
+
+/* ==========================================================================
+Browser Upgrade Prompt
+========================================================================== */
+
+.browserupgrade {
+  margin: 0.2em 0;
+  background: #ccc;
+  color: #000;
+  padding: 0.2em 0;
+}
+
+/* ==========================================================================
+Custom button styles
+========================================================================== */
+
+.icon-button > .btn {
+  background-color: transparent;
+  border-color: transparent;
+  padding: 0.5rem;
+  line-height: 1rem;
+  &:hover {
+    background-color: transparent;
+    border-color: transparent;
+  }
+  &:focus {
+    -webkit-box-shadow: none;
+    box-shadow: none;
+  }
+}
+
+/* ==========================================================================
+Generic styles
+========================================================================== */
+
+/* Temporary workaround for availity-reactstrap-validation */
+.invalid-feedback {
+  display: inline;
+}
+
+/* other generic styles */
+
+.title {
+  font-size: 1.25em;
+  margin: 1px 10px 1px 10px;
+}
+
+.description {
+  font-size: 0.9em;
+  margin: 1px 10px 1px 10px;
+}
+
+.shadow {
+  box-shadow:
+    rgba(0, 0, 0, 0.12) 0 1px 6px,
+    rgba(0, 0, 0, 0.12) 0 1px 4px;
+  border-radius: 2px;
+}
+
+.error {
+  color: white;
+  background-color: red;
+}
+
+.break {
+  white-space: normal;
+  word-break: break-all;
+}
+
+.break-word {
+  white-space: normal;
+  word-break: keep-all;
+}
+
+.preserve-space {
+  white-space: pre-wrap;
+}
+
+/* padding helpers */
+
+@mixin pad($size, $side) {
+  @if $size== '' {
+    @if $side== '' {
+      .pad {
+        padding: 10px !important;
+      }
+    } @else {
+      .pad {
+        padding-#{$side}: 10px !important;
+      }
+    }
+  } @else {
+    @if $side== '' {
+      .pad-#{$size} {
+        padding: #{$size}px !important;
+      }
+    } @else {
+      .pad-#{$side}-#{$size} {
+        padding-#{$side}: #{$size}px !important;
+      }
+    }
+  }
+}
+
+@include pad('', '');
+@include pad('2', '');
+@include pad('3', '');
+@include pad('5', '');
+@include pad('10', '');
+@include pad('20', '');
+@include pad('25', '');
+@include pad('30', '');
+@include pad('50', '');
+@include pad('75', '');
+@include pad('100', '');
+@include pad('4', 'top');
+@include pad('5', 'top');
+@include pad('10', 'top');
+@include pad('20', 'top');
+@include pad('25', 'top');
+@include pad('30', 'top');
+@include pad('50', 'top');
+@include pad('75', 'top');
+@include pad('100', 'top');
+@include pad('4', 'bottom');
+@include pad('5', 'bottom');
+@include pad('10', 'bottom');
+@include pad('20', 'bottom');
+@include pad('25', 'bottom');
+@include pad('30', 'bottom');
+@include pad('50', 'bottom');
+@include pad('75', 'bottom');
+@include pad('100', 'bottom');
+@include pad('5', 'right');
+@include pad('10', 'right');
+@include pad('20', 'right');
+@include pad('25', 'right');
+@include pad('30', 'right');
+@include pad('50', 'right');
+@include pad('75', 'right');
+@include pad('100', 'right');
+@include pad('5', 'left');
+@include pad('10', 'left');
+@include pad('20', 'left');
+@include pad('25', 'left');
+@include pad('30', 'left');
+@include pad('50', 'left');
+@include pad('75', 'left');
+@include pad('100', 'left');
+
+@mixin no-padding($side) {
+  @if $side== 'all' {
+    .no-padding {
+      padding: 0 !important;
+    }
+  } @else {
+    .no-padding-#{$side} {
+      padding-#{$side}: 0 !important;
+    }
+  }
+}
+
+@include no-padding('left');
+@include no-padding('right');
+@include no-padding('top');
+@include no-padding('bottom');
+@include no-padding('all');
+
+/* end of padding helpers */
+
+.no-margin {
+  margin: 0;
+}
+@mixin voffset($size) {
+  @if $size== '' {
+    .voffset {
+      margin-top: 2px !important;
+    }
+  } @else {
+    .voffset-#{$size} {
+      margin-top: #{$size}px !important;
+    }
+  }
+}
+
+@include voffset('');
+@include voffset('5');
+@include voffset('10');
+@include voffset('15');
+@include voffset('30');
+@include voffset('40');
+@include voffset('60');
+@include voffset('80');
+@include voffset('100');
+@include voffset('150');
+
+.readonly {
+  background-color: #eee;
+  opacity: 1;
+}
+
+/* ==========================================================================
+make sure browsers use the pointer cursor for anchors, even with no href
+========================================================================== */
+
+a:hover {
+  cursor: pointer;
+}
+
+.hand {
+  cursor: pointer;
+}
+
+button.anchor-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  align-items: initial;
+  text-align: initial;
+  width: 100%;
+}
+
+a.anchor-btn:hover {
+  text-decoration: none;
+}
+
+/* ==========================================================================
+Metrics and Health styles
+========================================================================== */
+
+#threadDump .popover,
+#healthCheck .popover {
+  top: inherit;
+  display: block;
+  font-size: 10px;
+  max-width: 1024px;
+}
+
+.thread-dump-modal-lock {
+  max-width: 450px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#healthCheck .popover {
+  margin-left: -50px;
+}
+
+.health-details {
+  min-width: 400px;
+}
+
+/* bootstrap 3 input-group 100% width
+http://stackoverflow.com/questions/23436430/bootstrap-3-input-group-100-width */
+
+.width-min {
+  width: 1% !important;
+}
+
+/* jhipster-needle-scss-add-main JHipster will add new css style */

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20251125000009-1" author="system">
+        <createTable tableName="listening_option">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="option_text" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_correct" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="listening_exercise_id" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20251125000009-2" author="system">
+        <addForeignKeyConstraint
+            baseColumnNames="listening_exercise_id"
+            baseTableName="listening_option"
+            constraintName="fk_listening_option_listening_exercise_id"
+            referencedColumnNames="id"
+            referencedTableName="listening_exercise"/>
+    </changeSet>
+
+</databaseChangeLog>
+

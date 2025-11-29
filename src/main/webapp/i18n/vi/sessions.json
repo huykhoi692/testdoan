@@ -1,0 +1,15 @@
+{
+  "sessions": {
+    "title": "Phiên hoạt động",
+    "table": {
+      "ipaddress": "Địa chỉ IP",
+      "useragent": "User Agent",
+      "date": "Ngày",
+      "button": "Hủy bỏ"
+    },
+    "messages": {
+      "success": "Phiên hoạt động đã bị hủy bỏ!",
+      "error": "Đã xảy ra lỗi khi hủy bỏ phiên hoạt động. Vui lòng thử lại."
+    }
+  }
+}

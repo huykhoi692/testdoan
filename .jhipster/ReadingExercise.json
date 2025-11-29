@@ -1,0 +1,32 @@
+{
+  "annotations": {
+    "changelogDate": "20251021152353"
+  },
+  "applications": ["Langleague"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "passage",
+      "fieldType": "TextBlob"
+    },
+    {
+      "fieldName": "question",
+      "fieldType": "TextBlob"
+    },
+    {
+      "fieldName": "options",
+      "fieldType": "TextBlob"
+    },
+    {
+      "fieldName": "correctAnswer",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "255"
+    }
+  ],
+  "name": "ReadingExercise",
+  "pagination": "pagination",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

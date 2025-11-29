@@ -1,0 +1,22 @@
+{
+  "annotations": {
+    "changelogDate": "20251021152356"
+  },
+  "applications": ["Langleague"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "content",
+      "fieldType": "TextBlob"
+    },
+    {
+      "fieldName": "createdAt",
+      "fieldType": "Instant"
+    }
+  ],
+  "name": "Comment",
+  "pagination": "pagination",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

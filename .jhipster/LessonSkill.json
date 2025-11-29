@@ -1,0 +1,49 @@
+{
+  "annotations": {
+    "changelogDate": "20251021152350"
+  },
+  "applications": ["Langleague"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "exerciseType",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "50"
+    },
+    {
+      "fieldName": "has",
+      "fieldType": "TextBlob"
+    }
+  ],
+  "name": "LessonSkill",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "listeningExercise",
+      "relationshipName": "listeningExercise",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "speakingExercise",
+      "relationshipName": "speakingExercise",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "readingExercise",
+      "relationshipName": "readingExercise",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "writingExercise",
+      "relationshipName": "writingExercise",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

@@ -1,0 +1,26 @@
+{
+  "health": {
+    "title": "Kiểm tra sức khỏe",
+    "indicator": {
+      "diskSpace": "Dung lượng đĩa",
+      "mail": "Email",
+      "livenessState": "Trạng thái hoạt động",
+      "readinessState": "Trạng thái sẵn sàng",
+      "ping": "Ping"
+    },
+    "details": {
+      "properties": "Thuộc tính",
+      "name": "Tên",
+      "value": "Giá trị",
+      "error": "Lỗi"
+    },
+    "table": {
+      "service": "Tên dịch vụ",
+      "status": "Trạng thái"
+    },
+    "status": {
+      "UP": "HOẠT ĐỘNG",
+      "DOWN": "KHÔNG HOẠT ĐỘNG"
+    }
+  }
+}

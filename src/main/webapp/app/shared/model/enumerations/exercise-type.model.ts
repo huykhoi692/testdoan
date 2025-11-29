@@ -1,0 +1,6 @@
+export enum ExerciseType {
+  LISTENING = 'LISTENING',
+  SPEAKING = 'SPEAKING',
+  READING = 'READING',
+  WRITING = 'WRITING',
+}

@@ -1,0 +1,24 @@
+{
+  "register": {
+    "title": "Đăng ký",
+    "form": {
+      "button": "Đăng ký"
+    },
+    "messages": {
+      "validate": {
+        "login": {
+          "required": "Tên đăng nhập của bạn là bắt buộc.",
+          "minlength": "Tên đăng nhập của bạn phải có ít nhất 1 ký tự.",
+          "maxlength": "Tên đăng nhập của bạn không được quá 50 ký tự.",
+          "pattern": "Tên đăng nhập của bạn chỉ có thể chứa các chữ cái và số."
+        }
+      },
+      "success": "Đăng ký thành công! Vui lòng kiểm tra email của bạn để kích hoạt tài khoản.",
+      "error": {
+        "fail": "Đăng ký không thành công. Vui lòng thử lại sau.",
+        "userexists": "Tên đăng nhập đã được sử dụng!",
+        "emailexists": "Email đã được sử dụng!"
+      }
+    }
+  }
+}

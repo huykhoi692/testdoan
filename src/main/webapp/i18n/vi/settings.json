@@ -1,0 +1,21 @@
+{
+  "settings": {
+    "title": "Cài đặt người dùng cho [<b>{{username}}</b>]",
+    "form": {
+      "firstname": "Tên",
+      "firstname.placeholder": "Tên của bạn",
+      "lastname": "Họ",
+      "lastname.placeholder": "Họ của bạn",
+      "email": "Email",
+      "email.placeholder": "Email của bạn",
+      "button": "Lưu"
+    },
+    "messages": {
+      "error": {
+        "fail": "Đã xảy ra lỗi khi lưu cài đặt. Vui lòng thử lại.",
+        "emailexists": "Email đã được sử dụng!"
+      },
+      "success": "Cài đặt đã được lưu!"
+    }
+  }
+}

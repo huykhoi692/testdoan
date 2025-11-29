@@ -1,0 +1,95 @@
+@import 'app/shared/theme/variables.scss';
+
+.hero-section {
+  background: linear-gradient(135deg, $primary 0%, darken($primary, 10%) 100%);
+  color: $white;
+  padding: 6rem 2rem;
+  position: relative;
+  overflow: hidden;
+
+  @media (max-width: 768px) {
+    padding: 4rem 1rem;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .hero-title {
+    color: $white;
+    font-size: 3.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+
+    .highlight {
+      background: linear-gradient(90deg, $white 0%, $gray-200 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    @media (max-width: 768px) {
+      font-size: 2.5rem;
+    }
+  }
+
+  .hero-subtitle {
+    color: rgba($white, 0.9);
+    font-size: 1.125rem;
+    max-width: 550px;
+  }
+
+  .hero-buttons {
+    flex-wrap: wrap;
+
+    .ant-btn-primary {
+      background: $white;
+      color: $primary;
+      height: 56px;
+      padding: 0 40px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 12px;
+    }
+
+    .ant-btn-ghost {
+      height: 56px;
+      padding: 0 40px;
+      font-size: 1rem;
+      font-weight: 600;
+      border: 2px solid $white;
+      border-radius: 12px;
+      color: $white;
+
+      &:hover {
+        background: $white;
+        color: $primary;
+      }
+    }
+  }
+
+  .hero-stats {
+    margin-top: 1.5rem;
+
+    .ant-statistic-title {
+      color: rgba($white, 0.8);
+    }
+
+    .ant-statistic-content {
+      color: $white;
+      font-size: 2rem;
+      font-weight: 700;
+    }
+  }
+
+  .hero-image-wrapper {
+    position: relative;
+
+    .hero-image {
+      width: 100%;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+  }
+}

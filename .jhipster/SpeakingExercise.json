@@ -1,0 +1,36 @@
+{
+  "annotations": {
+    "changelogDate": "20251021152352"
+  },
+  "applications": ["Langleague"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "prompt",
+      "fieldType": "TextBlob"
+    },
+    {
+      "fieldName": "sampleAudio",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "512"
+    },
+    {
+      "fieldName": "targetPhrase",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "255"
+    },
+    {
+      "fieldName": "evaluationMethod",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "255"
+    }
+  ],
+  "name": "SpeakingExercise",
+  "pagination": "pagination",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

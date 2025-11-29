@@ -1,0 +1,227 @@
+application {
+  config {
+    baseName Langleague
+    applicationType monolith
+    authenticationType jwt
+    packageName com.langleague
+    buildTool maven
+    prodDatabaseType mysql
+    devDatabaseType mysql
+    serverPort 8080
+    cacheProvider ehcache
+    enableHibernateCache true
+    languages [en, vi]
+  }
+  entities *
+}
+
+enum RelationType {
+  SYNONYM,
+  ANTONYM,
+  RELATED
+}
+
+/* -------------------------
+   Entities
+   ------------------------- */
+
+entity AppUser {
+  displayName String maxlength(255)
+  avatarUrl String maxlength(512)
+  bio TextBlob
+}
+
+entity Book {
+  title String required maxlength(255)
+  level String maxlength(50)
+  description TextBlob
+  thumbnail String maxlength(255)
+}
+
+entity Chapter {
+  title String required maxlength(255)
+  orderIndex Integer required
+}
+
+entity Lesson {
+  title String required maxlength(255)
+  description TextBlob
+  level String maxlength(50)
+  estimatedMinutes Integer
+  thumbnail String maxlength(255)
+}
+
+entity Word {
+  text String required maxlength(255)
+  meaning TextBlob
+  pronunciation String maxlength(255)
+  partOfSpeech String maxlength(50)
+  imageUrl String maxlength(512)
+}
+
+entity WordExample {
+  exampleText TextBlob
+  translation TextBlob
+}
+
+entity WordRelation {
+  relationType RelationType
+  description String maxlength(500)
+}
+
+entity LessonWord {
+}
+
+entity Skill {
+  name String required maxlength(255)
+  description TextBlob
+}
+
+entity LessonSkill {
+  exerciseType String maxlength(50)
+  has TextBlob
+}
+
+entity ListeningExercise {
+  audioPath String maxlength(512)
+  transcript TextBlob
+  question TextBlob
+  optionA String maxlength(255)
+  optionB String maxlength(255)
+  optionC String maxlength(255)
+  correctOption String maxlength(255)
+  chart Integer
+}
+
+entity SpeakingExercise {
+  prompt TextBlob
+  sampleAudio String maxlength(512)
+  targetPhrase String maxlength(255)
+  evaluationMethod String maxlength(255)
+}
+
+entity ReadingExercise {
+  passage TextBlob
+  question TextBlob
+  options TextBlob
+  correctAnswer String maxlength(255)
+}
+
+entity WritingExercise {
+  prompt TextBlob
+  wordLimit String maxlength(255)
+  maxLength Integer
+  sampleAnswer TextBlob
+}
+
+entity MediaFile {
+  fileName String maxlength(255)
+  fileType String maxlength(50)
+  url String maxlength(512)
+}
+
+entity Comment {
+  content TextBlob
+  createdAt Instant
+}
+
+entity ExerciseResult {
+  exerciseType String maxlength(50)
+  score Integer
+  answer TextBlob
+  audioPath String maxlength(512)
+  submittedAt Instant
+}
+
+entity UserProgress {
+  percent Integer
+  lastAccessed Instant
+}
+
+entity UserVocabulary {
+  remembered Boolean
+  isMemorized Boolean
+  lastReviewed Instant
+}
+
+entity Achievement {
+  title String required maxlength(255)
+  description TextBlob
+}
+
+entity UserAchievement {
+  awardedTo Instant
+}
+
+entity LearningStreak {
+  currentStreak Integer
+  longestStreak Integer
+  lastStudyDate Instant
+  iconUrl String maxlength(256)
+}
+
+entity StudySession {
+  startAt Instant
+  endAt Instant
+  durationMinutes Integer
+}
+
+entity StreakIcon {
+  level String maxlength(50)
+  minDays Integer
+  iconPath String maxlength(256)
+  description String maxlength(255)
+}
+
+entity StreakMilestone {
+  milestoneDays Integer
+  rewardName String maxlength(255)
+}
+
+/* -------------------------
+   Relationships
+   ------------------------- */
+
+// Thay thế cả hai relationship sections bằng cái này:
+relationship OneToMany {
+  Book{chapter} to Chapter
+  Chapter{lesson} to Lesson
+  Lesson{lessonWord} to LessonWord
+  Lesson{lessonSkill} to LessonSkill
+  Lesson{mediaFile} to MediaFile
+  Lesson{comment} to Comment
+  Lesson{userProgress} to UserProgress
+  Lesson{userVocabulary} to UserVocabulary
+  
+  AppUser{comment} to Comment
+  AppUser{exerciseResult} to ExerciseResult
+  AppUser{userProgress} to UserProgress
+  AppUser{userVocabulary} to UserVocabulary
+  AppUser{userAchievement} to UserAchievement
+  AppUser{learningStreak} to LearningStreak
+  AppUser{studySession} to StudySession
+  
+  Word{wordExample} to WordExample
+  Word{userVocabulary} to UserVocabulary
+  Word{lessonWord} to LessonWord
+  
+  Skill{lessonSkill} to LessonSkill
+  Skill{exerciseResult} to ExerciseResult
+  
+  LessonSkill{listeningExercise} to ListeningExercise
+  LessonSkill{speakingExercise} to SpeakingExercise
+  LessonSkill{readingExercise} to ReadingExercise
+  LessonSkill{writingExercise} to WritingExercise
+  
+  Achievement{userAchievement} to UserAchievement
+  
+  StudySession{streakMilestone} to StreakMilestone
+}
+
+/* -------------------------
+   Options
+   ------------------------- */
+
+dto * with mapstruct
+service * with serviceClass
+paginate * with pagination

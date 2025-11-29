@@ -1,0 +1,26 @@
+{
+  "annotations": {
+    "changelogDate": "20251021152359"
+  },
+  "applications": ["Langleague"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "remembered",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "isMemorized",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "lastReviewed",
+      "fieldType": "Instant"
+    }
+  ],
+  "name": "UserVocabulary",
+  "pagination": "pagination",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

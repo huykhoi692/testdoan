@@ -1,0 +1,15 @@
+// SCSS Mixins for common patterns
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin transition($property: all, $duration: 0.3s, $ease: ease) {
+  transition: $property $duration $ease;
+}
+
+@mixin box-shadow($shadow...) {
+  box-shadow: $shadow;
+}

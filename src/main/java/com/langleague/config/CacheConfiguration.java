@@ -1,0 +1,131 @@
+package com.langleague.config;
+
+import java.time.Duration;
+import org.ehcache.config.builders.*;
+import org.ehcache.jsr107.Eh107Configuration;
+import org.hibernate.cache.jcache.ConfigSettings;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.cache.JCacheManagerCustomizer;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomizer;
+import org.springframework.boot.info.BuildProperties;
+import org.springframework.boot.info.GitProperties;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.interceptor.KeyGenerator;
+import org.springframework.context.annotation.*;
+import tech.jhipster.config.JHipsterProperties;
+import tech.jhipster.config.cache.PrefixedKeyGenerator;
+
+@Configuration
+@EnableCaching
+public class CacheConfiguration {
+
+    private GitProperties gitProperties;
+    private BuildProperties buildProperties;
+    private final javax.cache.configuration.Configuration<Object, Object> jcacheConfiguration;
+
+    public CacheConfiguration(JHipsterProperties jHipsterProperties) {
+        JHipsterProperties.Cache.Ehcache ehcache = jHipsterProperties.getCache().getEhcache();
+
+        jcacheConfiguration = Eh107Configuration.fromEhcacheCacheConfiguration(
+            CacheConfigurationBuilder.newCacheConfigurationBuilder(
+                Object.class,
+                Object.class,
+                ResourcePoolsBuilder.heap(ehcache.getMaxEntries())
+            )
+                .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofSeconds(ehcache.getTimeToLiveSeconds())))
+                .build()
+        );
+    }
+
+    @Bean
+    public HibernatePropertiesCustomizer hibernatePropertiesCustomizer(javax.cache.CacheManager cacheManager) {
+        return hibernateProperties -> hibernateProperties.put(ConfigSettings.CACHE_MANAGER, cacheManager);
+    }
+
+    @Bean
+    public JCacheManagerCustomizer cacheManagerCustomizer() {
+        return cm -> {
+            createCache(cm, com.langleague.repository.UserRepository.USERS_BY_LOGIN_CACHE);
+            createCache(cm, com.langleague.repository.UserRepository.USERS_BY_EMAIL_CACHE);
+            createCache(cm, com.langleague.domain.User.class.getName());
+            createCache(cm, com.langleague.domain.Authority.class.getName());
+            createCache(cm, com.langleague.domain.User.class.getName() + ".authorities");
+            createCache(cm, com.langleague.domain.AppUser.class.getName());
+            createCache(cm, com.langleague.domain.AppUser.class.getName() + ".comments");
+            createCache(cm, com.langleague.domain.AppUser.class.getName() + ".exerciseResults");
+            createCache(cm, com.langleague.domain.AppUser.class.getName() + ".userProgresses");
+            createCache(cm, com.langleague.domain.AppUser.class.getName() + ".userVocabularies");
+            createCache(cm, com.langleague.domain.AppUser.class.getName() + ".userAchievements");
+            createCache(cm, com.langleague.domain.AppUser.class.getName() + ".learningStreaks");
+            createCache(cm, com.langleague.domain.AppUser.class.getName() + ".studySessions");
+            createCache(cm, com.langleague.domain.Book.class.getName());
+            createCache(cm, com.langleague.domain.Book.class.getName() + ".chapters");
+            createCache(cm, com.langleague.domain.Chapter.class.getName());
+            createCache(cm, com.langleague.domain.Chapter.class.getName() + ".lessons");
+            createCache(cm, com.langleague.domain.Lesson.class.getName());
+            createCache(cm, com.langleague.domain.Lesson.class.getName() + ".lessonWords");
+            createCache(cm, com.langleague.domain.Lesson.class.getName() + ".lessonSkills");
+            createCache(cm, com.langleague.domain.Lesson.class.getName() + ".mediaFiles");
+            createCache(cm, com.langleague.domain.Lesson.class.getName() + ".comments");
+            createCache(cm, com.langleague.domain.Lesson.class.getName() + ".userProgresses");
+            createCache(cm, com.langleague.domain.Lesson.class.getName() + ".userVocabularies");
+            createCache(cm, com.langleague.domain.Word.class.getName());
+            createCache(cm, com.langleague.domain.Word.class.getName() + ".wordExamples");
+            createCache(cm, com.langleague.domain.Word.class.getName() + ".userVocabularies");
+            createCache(cm, com.langleague.domain.Word.class.getName() + ".lessonWords");
+            createCache(cm, com.langleague.domain.WordExample.class.getName());
+            createCache(cm, com.langleague.domain.WordRelation.class.getName());
+            createCache(cm, com.langleague.domain.LessonWord.class.getName());
+            createCache(cm, com.langleague.domain.Skill.class.getName());
+            createCache(cm, com.langleague.domain.Skill.class.getName() + ".lessonSkills");
+            createCache(cm, com.langleague.domain.Skill.class.getName() + ".exerciseResults");
+            createCache(cm, com.langleague.domain.LessonSkill.class.getName());
+            createCache(cm, com.langleague.domain.LessonSkill.class.getName() + ".listeningExercises");
+            createCache(cm, com.langleague.domain.LessonSkill.class.getName() + ".speakingExercises");
+            createCache(cm, com.langleague.domain.LessonSkill.class.getName() + ".readingExercises");
+            createCache(cm, com.langleague.domain.LessonSkill.class.getName() + ".writingExercises");
+            createCache(cm, com.langleague.domain.ListeningExercise.class.getName());
+            createCache(cm, com.langleague.domain.SpeakingExercise.class.getName());
+            createCache(cm, com.langleague.domain.ReadingExercise.class.getName());
+            createCache(cm, com.langleague.domain.WritingExercise.class.getName());
+            createCache(cm, com.langleague.domain.MediaFile.class.getName());
+            createCache(cm, com.langleague.domain.Comment.class.getName());
+            createCache(cm, com.langleague.domain.ExerciseResult.class.getName());
+            createCache(cm, com.langleague.domain.UserProgress.class.getName());
+            createCache(cm, com.langleague.domain.UserVocabulary.class.getName());
+            createCache(cm, com.langleague.domain.Achievement.class.getName());
+            createCache(cm, com.langleague.domain.Achievement.class.getName() + ".userAchievements");
+            createCache(cm, com.langleague.domain.UserAchievement.class.getName());
+            createCache(cm, com.langleague.domain.LearningStreak.class.getName());
+            createCache(cm, com.langleague.domain.StudySession.class.getName());
+            createCache(cm, com.langleague.domain.StudySession.class.getName() + ".streakMilestones");
+            createCache(cm, com.langleague.domain.StreakIcon.class.getName());
+            createCache(cm, com.langleague.domain.StreakMilestone.class.getName());
+            // jhipster-needle-ehcache-add-entry
+        };
+    }
+
+    private void createCache(javax.cache.CacheManager cm, String cacheName) {
+        javax.cache.Cache<Object, Object> cache = cm.getCache(cacheName);
+        if (cache != null) {
+            cache.clear();
+        } else {
+            cm.createCache(cacheName, jcacheConfiguration);
+        }
+    }
+
+    @Autowired(required = false)
+    public void setGitProperties(GitProperties gitProperties) {
+        this.gitProperties = gitProperties;
+    }
+
+    @Autowired(required = false)
+    public void setBuildProperties(BuildProperties buildProperties) {
+        this.buildProperties = buildProperties;
+    }
+
+    @Bean
+    public KeyGenerator keyGenerator() {
+        return new PrefixedKeyGenerator(this.gitProperties, this.buildProperties);
+    }
+}

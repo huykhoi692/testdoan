@@ -1,0 +1,38 @@
+@import 'app/shared/theme/variables.scss';
+
+.cta-section {
+  background: linear-gradient(135deg, $primary 0%, darken($primary, 10%) 100%);
+  color: $white;
+  padding: 5rem 2rem;
+  text-align: center;
+
+  @media (max-width: 768px) {
+    padding: 4rem 1rem;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  h2 {
+    color: $white;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: rgba($white, 0.9);
+    font-size: 1.125rem;
+  }
+
+  .ant-btn-primary {
+    background: $white;
+    color: $primary;
+    height: 56px;
+    padding: 0 48px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 12px;
+  }
+}

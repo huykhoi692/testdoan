@@ -1,0 +1,64 @@
+{
+  "dashboard": {
+    "title": "Bảng điều khiển",
+    "greeting": {
+      "morning": "Chào buổi sáng",
+      "afternoon": "Chào buổi chiều",
+      "evening": "Chào buổi tối"
+    },
+    "welcome": "Xin chào {{name}}, {{greeting}}!",
+    "subtitle": "Sẵn sàng bắt đầu học hôm nay?",
+    "newLessons": "Bạn có <b>{{count}}</b> bài học mới chờ bạn",
+    "stats": {
+      "wordLearned": "Từ đã học",
+      "quiz": "Bài kiểm tra",
+      "courseProgress": "Tiến độ khóa học",
+      "language": "Ngôn ngữ"
+    },
+    "sections": {
+      "courseOfProgress": "Tiến độ khóa học",
+      "dailyHours": "Giờ học hàng ngày",
+      "myProgress": "Tiến độ của tôi",
+      "languageProgress": "Tiến độ ngôn ngữ"
+    }
+  },
+  "menu": {
+    "dashboard": "Bảng điều khiển",
+    "bookLibrary": "Thư viện sách",
+    "myProfile": "Hồ sơ của tôi",
+    "settings": "Cài đặt"
+  },
+  "profile": {
+    "title": "Thông tin tài khoản",
+    "fullName": "Họ và tên",
+    "email": "Email",
+    "gender": "Giới tính",
+    "birthDate": "Ngày sinh",
+    "save": "Lưu",
+    "male": "Nam",
+    "female": "Nữ",
+    "other": "Khác"
+  },
+  "settings": {
+    "title": "Thông tin tài khoản",
+    "username": "Tên người dùng",
+    "email": "Email",
+    "changePassword": "Đổi mật khẩu",
+    "currentPassword": "Mật khẩu hiện tại",
+    "newPassword": "Mật khẩu mới",
+    "confirmPassword": "Nhập lại mật khẩu mới",
+    "interfaceLanguage": "Ngôn ngữ giao diện",
+    "theme": "Giao diện",
+    "themeLight": "Sáng",
+    "themeDark": "Tối",
+    "themeAuto": "Tự động (Theo thiết bị)",
+    "notifications": "Thông báo",
+    "enableNotifications": "Bật thông báo",
+    "dailyNotifications": "Thông báo hàng ngày",
+    "save": "Lưu"
+  },
+  "common": {
+    "search": "Tìm kiếm...",
+    "logout": "Đăng xuất"
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "annotations": {
+    "changelogDate": "20251021152341"
+  },
+  "applications": ["Langleague"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "displayName",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "255"
+    },
+    {
+      "fieldName": "avatarUrl",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "512"
+    },
+    {
+      "fieldName": "bio",
+      "fieldType": "TextBlob"
+    }
+  ],
+  "name": "AppUser",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "comment",
+      "relationshipName": "comment",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "exerciseResult",
+      "relationshipName": "exerciseResult",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "userProgress",
+      "relationshipName": "userProgress",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "userVocabulary",
+      "relationshipName": "userVocabulary",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "userAchievement",
+      "relationshipName": "userAchievement",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "learningStreak",
+      "relationshipName": "learningStreak",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "studySession",
+      "relationshipName": "studySession",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

@@ -1,0 +1,164 @@
+.chapter-detail {
+  padding: 24px;
+  background: #f5f7fa;
+  min-height: calc(100vh - 120px);
+
+  .chapter-header {
+    margin-bottom: 24px;
+
+    .chapter-info {
+      margin-top: 16px;
+
+      h2 {
+        margin-top: 4px !important;
+        margin-bottom: 8px !important;
+      }
+    }
+  }
+
+  .chapter-content {
+    border-radius: 12px;
+
+    .section-progress {
+      margin-bottom: 24px;
+      padding: 16px;
+      background: #f9fafb;
+      border-radius: 8px;
+
+      .ant-progress {
+        margin-top: 8px;
+      }
+    }
+
+    // Vocabulary styles
+    .vocabulary-section {
+      .vocabulary-card {
+        height: 100%;
+        border-radius: 8px;
+
+        .word-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          margin-bottom: 8px;
+
+          .word-text {
+            font-size: 24px;
+            margin-bottom: 0 !important;
+            color: #6366f1;
+          }
+        }
+
+        .word-pronunciation {
+          font-size: 14px;
+          color: #6b7280;
+          margin-bottom: 8px;
+        }
+
+        .word-meaning {
+          font-size: 15px;
+          color: #1f2937;
+          font-weight: 500;
+          margin-bottom: 12px;
+        }
+
+        .word-examples {
+          margin-top: 12px;
+          padding-top: 12px;
+          border-top: 1px solid #f0f0f0;
+
+          .example-text {
+            font-size: 13px;
+            color: #4b5563;
+            margin-top: 4px;
+            line-height: 1.6;
+          }
+        }
+      }
+    }
+
+    // Grammar styles
+    .grammar-section {
+      .grammar-card {
+        margin-bottom: 16px;
+        border-radius: 8px;
+
+        h4 {
+          color: #10b981;
+          margin-bottom: 16px !important;
+        }
+
+        .grammar-formula {
+          margin-bottom: 12px;
+
+          .formula-tag {
+            margin-left: 8px;
+            font-size: 13px;
+            padding: 4px 12px;
+          }
+        }
+
+        .ant-typography {
+          margin-bottom: 12px;
+        }
+
+        .grammar-examples {
+          margin-top: 12px;
+
+          .example-text {
+            font-size: 14px;
+            color: #4b5563;
+            margin-top: 6px;
+            line-height: 1.8;
+          }
+        }
+      }
+    }
+
+    // Exercise styles
+    .exercise-section {
+      .exercise-card {
+        margin-bottom: 16px;
+        border-radius: 8px;
+
+        &:hover {
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .ant-card-meta-title {
+          font-size: 15px;
+          color: #1f2937;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .chapter-detail {
+    padding: 16px;
+
+    .chapter-content {
+      .ant-tabs-nav {
+        .ant-tabs-tab {
+          font-size: 12px;
+          padding: 8px 12px;
+
+          .anticon {
+            font-size: 14px;
+          }
+        }
+      }
+
+      .vocabulary-section {
+        .vocabulary-card {
+          .word-header {
+            .word-text {
+              font-size: 20px;
+            }
+          }
+        }
+      }
+    }
+  }
+}

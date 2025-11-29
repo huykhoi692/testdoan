@@ -1,0 +1,17 @@
+{
+  "vocabularyList": {
+    "vocabularyListTitle": "Danh sách Từ vựng",
+    "vocabularyListSubtitle": "Khám phá và học từ mới",
+    "totalWords": "Tổng số từ",
+    "favorites": "Yêu thích",
+    "searchPlaceholder": "Tìm kiếm theo tiếng Hàn, Latinh, hoặc tiếng Anh...",
+    "allCategories": "Tất cả danh mục",
+    "allWords": "Tất cả từ",
+    "noAudioAvailable": "Không có âm thanh cho từ này.",
+    "defaultCategory": "Chung",
+    "error": {
+      "chapterIdMissing": "Thiếu ID Chương trên URL.",
+      "loadFailed": "Không thể tải từ vựng. Vui lòng thử lại sau."
+    }
+  }
+}

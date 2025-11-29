@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20251125000080-1" author="system">
+        <comment>Add performance indexes for frequently queried columns</comment>
+        
+        <!-- Book indexes -->
+        <createIndex indexName="idx_book_level" tableName="book">
+            <column name="level"/>
+        </createIndex>
+        
+        <!-- Chapter indexes -->
+        <createIndex indexName="idx_chapter_book_id" tableName="chapter">
+            <column name="book_id"/>
+        </createIndex>
+        <createIndex indexName="idx_chapter_order_index" tableName="chapter">
+            <column name="order_index"/>
+        </createIndex>
+        
+        <!-- Word indexes -->
+        <createIndex indexName="idx_word_chapter_id" tableName="word">
+            <column name="chapter_id"/>
+        </createIndex>
+        <createIndex indexName="idx_word_text" tableName="word">
+            <column name="text"/>
+        </createIndex>
+        
+        <!-- Grammar indexes -->
+        <createIndex indexName="idx_grammar_chapter_id" tableName="grammar">
+            <column name="chapter_id"/>
+        </createIndex>
+        
+        <!-- Exercise indexes -->
+        <createIndex indexName="idx_listening_exercise_chapter_id" tableName="listening_exercise">
+            <column name="chapter_id"/>
+        </createIndex>
+        <createIndex indexName="idx_reading_exercise_chapter_id" tableName="reading_exercise">
+            <column name="chapter_id"/>
+        </createIndex>
+        <createIndex indexName="idx_speaking_exercise_chapter_id" tableName="speaking_exercise">
+            <column name="chapter_id"/>
+        </createIndex>
+        <createIndex indexName="idx_writing_exercise_chapter_id" tableName="writing_exercise">
+            <column name="chapter_id"/>
+        </createIndex>
+        
+        <!-- Exercise Result indexes -->
+        <createIndex indexName="idx_exercise_result_app_user_id" tableName="exercise_result">
+            <column name="app_user_id"/>
+        </createIndex>
+        <createIndex indexName="idx_exercise_result_type" tableName="exercise_result">
+            <column name="exercise_type"/>
+        </createIndex>
+        <createIndex indexName="idx_exercise_result_submitted_at" tableName="exercise_result">
+            <column name="submitted_at"/>
+        </createIndex>
+        
+        <!-- User Progress indexes -->
+        <createIndex indexName="idx_user_vocabulary_app_user_id" tableName="user_vocabulary">
+            <column name="app_user_id"/>
+        </createIndex>
+        <createIndex indexName="idx_user_vocabulary_next_review" tableName="user_vocabulary">
+            <column name="next_review_date"/>
+        </createIndex>
+        <createIndex indexName="idx_user_grammar_app_user_id" tableName="user_grammar">
+            <column name="app_user_id"/>
+        </createIndex>
+        
+        <!-- Book/Chapter Progress indexes -->
+        <createIndex indexName="idx_book_progress_user_book" tableName="book_progress">
+            <column name="app_user_id"/>
+            <column name="book_id"/>
+        </createIndex>
+        <createIndex indexName="idx_chapter_progress_user_chapter" tableName="chapter_progress">
+            <column name="app_user_id"/>
+            <column name="chapter_id"/>
+        </createIndex>
+        
+        <!-- Social indexes -->
+        <createIndex indexName="idx_book_review_book_id" tableName="book_review">
+            <column name="book_id"/>
+        </createIndex>
+        <createIndex indexName="idx_comment_chapter_id" tableName="comment">
+            <column name="chapter_id"/>
+        </createIndex>
+        
+        <!-- Gamification indexes -->
+        <createIndex indexName="idx_user_achievement_app_user_id" tableName="user_achievement">
+            <column name="app_user_id"/>
+        </createIndex>
+        <createIndex indexName="idx_learning_streak_app_user_id" tableName="learning_streak">
+            <column name="app_user_id"/>
+        </createIndex>
+        <createIndex indexName="idx_study_session_app_user_id" tableName="study_session">
+            <column name="app_user_id"/>
+        </createIndex>
+        <createIndex indexName="idx_study_session_started_at" tableName="study_session">
+            <column name="started_at"/>
+        </createIndex>
+        
+        <!-- Notification indexes -->
+        <createIndex indexName="idx_notification_app_user_id" tableName="notification">
+            <column name="app_user_id"/>
+        </createIndex>
+        <createIndex indexName="idx_notification_is_read" tableName="notification">
+            <column name="is_read"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
+

@@ -1,0 +1,22 @@
+{
+  "annotations": {
+    "changelogDate": "20251021152358"
+  },
+  "applications": ["Langleague"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "percent",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "lastAccessed",
+      "fieldType": "Instant"
+    }
+  ],
+  "name": "UserProgress",
+  "pagination": "pagination",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

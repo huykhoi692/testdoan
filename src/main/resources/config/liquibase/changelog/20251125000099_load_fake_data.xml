@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Load comprehensive fake data for development and testing
+        This includes realistic Korean language learning content
+    -->
+
+    <changeSet id="20251125000099-1" author="system" context="dev">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM jhi_user WHERE id IN (1, 2, 3)</sqlCheck>
+        </preConditions>
+        <comment>Load fake users (admin, user, tuanmac)</comment>
+        <loadData
+            file="config/liquibase/fake-data/jhi_user.csv"
+            separator=";"
+            tableName="jhi_user"
+            usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="activated" type="boolean"/>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_date" type="timestamp"/>
+            <column name="account_locked" type="boolean"/>
+        </loadData>
+    </changeSet>
+
+    <changeSet id="20251125000099-2" author="system" context="dev">
+        <comment>Load fake app_user profiles</comment>
+        <loadData
+            file="config/liquibase/fake-data/app_user.csv"
+            separator=";"
+            tableName="app_user"
+            usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="internal_user_id" type="numeric"/>
+        </loadData>
+    </changeSet>
+
+    <changeSet id="20251125000099-3" author="system" context="dev">
+        <comment>Load fake books (5 Korean courses)</comment>
+        <loadData
+            file="config/liquibase/fake-data/book.csv"
+            separator=";"
+            tableName="book"
+            usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+        </loadData>
+    </changeSet>
+
+    <changeSet id="20251125000099-4" author="system" context="dev">
+        <comment>Load fake chapters (10 chapters)</comment>
+        <loadData
+            file="config/liquibase/fake-data/chapter.csv"
+            separator=";"
+            tableName="chapter"
+            usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="order_index" type="numeric"/>
+            <column name="book_id" type="numeric"/>
+        </loadData>
+    </changeSet>
+
+    <changeSet id="20251125000099-5" author="system" context="dev">
+        <comment>Load fake words (20 Korean vocabulary words)</comment>
+        <loadData
+            file="config/liquibase/fake-data/word.csv"
+            separator=";"
+            tableName="word"
+            usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="chapter_id" type="numeric"/>
+        </loadData>
+    </changeSet>
+
+    <changeSet id="20251125000099-6" author="system" context="dev">
+        <comment>Load fake word examples (10 examples)</comment>
+        <loadData
+            file="config/liquibase/fake-data/word_example.csv"
+            separator=";"
+            tableName="word_example"
+            usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="word_id" type="numeric"/>
+        </loadData>
+    </changeSet>
+
+    <changeSet id="20251125000099-7" author="system" context="dev">
+        <comment>Load fake grammar rules (10 rules)</comment>
+        <loadData
+            file="config/liquibase/fake-data/grammar.csv"
+            separator=";"
+            tableName="grammar"
+            usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="chapter_id" type="numeric"/>
+        </loadData>
+    </changeSet>
+
+    <changeSet id="20251125000099-8" author="system" context="dev">
+        <comment>Load fake grammar examples (10 examples)</comment>
+        <loadData
+            file="config/liquibase/fake-data/grammar_example.csv"
+            separator=";"
+            tableName="grammar_example"
+            usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="grammar_id" type="numeric"/>
+        </loadData>
+    </changeSet>
+
+    <changeSet id="20251125000099-9" author="system" context="dev">
+        <comment>Load fake listening exercises (5 exercises)</comment>
+        <loadData
+            file="config/liquibase/fake-data/listening_exercise.csv"
+            separator=";"
+            tableName="listening_exercise"
+            usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="max_score" type="numeric"/>
+            <column name="chapter_id" type="numeric"/>
+        </loadData>
+    </changeSet>
+
+    <changeSet id="20251125000099-10" author="system" context="dev">
+        <comment>Load fake listening options (12 options)</comment>
+        <loadData
+            file="config/liquibase/fake-data/listening_option.csv"
+            separator=";"
+            tableName="listening_option"
+            usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="is_correct" type="boolean"/>
+            <column name="listening_exercise_id" type="numeric"/>
+        </loadData>
+    </changeSet>
+
+    <changeSet id="20251125000099-11" author="system" context="dev">
+        <comment>Load fake reading exercises (3 exercises)</comment>
+        <loadData
+            file="config/liquibase/fake-data/reading_exercise.csv"
+            separator=";"
+            tableName="reading_exercise"
+            usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="max_score" type="numeric"/>
+            <column name="chapter_id" type="numeric"/>
+        </loadData>
+    </changeSet>
+
+    <changeSet id="20251125000099-12" author="system" context="dev">
+        <comment>Load fake reading options (8 options)</comment>
+        <loadData
+            file="config/liquibase/fake-data/reading_option.csv"
+            separator=";"
+            tableName="reading_option"
+            usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="is_correct" type="boolean"/>
+            <column name="reading_exercise_id" type="numeric"/>
+        </loadData>
+    </changeSet>
+
+    <changeSet id="20251125000099-13" author="system" context="dev">
+        <comment>Load fake speaking exercises (3 exercises)</comment>
+        <loadData
+            file="config/liquibase/fake-data/speaking_exercise.csv"
+            separator=";"
+            tableName="speaking_exercise"
+            usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="max_score" type="numeric"/>
+            <column name="chapter_id" type="numeric"/>
+        </loadData>
+    </changeSet>
+
+    <changeSet id="20251125000099-14" author="system" context="dev">
+        <comment>Load fake writing exercises (3 exercises)</comment>
+        <loadData
+            file="config/liquibase/fake-data/writing_exercise.csv"
+            separator=";"
+            tableName="writing_exercise"
+            usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="max_score" type="numeric"/>
+            <column name="chapter_id" type="numeric"/>
+        </loadData>
+    </changeSet>
+
+    <changeSet id="20251125000099-15" author="system" context="dev">
+        <comment>Load fake book progress (4 records)</comment>
+        <loadData
+            file="config/liquibase/fake-data/book_progress.csv"
+            separator=";"
+            tableName="book_progress"
+            usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="percent" type="numeric"/>
+            <column name="last_accessed" type="timestamp"/>
+            <column name="completed" type="boolean"/>
+            <column name="app_user_id" type="numeric"/>
+            <column name="book_id" type="numeric"/>
+        </loadData>
+    </changeSet>
+
+    <changeSet id="20251125000099-16" author="system" context="dev">
+        <comment>Load fake chapter progress (6 records)</comment>
+        <loadData
+            file="config/liquibase/fake-data/chapter_progress.csv"
+            separator=";"
+            tableName="chapter_progress"
+            usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="percent" type="numeric"/>
+            <column name="last_accessed" type="timestamp"/>
+            <column name="completed" type="boolean"/>
+            <column name="app_user_id" type="numeric"/>
+            <column name="chapter_id" type="numeric"/>
+        </loadData>
+    </changeSet>
+
+    <changeSet id="20251125000099-17" author="system" context="dev">
+        <comment>Load fake achievements (5 achievements)</comment>
+        <loadData
+            file="config/liquibase/fake-data/achievement.csv"
+            separator=";"
+            tableName="achievement"
+            usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="points" type="numeric"/>
+        </loadData>
+    </changeSet>
+
+    <changeSet id="20251125000099-18" author="system" context="dev">
+        <comment>Load fake user achievements (4 unlocked achievements)</comment>
+        <loadData
+            file="config/liquibase/fake-data/user_achievement.csv"
+            separator=";"
+            tableName="user_achievement"
+            usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="unlocked_at" type="timestamp"/>
+            <column name="app_user_id" type="numeric"/>
+            <column name="achievement_id" type="numeric"/>
+        </loadData>
+    </changeSet>
+
+</databaseChangeLog>
+

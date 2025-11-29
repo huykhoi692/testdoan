@@ -1,0 +1,63 @@
+{
+  "metrics": {
+    "title": "Số liệu ứng dụng",
+    "jvm": {
+      "title": "Số liệu JVM",
+      "memory": {
+        "title": "Bộ nhớ",
+        "total": "Tổng bộ nhớ",
+        "heap": "Heap",
+        "nonheap": "Non-Heap",
+        "unit": "MB",
+        "pools": "Pools"
+      },
+      "threads": {
+        "title": "Luồng",
+        "all": "Tất cả",
+        "runnable": "Có thể chạy",
+        "timedwaiting": "Chờ có thời gian",
+        "waiting": "Đang chờ",
+        "blocked": "Bị chặn",
+        "daemon": "Daemon"
+      }
+    },
+    "http": {
+      "title": "Yêu cầu HTTP (s)",
+      "code": "Mã",
+      "count": "Số lượng",
+      "mean": "Trung bình",
+      "max": "Tối đa"
+    },
+    "cache": {
+      "title": "Số liệu Cache",
+      "hit": "Lượt truy cập Cache",
+      "miss": "Lượt bỏ lỡ Cache",
+      "eviction": "Lượt xóa Cache"
+    },
+    "datasource": {
+      "title": "Số liệu DataSource",
+      "usage": "Sử dụng",
+      "count": "Số lượng",
+      "active": "Hoạt động",
+      "min": "Tối thiểu",
+      "max": "Tối đa",
+      "idle": "Không hoạt động",
+      "pending": "Đang chờ",
+      "acquire": "Thời gian lấy",
+      "create": "Thời gian tạo"
+    },
+    "garbagecollector": {
+      "title": "Bộ thu gom rác",
+      "collections": "Bộ sưu tập",
+      "time": "Thời gian",
+      "display": {
+        "ms": "ms"
+      }
+    },
+    "details": {
+      "properties": "Thuộc tính",
+      "name": "Tên",
+      "value": "Giá trị"
+    }
+  }
+}

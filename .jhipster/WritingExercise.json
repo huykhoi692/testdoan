@@ -1,0 +1,32 @@
+{
+  "annotations": {
+    "changelogDate": "20251021152354"
+  },
+  "applications": ["Langleague"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "prompt",
+      "fieldType": "TextBlob"
+    },
+    {
+      "fieldName": "wordLimit",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "255"
+    },
+    {
+      "fieldName": "maxLength",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "sampleAnswer",
+      "fieldType": "TextBlob"
+    }
+  ],
+  "name": "WritingExercise",
+  "pagination": "pagination",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

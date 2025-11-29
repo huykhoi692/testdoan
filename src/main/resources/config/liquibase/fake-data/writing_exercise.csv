@@ -1,0 +1,11 @@
+id;prompt;word_limit;max_length;sample_answer
+1;../fake-data/blob/hipster.txt;tinderbox hungry uh-huh;29640;../fake-data/blob/hipster.txt
+2;../fake-data/blob/hipster.txt;mid monstrous schnitzel;6494;../fake-data/blob/hipster.txt
+3;../fake-data/blob/hipster.txt;ah;27356;../fake-data/blob/hipster.txt
+4;../fake-data/blob/hipster.txt;mmm finally who;28908;../fake-data/blob/hipster.txt
+5;../fake-data/blob/hipster.txt;partial whoever;2121;../fake-data/blob/hipster.txt
+6;../fake-data/blob/hipster.txt;er;27947;../fake-data/blob/hipster.txt
+7;../fake-data/blob/hipster.txt;meanwhile;12113;../fake-data/blob/hipster.txt
+8;../fake-data/blob/hipster.txt;supposing;18050;../fake-data/blob/hipster.txt
+9;../fake-data/blob/hipster.txt;tenderly debut;23961;../fake-data/blob/hipster.txt
+10;../fake-data/blob/hipster.txt;absent mostly;21988;../fake-data/blob/hipster.txt

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Add user_id column to app_user table
+    -->
+    <changeSet id="20251102041200-1" author="jhipster">
+        <addColumn tableName="app_user">
+            <column name="user_id" type="bigint">
+                <constraints nullable="true" unique="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20251102041200-2" author="jhipster">
+        <addForeignKeyConstraint baseTableName="app_user"
+                                 baseColumnNames="user_id"
+                                 constraintName="fk_app_user_user_id"
+                                 referencedTableName="jhi_user"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+</databaseChangeLog>
+

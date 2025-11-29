@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <property name="now" value="now()" dbms="mysql"/>
+    <property name="floatType" value="float" dbms="mysql"/>
+    <property name="clobType" value="clob" dbms="mysql"/>
+    <property name="blobType" value="longblob" dbms="mysql"/>
+    <property name="uuidType" value="varchar(36)" dbms="mysql"/>
+    <property name="datetimeType" value="datetime(6)" dbms="mysql"/>
+    <property name="timeType" value="time(6)" dbms="mysql"/>
+
+    <include file="config/liquibase/changelog/00000000000000_initial_schema.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152341_added_entity_AppUser.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251102041200_add_user_id_to_app_user.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152342_added_entity_Book.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152343_added_entity_Chapter.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152344_added_entity_Lesson.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152345_added_entity_Word.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152346_added_entity_WordExample.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152347_added_entity_WordRelation.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152348_added_entity_LessonWord.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152349_added_entity_Skill.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152350_added_entity_LessonSkill.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152351_added_entity_ListeningExercise.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152352_added_entity_SpeakingExercise.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152353_added_entity_ReadingExercise.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152354_added_entity_WritingExercise.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152355_added_entity_MediaFile.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152356_added_entity_Comment.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152357_added_entity_ExerciseResult.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152358_added_entity_UserProgress.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152359_added_entity_UserVocabulary.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152400_added_entity_Achievement.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152401_added_entity_UserAchievement.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152402_added_entity_LearningStreak.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152403_added_entity_StudySession.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152404_added_entity_StreakIcon.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152405_added_entity_StreakMilestone.xml" relativeToChangelogFile="false"/>
+    <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
+    <include file="config/liquibase/changelog/20251021152343_added_entity_constraints_Chapter.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152344_added_entity_constraints_Lesson.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152346_added_entity_constraints_WordExample.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152348_added_entity_constraints_LessonWord.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152350_added_entity_constraints_LessonSkill.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152351_added_entity_constraints_ListeningExercise.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152352_added_entity_constraints_SpeakingExercise.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152353_added_entity_constraints_ReadingExercise.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152354_added_entity_constraints_WritingExercise.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152355_added_entity_constraints_MediaFile.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152356_added_entity_constraints_Comment.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152357_added_entity_constraints_ExerciseResult.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152358_added_entity_constraints_UserProgress.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152359_added_entity_constraints_UserVocabulary.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152401_added_entity_constraints_UserAchievement.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152402_added_entity_constraints_LearningStreak.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152403_added_entity_constraints_StudySession.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251021152405_added_entity_constraints_StreakMilestone.xml" relativeToChangelogFile="false"/>
+    <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
+    <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
+
+</databaseChangeLog>
