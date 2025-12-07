@@ -143,7 +143,13 @@ public class AppUserResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of appUsers in body.
      */
     @GetMapping("")
-    public ResponseEntity<List<AppUserDTO>> getAllAppUsers(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
+    public ResponseEntity<List<AppUserDTO>> getAllAppUsers(
+        @org.springframework.data.web.PageableDefault(
+            size = 20,
+            sort = "id",
+            direction = org.springframework.data.domain.Sort.Direction.ASC
+        ) @org.springdoc.core.annotations.ParameterObject Pageable pageable
+    ) {
         LOG.debug("REST request to get a page of AppUsers");
         Page<AppUserDTO> page = appUserService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);

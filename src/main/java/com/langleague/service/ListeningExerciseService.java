@@ -4,7 +4,9 @@ import com.langleague.domain.ListeningExercise;
 import com.langleague.repository.ListeningExerciseRepository;
 import com.langleague.service.dto.ListeningExerciseDTO;
 import com.langleague.service.mapper.ListeningExerciseMapper;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -111,5 +113,21 @@ public class ListeningExerciseService {
     public void delete(Long id) {
         LOG.debug("Request to delete ListeningExercise : {}", id);
         listeningExerciseRepository.deleteById(id);
+    }
+
+    /**
+     * Get all listening exercises by chapter ID.
+     *
+     * @param chapterId the chapter ID
+     * @return list of listening exercises
+     */
+    @Transactional(readOnly = true)
+    public List<ListeningExerciseDTO> findByChapterId(Long chapterId) {
+        LOG.debug("Request to get ListeningExercises by chapter : {}", chapterId);
+        return listeningExerciseRepository
+            .findByChapterId(chapterId)
+            .stream()
+            .map(listeningExerciseMapper::toDto)
+            .collect(Collectors.toList());
     }
 }

@@ -30,5 +30,24 @@
             referencedTableName="book"/>
     </changeSet>
 
+    <!-- Add indexes -->
+    <changeSet id="20251125000003-3" author="system">
+        <preConditions onFail="MARK_RAN">
+            <not><indexExists indexName="idx_chapter_book_id"/></not>
+        </preConditions>
+        <createIndex indexName="idx_chapter_book_id" tableName="chapter">
+            <column name="book_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20251125000003-4" author="system">
+        <preConditions onFail="MARK_RAN">
+            <not><indexExists indexName="idx_chapter_order_index"/></not>
+        </preConditions>
+        <createIndex indexName="idx_chapter_order_index" tableName="chapter">
+            <column name="order_index"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>
 

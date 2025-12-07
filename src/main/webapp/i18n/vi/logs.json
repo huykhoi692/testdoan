@@ -1,11 +1,11 @@
 {
   "logs": {
     "title": "Nhật ký",
-    "nbloggers": "Có {{total}} logger.",
+    "nbloggers": "Có {{ total }} logger.",
     "filter": "Lọc",
     "table": {
       "name": "Tên",
-      "level": "Cấp độ"
+      "level": "Mức độ"
     }
   }
 }

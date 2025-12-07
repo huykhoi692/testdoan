@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -24,31 +26,49 @@ public class ReadingExercise implements Serializable {
     private Long id;
 
     @Lob
-    @Column(name = "passage")
+    @Column(name = "passage", nullable = false)
     private String passage;
 
     @Lob
-    @Column(name = "question")
+    @Column(name = "question", nullable = false)
     private String question;
-
-    @Lob
-    @Column(name = "options")
-    private String options;
 
     @Size(max = 255)
     @Column(name = "correct_answer", length = 255)
     private String correctAnswer;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @NotNull
+    @Column(name = "max_score", nullable = false)
+    private Integer maxScore;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "readingExercise")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "readingExercise" }, allowSetters = true)
+    private Set<ReadingOption> options = new HashSet<>();
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "readingExercise")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(
-        value = { "listeningExercises", "speakingExercises", "readingExercises", "writingExercises", "lesson", "skill" },
+        value = { "appUser", "listeningExercise", "speakingExercise", "readingExercise", "writingExercise" },
         allowSetters = true
     )
-    private LessonSkill lessonSkill;
+    private Set<ExerciseResult> exerciseResults = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "lesson_id")
-    private Lesson lesson;
+    @JsonIgnoreProperties(
+        value = {
+            "words",
+            "grammars",
+            "listeningExercises",
+            "speakingExercises",
+            "readingExercises",
+            "writingExercises",
+            "chapterProgresses",
+            "book",
+        },
+        allowSetters = true
+    )
+    private Chapter chapter;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -91,19 +111,6 @@ public class ReadingExercise implements Serializable {
         this.question = question;
     }
 
-    public String getOptions() {
-        return this.options;
-    }
-
-    public ReadingExercise options(String options) {
-        this.setOptions(options);
-        return this;
-    }
-
-    public void setOptions(String options) {
-        this.options = options;
-    }
-
     public String getCorrectAnswer() {
         return this.correctAnswer;
     }
@@ -117,29 +124,91 @@ public class ReadingExercise implements Serializable {
         this.correctAnswer = correctAnswer;
     }
 
-    public LessonSkill getLessonSkill() {
-        return this.lessonSkill;
+    public Integer getMaxScore() {
+        return this.maxScore;
     }
 
-    public void setLessonSkill(LessonSkill lessonSkill) {
-        this.lessonSkill = lessonSkill;
-    }
-
-    public ReadingExercise lessonSkill(LessonSkill lessonSkill) {
-        this.setLessonSkill(lessonSkill);
+    public ReadingExercise maxScore(Integer maxScore) {
+        this.setMaxScore(maxScore);
         return this;
     }
 
-    public Lesson getLesson() {
-        return this.lesson;
+    public void setMaxScore(Integer maxScore) {
+        this.maxScore = maxScore;
     }
 
-    public void setLesson(Lesson lesson) {
-        this.lesson = lesson;
+    public Set<ReadingOption> getOptions() {
+        return this.options;
     }
 
-    public ReadingExercise lesson(Lesson lesson) {
-        this.setLesson(lesson);
+    public void setOptions(Set<ReadingOption> readingOptions) {
+        if (this.options != null) {
+            this.options.forEach(i -> i.setReadingExercise(null));
+        }
+        if (readingOptions != null) {
+            readingOptions.forEach(i -> i.setReadingExercise(this));
+        }
+        this.options = readingOptions;
+    }
+
+    public ReadingExercise options(Set<ReadingOption> readingOptions) {
+        this.setOptions(readingOptions);
+        return this;
+    }
+
+    public ReadingExercise addOption(ReadingOption readingOption) {
+        this.options.add(readingOption);
+        readingOption.setReadingExercise(this);
+        return this;
+    }
+
+    public ReadingExercise removeOption(ReadingOption readingOption) {
+        this.options.remove(readingOption);
+        readingOption.setReadingExercise(null);
+        return this;
+    }
+
+    public Set<ExerciseResult> getExerciseResults() {
+        return this.exerciseResults;
+    }
+
+    public void setExerciseResults(Set<ExerciseResult> exerciseResults) {
+        if (this.exerciseResults != null) {
+            this.exerciseResults.forEach(i -> i.setReadingExercise(null));
+        }
+        if (exerciseResults != null) {
+            exerciseResults.forEach(i -> i.setReadingExercise(this));
+        }
+        this.exerciseResults = exerciseResults;
+    }
+
+    public ReadingExercise exerciseResults(Set<ExerciseResult> exerciseResults) {
+        this.setExerciseResults(exerciseResults);
+        return this;
+    }
+
+    public ReadingExercise addExerciseResult(ExerciseResult exerciseResult) {
+        this.exerciseResults.add(exerciseResult);
+        exerciseResult.setReadingExercise(this);
+        return this;
+    }
+
+    public ReadingExercise removeExerciseResult(ExerciseResult exerciseResult) {
+        this.exerciseResults.remove(exerciseResult);
+        exerciseResult.setReadingExercise(null);
+        return this;
+    }
+
+    public Chapter getChapter() {
+        return this.chapter;
+    }
+
+    public void setChapter(Chapter chapter) {
+        this.chapter = chapter;
+    }
+
+    public ReadingExercise chapter(Chapter chapter) {
+        this.setChapter(chapter);
         return this;
     }
 
@@ -169,8 +238,8 @@ public class ReadingExercise implements Serializable {
             "id=" + getId() +
             ", passage='" + getPassage() + "'" +
             ", question='" + getQuestion() + "'" +
-            ", options='" + getOptions() + "'" +
             ", correctAnswer='" + getCorrectAnswer() + "'" +
+            ", maxScore=" + getMaxScore() +
             "}";
     }
 }

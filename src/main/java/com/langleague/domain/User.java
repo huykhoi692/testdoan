@@ -1,7 +1,6 @@
 package com.langleague.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.langleague.config.Constants;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -57,21 +56,23 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @Column(length = 254, unique = true)
     private String email;
 
+    // Enhanced imageUrl to support both HTTP(S) URLs and base64 data URIs
+    // Accepts: http(s) URLs or data:image URIs (base64) for avatar images
+    @Pattern(
+        regexp = "^(https?://.*|data:image/(png|jpg|jpeg|gif|webp|svg\\+xml);base64,[A-Za-z0-9+/=]+)?$",
+        message = "Image URL must be a valid HTTP(S) URL or base64 image data URI"
+    )
+    @Lob
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @NotNull
     @Column(nullable = false)
     private boolean activated = false;
 
-    // Use case 12, 50, 51: Lock/Unlock account
-    @Column(name = "account_locked")
-    private Boolean accountLocked = false;
-
     @Size(min = 2, max = 10)
     @Column(name = "lang_key", length = 10)
     private String langKey;
-
-    @Size(max = 256)
-    @Column(name = "image_url", length = 256)
-    private String imageUrl;
 
     @Size(max = 20)
     @Column(name = "activation_key", length = 20)
@@ -86,6 +87,10 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @Column(name = "reset_date")
     private Instant resetDate = null;
 
+    @NotNull
+    @Column(name = "account_locked", nullable = false)
+    private boolean locked = false;
+
     @JsonIgnore
     @ManyToMany
     @JoinTable(
@@ -97,10 +102,6 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @BatchSize(size = 20)
     private Set<Authority> authorities = new HashSet<>();
 
-    @OneToOne(mappedBy = "user")
-    @JsonIgnore
-    private AppUser appUser;
-
     public Long getId() {
         return id;
     }
@@ -111,14 +112,6 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     public String getLogin() {
         return login;
-    }
-
-    public AppUser getAppUser() {
-        return appUser;
-    }
-
-    public void setAppUser(AppUser appUser) {
-        this.appUser = appUser;
     }
 
     // Lowercase the login before saving it in database
@@ -174,6 +167,14 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
         this.activated = activated;
     }
 
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
+
     public String getActivationKey() {
         return activationKey;
     }
@@ -204,14 +205,6 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     public void setLangKey(String langKey) {
         this.langKey = langKey;
-    }
-
-    public Boolean getAccountLocked() {
-        return accountLocked;
-    }
-
-    public void setAccountLocked(Boolean accountLocked) {
-        this.accountLocked = accountLocked;
     }
 
     public Set<Authority> getAuthorities() {

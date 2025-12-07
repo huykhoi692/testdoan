@@ -47,6 +47,7 @@ public class CacheConfiguration {
         return cm -> {
             createCache(cm, com.langleague.repository.UserRepository.USERS_BY_LOGIN_CACHE);
             createCache(cm, com.langleague.repository.UserRepository.USERS_BY_EMAIL_CACHE);
+            createCache(cm, "appUserByLogin"); // Custom cache for AppUser lookups
             createCache(cm, com.langleague.domain.User.class.getName());
             createCache(cm, com.langleague.domain.Authority.class.getName());
             createCache(cm, com.langleague.domain.User.class.getName() + ".authorities");
@@ -61,37 +62,19 @@ public class CacheConfiguration {
             createCache(cm, com.langleague.domain.Book.class.getName());
             createCache(cm, com.langleague.domain.Book.class.getName() + ".chapters");
             createCache(cm, com.langleague.domain.Chapter.class.getName());
-            createCache(cm, com.langleague.domain.Chapter.class.getName() + ".lessons");
-            createCache(cm, com.langleague.domain.Lesson.class.getName());
-            createCache(cm, com.langleague.domain.Lesson.class.getName() + ".lessonWords");
-            createCache(cm, com.langleague.domain.Lesson.class.getName() + ".lessonSkills");
-            createCache(cm, com.langleague.domain.Lesson.class.getName() + ".mediaFiles");
-            createCache(cm, com.langleague.domain.Lesson.class.getName() + ".comments");
-            createCache(cm, com.langleague.domain.Lesson.class.getName() + ".userProgresses");
-            createCache(cm, com.langleague.domain.Lesson.class.getName() + ".userVocabularies");
             createCache(cm, com.langleague.domain.Word.class.getName());
             createCache(cm, com.langleague.domain.Word.class.getName() + ".wordExamples");
             createCache(cm, com.langleague.domain.Word.class.getName() + ".userVocabularies");
-            createCache(cm, com.langleague.domain.Word.class.getName() + ".lessonWords");
             createCache(cm, com.langleague.domain.WordExample.class.getName());
-            createCache(cm, com.langleague.domain.WordRelation.class.getName());
-            createCache(cm, com.langleague.domain.LessonWord.class.getName());
-            createCache(cm, com.langleague.domain.Skill.class.getName());
-            createCache(cm, com.langleague.domain.Skill.class.getName() + ".lessonSkills");
-            createCache(cm, com.langleague.domain.Skill.class.getName() + ".exerciseResults");
-            createCache(cm, com.langleague.domain.LessonSkill.class.getName());
-            createCache(cm, com.langleague.domain.LessonSkill.class.getName() + ".listeningExercises");
-            createCache(cm, com.langleague.domain.LessonSkill.class.getName() + ".speakingExercises");
-            createCache(cm, com.langleague.domain.LessonSkill.class.getName() + ".readingExercises");
-            createCache(cm, com.langleague.domain.LessonSkill.class.getName() + ".writingExercises");
+
             createCache(cm, com.langleague.domain.ListeningExercise.class.getName());
             createCache(cm, com.langleague.domain.SpeakingExercise.class.getName());
             createCache(cm, com.langleague.domain.ReadingExercise.class.getName());
             createCache(cm, com.langleague.domain.WritingExercise.class.getName());
-            createCache(cm, com.langleague.domain.MediaFile.class.getName());
+
             createCache(cm, com.langleague.domain.Comment.class.getName());
             createCache(cm, com.langleague.domain.ExerciseResult.class.getName());
-            createCache(cm, com.langleague.domain.UserProgress.class.getName());
+
             createCache(cm, com.langleague.domain.UserVocabulary.class.getName());
             createCache(cm, com.langleague.domain.Achievement.class.getName());
             createCache(cm, com.langleague.domain.Achievement.class.getName() + ".userAchievements");
@@ -101,6 +84,42 @@ public class CacheConfiguration {
             createCache(cm, com.langleague.domain.StudySession.class.getName() + ".streakMilestones");
             createCache(cm, com.langleague.domain.StreakIcon.class.getName());
             createCache(cm, com.langleague.domain.StreakMilestone.class.getName());
+
+            // Custom caches for service layer
+            createCache(cm, "books");
+            createCache(cm, "booksByLevel");
+            createCache(cm, com.langleague.domain.UserBook.class.getName());
+            createCache(cm, com.langleague.domain.ChapterProgress.class.getName());
+            createCache(cm, com.langleague.domain.ReadingOption.class.getName());
+            createCache(cm, com.langleague.domain.BookReview.class.getName());
+
+            // Additional caches for entity collections (fix HHH90001006 warnings)
+            createCache(cm, com.langleague.domain.Chapter.class.getName() + ".chapterProgresses");
+            createCache(cm, com.langleague.domain.Chapter.class.getName() + ".words");
+            createCache(cm, com.langleague.domain.Book.class.getName() + ".bookReviews");
+            createCache(cm, com.langleague.domain.ListeningExercise.class.getName() + ".exerciseResults");
+            createCache(cm, com.langleague.domain.ListeningExercise.class.getName() + ".options");
+            createCache(cm, com.langleague.domain.Chapter.class.getName() + ".listeningExercises");
+            createCache(cm, com.langleague.domain.ListeningOption.class.getName());
+            createCache(cm, com.langleague.domain.Chapter.class.getName() + ".grammars");
+            createCache(cm, com.langleague.domain.ReadingExercise.class.getName() + ".exerciseResults");
+            createCache(cm, com.langleague.domain.AppUser.class.getName() + ".chapterProgresses");
+            createCache(cm, com.langleague.domain.Grammar.class.getName() + ".userGrammars");
+            createCache(cm, com.langleague.domain.ReadingExercise.class.getName() + ".options");
+            createCache(cm, com.langleague.domain.UserChapter.class.getName());
+            createCache(cm, com.langleague.domain.AppUser.class.getName() + ".bookReviews");
+            createCache(cm, com.langleague.domain.Grammar.class.getName());
+            createCache(cm, com.langleague.domain.Chapter.class.getName() + ".writingExercises");
+            createCache(cm, com.langleague.domain.BookUpload.class.getName());
+            createCache(cm, com.langleague.domain.Chapter.class.getName() + ".speakingExercises");
+            createCache(cm, com.langleague.domain.Grammar.class.getName() + ".grammarExamples");
+            createCache(cm, com.langleague.domain.SpeakingExercise.class.getName() + ".exerciseResults");
+            createCache(cm, com.langleague.domain.Notification.class.getName());
+            createCache(cm, com.langleague.domain.GrammarExample.class.getName());
+            createCache(cm, com.langleague.domain.UserGrammar.class.getName());
+            createCache(cm, com.langleague.domain.Chapter.class.getName() + ".readingExercises");
+            createCache(cm, com.langleague.domain.WritingExercise.class.getName() + ".exerciseResults");
+            createCache(cm, com.langleague.domain.AppUser.class.getName() + ".userGrammars");
             // jhipster-needle-ehcache-add-entry
         };
     }

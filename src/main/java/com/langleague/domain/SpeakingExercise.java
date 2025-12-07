@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -24,31 +26,40 @@ public class SpeakingExercise implements Serializable {
     private Long id;
 
     @Lob
-    @Column(name = "prompt")
+    @Column(name = "prompt", nullable = false)
     private String prompt;
 
     @Size(max = 512)
     @Column(name = "sample_audio", length = 512)
     private String sampleAudio;
 
-    @Size(max = 255)
-    @Column(name = "target_phrase", length = 255)
-    private String targetPhrase;
+    @NotNull
+    @Column(name = "max_score", nullable = false)
+    private Integer maxScore;
 
-    @Size(max = 255)
-    @Column(name = "evaluation_method", length = 255)
-    private String evaluationMethod;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "speakingExercise")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(
+        value = { "appUser", "listeningExercise", "speakingExercise", "readingExercise", "writingExercise" },
+        allowSetters = true
+    )
+    private Set<ExerciseResult> exerciseResults = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(
-        value = { "listeningExercises", "speakingExercises", "readingExercises", "writingExercises", "lesson", "skill" },
+        value = {
+            "words",
+            "grammars",
+            "listeningExercises",
+            "speakingExercises",
+            "readingExercises",
+            "writingExercises",
+            "chapterProgresses",
+            "book",
+        },
         allowSetters = true
     )
-    private LessonSkill lessonSkill;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "lesson_id")
-    private Lesson lesson;
+    private Chapter chapter;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -91,55 +102,60 @@ public class SpeakingExercise implements Serializable {
         this.sampleAudio = sampleAudio;
     }
 
-    public String getTargetPhrase() {
-        return this.targetPhrase;
+    public Integer getMaxScore() {
+        return this.maxScore;
     }
 
-    public SpeakingExercise targetPhrase(String targetPhrase) {
-        this.setTargetPhrase(targetPhrase);
+    public SpeakingExercise maxScore(Integer maxScore) {
+        this.setMaxScore(maxScore);
         return this;
     }
 
-    public void setTargetPhrase(String targetPhrase) {
-        this.targetPhrase = targetPhrase;
+    public void setMaxScore(Integer maxScore) {
+        this.maxScore = maxScore;
     }
 
-    public String getEvaluationMethod() {
-        return this.evaluationMethod;
+    public Set<ExerciseResult> getExerciseResults() {
+        return this.exerciseResults;
     }
 
-    public SpeakingExercise evaluationMethod(String evaluationMethod) {
-        this.setEvaluationMethod(evaluationMethod);
+    public void setExerciseResults(Set<ExerciseResult> exerciseResults) {
+        if (this.exerciseResults != null) {
+            this.exerciseResults.forEach(i -> i.setSpeakingExercise(null));
+        }
+        if (exerciseResults != null) {
+            exerciseResults.forEach(i -> i.setSpeakingExercise(this));
+        }
+        this.exerciseResults = exerciseResults;
+    }
+
+    public SpeakingExercise exerciseResults(Set<ExerciseResult> exerciseResults) {
+        this.setExerciseResults(exerciseResults);
         return this;
     }
 
-    public void setEvaluationMethod(String evaluationMethod) {
-        this.evaluationMethod = evaluationMethod;
-    }
-
-    public LessonSkill getLessonSkill() {
-        return this.lessonSkill;
-    }
-
-    public void setLessonSkill(LessonSkill lessonSkill) {
-        this.lessonSkill = lessonSkill;
-    }
-
-    public SpeakingExercise lessonSkill(LessonSkill lessonSkill) {
-        this.setLessonSkill(lessonSkill);
+    public SpeakingExercise addExerciseResult(ExerciseResult exerciseResult) {
+        this.exerciseResults.add(exerciseResult);
+        exerciseResult.setSpeakingExercise(this);
         return this;
     }
 
-    public Lesson getLesson() {
-        return this.lesson;
+    public SpeakingExercise removeExerciseResult(ExerciseResult exerciseResult) {
+        this.exerciseResults.remove(exerciseResult);
+        exerciseResult.setSpeakingExercise(null);
+        return this;
     }
 
-    public void setLesson(Lesson lesson) {
-        this.lesson = lesson;
+    public Chapter getChapter() {
+        return this.chapter;
     }
 
-    public SpeakingExercise lesson(Lesson lesson) {
-        this.setLesson(lesson);
+    public void setChapter(Chapter chapter) {
+        this.chapter = chapter;
+    }
+
+    public SpeakingExercise chapter(Chapter chapter) {
+        this.setChapter(chapter);
         return this;
     }
 
@@ -169,8 +185,7 @@ public class SpeakingExercise implements Serializable {
             "id=" + getId() +
             ", prompt='" + getPrompt() + "'" +
             ", sampleAudio='" + getSampleAudio() + "'" +
-            ", targetPhrase='" + getTargetPhrase() + "'" +
-            ", evaluationMethod='" + getEvaluationMethod() + "'" +
+            ", maxScore=" + getMaxScore() +
             "}";
     }
 }

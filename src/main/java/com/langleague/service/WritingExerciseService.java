@@ -4,7 +4,9 @@ import com.langleague.domain.WritingExercise;
 import com.langleague.repository.WritingExerciseRepository;
 import com.langleague.service.dto.WritingExerciseDTO;
 import com.langleague.service.mapper.WritingExerciseMapper;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -108,5 +110,17 @@ public class WritingExerciseService {
     public void delete(Long id) {
         LOG.debug("Request to delete WritingExercise : {}", id);
         writingExerciseRepository.deleteById(id);
+    }
+
+    /**
+     * Get all writing exercises by chapter ID.
+     *
+     * @param chapterId the chapter ID
+     * @return list of writing exercises
+     */
+    @Transactional(readOnly = true)
+    public List<WritingExerciseDTO> findByChapterId(Long chapterId) {
+        LOG.debug("Request to get WritingExercises by chapter : {}", chapterId);
+        return writingExerciseRepository.findByChapterId(chapterId).stream().map(writingExerciseMapper::toDto).collect(Collectors.toList());
     }
 }

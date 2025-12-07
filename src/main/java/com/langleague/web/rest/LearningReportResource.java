@@ -101,6 +101,20 @@ public class LearningReportResource {
     }
 
     /**
+     * {@code GET  /learning-reports/admin/statistics} : Get admin overview statistics (Admin only).
+     * Use case: Admin dashboard overview
+     *
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and aggregated statistics in body.
+     */
+    @PreAuthorize("hasAuthority('" + AuthoritiesConstants.ADMIN + "')")
+    @GetMapping("/admin/statistics")
+    public ResponseEntity<LearningReportDTO> getAdminStatistics() {
+        LOG.debug("REST request to get admin overview statistics");
+        LearningReportDTO stats = learningReportService.getAdminStatistics();
+        return ResponseEntity.ok().body(stats);
+    }
+
+    /**
      * {@code GET  /learning-reports/admin/completion-stats} : Get completion statistics (Admin only).
      * Use case 52: View completion statistics
      *

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -24,30 +26,40 @@ public class WritingExercise implements Serializable {
     private Long id;
 
     @Lob
-    @Column(name = "prompt")
+    @Column(name = "prompt", nullable = false)
     private String prompt;
-
-    @Size(max = 255)
-    @Column(name = "word_limit", length = 255)
-    private String wordLimit;
-
-    @Column(name = "max_length")
-    private Integer maxLength;
 
     @Lob
     @Column(name = "sample_answer")
     private String sampleAnswer;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @NotNull
+    @Column(name = "max_score", nullable = false)
+    private Integer maxScore;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "writingExercise")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(
-        value = { "listeningExercises", "speakingExercises", "readingExercises", "writingExercises", "lesson", "skill" },
+        value = { "appUser", "listeningExercise", "speakingExercise", "readingExercise", "writingExercise" },
         allowSetters = true
     )
-    private LessonSkill lessonSkill;
+    private Set<ExerciseResult> exerciseResults = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "lesson_id")
-    private Lesson lesson;
+    @JsonIgnoreProperties(
+        value = {
+            "words",
+            "grammars",
+            "listeningExercises",
+            "speakingExercises",
+            "readingExercises",
+            "writingExercises",
+            "chapterProgresses",
+            "book",
+        },
+        allowSetters = true
+    )
+    private Chapter chapter;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -77,32 +89,6 @@ public class WritingExercise implements Serializable {
         this.prompt = prompt;
     }
 
-    public String getWordLimit() {
-        return this.wordLimit;
-    }
-
-    public WritingExercise wordLimit(String wordLimit) {
-        this.setWordLimit(wordLimit);
-        return this;
-    }
-
-    public void setWordLimit(String wordLimit) {
-        this.wordLimit = wordLimit;
-    }
-
-    public Integer getMaxLength() {
-        return this.maxLength;
-    }
-
-    public WritingExercise maxLength(Integer maxLength) {
-        this.setMaxLength(maxLength);
-        return this;
-    }
-
-    public void setMaxLength(Integer maxLength) {
-        this.maxLength = maxLength;
-    }
-
     public String getSampleAnswer() {
         return this.sampleAnswer;
     }
@@ -116,29 +102,60 @@ public class WritingExercise implements Serializable {
         this.sampleAnswer = sampleAnswer;
     }
 
-    public LessonSkill getLessonSkill() {
-        return this.lessonSkill;
+    public Integer getMaxScore() {
+        return this.maxScore;
     }
 
-    public void setLessonSkill(LessonSkill lessonSkill) {
-        this.lessonSkill = lessonSkill;
-    }
-
-    public WritingExercise lessonSkill(LessonSkill lessonSkill) {
-        this.setLessonSkill(lessonSkill);
+    public WritingExercise maxScore(Integer maxScore) {
+        this.setMaxScore(maxScore);
         return this;
     }
 
-    public Lesson getLesson() {
-        return this.lesson;
+    public void setMaxScore(Integer maxScore) {
+        this.maxScore = maxScore;
     }
 
-    public void setLesson(Lesson lesson) {
-        this.lesson = lesson;
+    public Set<ExerciseResult> getExerciseResults() {
+        return this.exerciseResults;
     }
 
-    public WritingExercise lesson(Lesson lesson) {
-        this.setLesson(lesson);
+    public void setExerciseResults(Set<ExerciseResult> exerciseResults) {
+        if (this.exerciseResults != null) {
+            this.exerciseResults.forEach(i -> i.setWritingExercise(null));
+        }
+        if (exerciseResults != null) {
+            exerciseResults.forEach(i -> i.setWritingExercise(this));
+        }
+        this.exerciseResults = exerciseResults;
+    }
+
+    public WritingExercise exerciseResults(Set<ExerciseResult> exerciseResults) {
+        this.setExerciseResults(exerciseResults);
+        return this;
+    }
+
+    public WritingExercise addExerciseResult(ExerciseResult exerciseResult) {
+        this.exerciseResults.add(exerciseResult);
+        exerciseResult.setWritingExercise(this);
+        return this;
+    }
+
+    public WritingExercise removeExerciseResult(ExerciseResult exerciseResult) {
+        this.exerciseResults.remove(exerciseResult);
+        exerciseResult.setWritingExercise(null);
+        return this;
+    }
+
+    public Chapter getChapter() {
+        return this.chapter;
+    }
+
+    public void setChapter(Chapter chapter) {
+        this.chapter = chapter;
+    }
+
+    public WritingExercise chapter(Chapter chapter) {
+        this.setChapter(chapter);
         return this;
     }
 
@@ -167,9 +184,8 @@ public class WritingExercise implements Serializable {
         return "WritingExercise{" +
             "id=" + getId() +
             ", prompt='" + getPrompt() + "'" +
-            ", wordLimit='" + getWordLimit() + "'" +
-            ", maxLength=" + getMaxLength() +
             ", sampleAnswer='" + getSampleAnswer() + "'" +
+            ", maxScore=" + getMaxScore() +
             "}";
     }
 }

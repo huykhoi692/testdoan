@@ -1,11 +1,7 @@
 id;level;min_days;icon_path;description
-1;till which ambitious;3388;ick ouch;ick
-2;merry teammate about;19663;which into;forgery after
-3;ethical quaintly;32650;toe;garage
-4;frizz;2855;electronics expostulate;misguided seemingly
-5;pliers but;29275;beep doorpost;membership yak
-6;searchingly actually;6982;meadow;gadzooks
-7;though follower satirize;764;if;incidentally
-8;psst;10472;mathematics anesthetize;whereas mispronounce across
-9;strategy;13324;freely with;debit er on
-10;wherever zowie agile;26555;bah sans confute;season
+1;Bronze;1;/icons/streak/bronze.svg;Just getting started!
+2;Silver;3;/icons/streak/silver.svg;3 days strong!
+3;Gold;7;/icons/streak/gold.svg;A full week!
+4;Platinum;14;/icons/streak/platinum.svg;Two weeks of dedication!
+5;Diamond;30;/icons/streak/diamond.svg;30 days of mastery!
+

@@ -1,9 +1,12 @@
 package com.langleague.web.rest;
 
 import com.langleague.repository.ChapterRepository;
+import com.langleague.security.AuthoritiesConstants;
 import com.langleague.service.ChapterService;
 import com.langleague.service.dto.ChapterDTO;
+import com.langleague.service.dto.ChapterDetailDTO;
 import com.langleague.web.rest.errors.BadRequestAlertException;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.net.URI;
@@ -18,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -26,7 +30,12 @@ import tech.jhipster.web.util.ResponseUtil;
 
 /**
  * REST controller for managing {@link com.langleague.domain.Chapter}.
+ * Use case 16: View assigned lessons
+ * Use case 17: View lesson details
+ * Use case 18: Search lessons
+ * Use case 43: Create lesson (Staff/Admin)
  */
+@Tag(name = "Chapters", description = "Lesson/Chapter management")
 @RestController
 @RequestMapping("/api/chapters")
 public class ChapterResource {
@@ -49,17 +58,31 @@ public class ChapterResource {
 
     /**
      * {@code POST  /chapters} : Create a new chapter.
+     * Use case 43: Create lesson (Staff/Admin only)
      *
      * @param chapterDTO the chapterDTO to create.
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new chapterDTO, or with status {@code 400 (Bad Request)} if the chapter has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.ADMIN + "', '" + AuthoritiesConstants.STAFF + "')")
     @PostMapping("")
     public ResponseEntity<ChapterDTO> createChapter(@Valid @RequestBody ChapterDTO chapterDTO) throws URISyntaxException {
         LOG.debug("REST request to save Chapter : {}", chapterDTO);
         if (chapterDTO.getId() != null) {
             throw new BadRequestAlertException("A new chapter cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
+        // Validate that order index is not duplicated for the same book
+        if (chapterDTO.getBook() != null && chapterDTO.getOrderIndex() != null) {
+            if (chapterService.existsByBookIdAndOrderIndex(chapterDTO.getBook().getId(), chapterDTO.getOrderIndex())) {
+                throw new BadRequestAlertException(
+                    "A chapter with this order index already exists for this book",
+                    ENTITY_NAME,
+                    "orderindexexists"
+                );
+            }
+        }
+
         chapterDTO = chapterService.save(chapterDTO);
         return ResponseEntity.created(new URI("/api/chapters/" + chapterDTO.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, chapterDTO.getId().toString()))
@@ -68,14 +91,16 @@ public class ChapterResource {
 
     /**
      * {@code PUT  /chapters/:id} : Updates an existing chapter.
+     * Use case 43: Create lesson (Staff/Admin only)
      *
      * @param id the id of the chapterDTO to save.
      * @param chapterDTO the chapterDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated chapterDTO,
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated bookDTO,
      * or with status {@code 400 (Bad Request)} if the chapterDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the chapterDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.ADMIN + "', '" + AuthoritiesConstants.STAFF + "')")
     @PutMapping("/{id}")
     public ResponseEntity<ChapterDTO> updateChapter(
         @PathVariable(value = "id", required = false) final Long id,
@@ -101,6 +126,7 @@ public class ChapterResource {
 
     /**
      * {@code PATCH  /chapters/:id} : Partial updates given fields of an existing chapter, field will ignore if it is null
+     * Use case 43: Create lesson (Staff/Admin only)
      *
      * @param id the id of the chapterDTO to save.
      * @param chapterDTO the chapterDTO to update.
@@ -110,6 +136,7 @@ public class ChapterResource {
      * or with status {@code 500 (Internal Server Error)} if the chapterDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.ADMIN + "', '" + AuthoritiesConstants.STAFF + "')")
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<ChapterDTO> partialUpdateChapter(
         @PathVariable(value = "id", required = false) final Long id,
@@ -150,19 +177,6 @@ public class ChapterResource {
     }
 
     /**
-     * {@code GET  /chapters/book/:bookId} : get all chapters by book id.
-     *
-     * @param bookId the id of the book.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of chapters in body.
-     */
-    @GetMapping("/book/{bookId}")
-    public ResponseEntity<List<ChapterDTO>> getChaptersByBookId(@PathVariable("bookId") Long bookId) {
-        LOG.debug("REST request to get Chapters by Book ID : {}", bookId);
-        List<ChapterDTO> chapters = chapterService.findAllByBookId(bookId);
-        return ResponseEntity.ok().body(chapters);
-    }
-
-    /**
      * {@code GET  /chapters/:id} : get the "id" chapter.
      *
      * @param id the id of the chapterDTO to retrieve.
@@ -177,10 +191,12 @@ public class ChapterResource {
 
     /**
      * {@code DELETE  /chapters/:id} : delete the "id" chapter.
+     * Use case 43: Create lesson (Staff/Admin only)
      *
      * @param id the id of the chapterDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
+    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.ADMIN + "', '" + AuthoritiesConstants.STAFF + "')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteChapter(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete Chapter : {}", id);
@@ -188,5 +204,106 @@ public class ChapterResource {
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    /**
+     * {@code GET  /chapters/book/:bookId} : get all chapters for a specific book.
+     * Use case 16: View assigned lessons
+     *
+     * @param bookId the id of the book.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of chapters in body.
+     */
+    @GetMapping("/book/{bookId}")
+    public ResponseEntity<List<ChapterDTO>> getChaptersByBook(@PathVariable("bookId") Long bookId) {
+        LOG.debug("REST request to get Chapters by book id : {}", bookId);
+        List<ChapterDTO> chapters = chapterService.findByBookId(bookId);
+        return ResponseEntity.ok().body(chapters);
+    }
+
+    /**
+     * {@code GET  /chapters/:id/details} : get chapter with all details (exercises, words, grammar).
+     * Use case 17: View lesson details
+     *
+     * @param id the id of the chapter.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the chapterDetailDTO with details, or with status {@code 404 (Not Found)}.
+     */
+    @GetMapping("/{id}/details")
+    public ResponseEntity<ChapterDetailDTO> getChapterWithDetails(@PathVariable("id") Long id) {
+        LOG.debug("REST request to get Chapter with details : {}", id);
+        Optional<ChapterDetailDTO> chapterDetailDTO = chapterService.findOneWithDetails(id);
+        return ResponseUtil.wrapOrNotFound(chapterDetailDTO);
+    }
+
+    /**
+     * {@code GET  /chapters/search} : search chapters by keyword.
+     * Use case 18: Search lessons
+     *
+     * @param keyword the search keyword.
+     * @param pageable the pagination information.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of matching chapters in body.
+     */
+    @GetMapping("/search")
+    public ResponseEntity<List<ChapterDTO>> searchChapters(
+        @RequestParam(required = false) String keyword,
+        @org.springdoc.core.annotations.ParameterObject Pageable pageable
+    ) {
+        LOG.debug("REST request to search Chapters with keyword : {}", keyword);
+        Page<ChapterDTO> page = chapterService.searchChapters(keyword, pageable);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    /**
+     * {@code GET  /chapters/count/book/:bookId} : get the count of chapters for a specific book.
+     *
+     * @param bookId the id of the book.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/count/book/{bookId}")
+    public ResponseEntity<Long> countChaptersByBook(@PathVariable("bookId") Long bookId) {
+        LOG.debug("REST request to count Chapters by book id : {}", bookId);
+        long count = chapterService.countByBookId(bookId);
+        return ResponseEntity.ok().body(count);
+    }
+
+    /**
+     * {@code PUT  /chapters/reorder} : Reorder chapters for a book.
+     * Use case 43: Create lesson (Staff/Admin only)
+     *
+     * @param chapterDTOs the list of chapters with updated order indices.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated chapters.
+     */
+    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.ADMIN + "', '" + AuthoritiesConstants.STAFF + "')")
+    @PutMapping("/reorder")
+    public ResponseEntity<List<ChapterDTO>> reorderChapters(@Valid @RequestBody List<ChapterDTO> chapterDTOs) {
+        LOG.debug("REST request to reorder {} Chapters", chapterDTOs.size());
+        List<ChapterDTO> updatedChapters = chapterService.reorderChapters(chapterDTOs);
+        return ResponseEntity.ok().body(updatedChapters);
+    }
+
+    /**
+     * {@code GET  /chapters/:id/next} : get the next chapter in sequence.
+     *
+     * @param id the id of the current chapter.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the next chapterDTO, or with status {@code 404 (Not Found)}.
+     */
+    @GetMapping("/{id}/next")
+    public ResponseEntity<ChapterDTO> getNextChapter(@PathVariable("id") Long id) {
+        LOG.debug("REST request to get next Chapter after chapter id : {}", id);
+        Optional<ChapterDTO> nextChapter = chapterService.findNextChapter(id);
+        return ResponseUtil.wrapOrNotFound(nextChapter);
+    }
+
+    /**
+     * {@code GET  /chapters/:id/previous} : get the previous chapter in sequence.
+     *
+     * @param id the id of the current chapter.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the previous chapterDTO, or with status {@code 404 (Not Found)}.
+     */
+    @GetMapping("/{id}/previous")
+    public ResponseEntity<ChapterDTO> getPreviousChapter(@PathVariable("id") Long id) {
+        LOG.debug("REST request to get previous Chapter before chapter id : {}", id);
+        Optional<ChapterDTO> previousChapter = chapterService.findPreviousChapter(id);
+        return ResponseUtil.wrapOrNotFound(previousChapter);
     }
 }

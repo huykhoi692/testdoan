@@ -11,7 +11,12 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AppUserRepository extends JpaRepository<AppUser, Long> {
-    Optional<AppUser> findByUser_Login(String login);
+    Optional<AppUser> findByInternalUser_Login(String login);
 
-    Optional<AppUser> findByUserId(Long userId);
+    // Alias for compatibility
+    default Optional<AppUser> findByUser_Login(String login) {
+        return findByInternalUser_Login(login);
+    }
+
+    Optional<AppUser> findByInternalUserId(Long userId);
 }

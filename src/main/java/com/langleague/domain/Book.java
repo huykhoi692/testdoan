@@ -1,6 +1,7 @@
 package com.langleague.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.langleague.domain.enumeration.Level;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -30,25 +31,54 @@ public class Book implements Serializable {
     @Column(name = "title", length = 255, nullable = false)
     private String title;
 
-    @Size(max = 50)
-    @Column(name = "level", length = 50)
-    private String level;
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "level", nullable = false)
+    private Level level;
 
     @Lob
-    @Column(name = "description")
+    @Size(max = 5000, message = "Description cannot exceed 5000 characters")
+    @Column(name = "description", length = 5000)
     private String description;
 
-    @Size(max = 255)
-    @Column(name = "thumbnail", length = 255)
+    @Size(max = 500)
+    @Pattern(
+        regexp = "^(https?://.*\\.(jpg|jpeg|png|gif|webp|svg)|/uploads/.*)",
+        message = "Thumbnail must be a valid image URL or upload path"
+    )
+    @Column(name = "thumbnail", length = 500)
     private String thumbnail;
 
-    @Column(name = "reviewed")
-    private Boolean reviewed = false;
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive = true;
+
+    @Column(name = "average_rating")
+    private Double averageRating = 0.0;
+
+    @Column(name = "total_reviews")
+    private Long totalReviews = 0L;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "book")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "lessons", "book" }, allowSetters = true)
+    @JsonIgnoreProperties(
+        value = {
+            "words",
+            "grammars",
+            "listeningExercises",
+            "speakingExercises",
+            "readingExercises",
+            "writingExercises",
+            "chapterProgresses",
+            "book",
+        },
+        allowSetters = true
+    )
     private Set<Chapter> chapters = new HashSet<>();
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "book")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "appUser", "book" }, allowSetters = true)
+    private Set<BookReview> bookReviews = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -78,16 +108,16 @@ public class Book implements Serializable {
         this.title = title;
     }
 
-    public String getLevel() {
+    public Level getLevel() {
         return this.level;
     }
 
-    public Book level(String level) {
+    public Book level(Level level) {
         this.setLevel(level);
         return this;
     }
 
-    public void setLevel(String level) {
+    public void setLevel(Level level) {
         this.level = level;
     }
 
@@ -117,17 +147,43 @@ public class Book implements Serializable {
         this.thumbnail = thumbnail;
     }
 
-    public Boolean getReviewed() {
-        return this.reviewed;
+    public Boolean getIsActive() {
+        return this.isActive;
     }
 
-    public Book reviewed(Boolean reviewed) {
-        this.setReviewed(reviewed);
+    public Book isActive(Boolean isActive) {
+        this.setIsActive(isActive);
         return this;
     }
 
-    public void setReviewed(Boolean reviewed) {
-        this.reviewed = reviewed;
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    public Double getAverageRating() {
+        return this.averageRating;
+    }
+
+    public Book averageRating(Double averageRating) {
+        this.setAverageRating(averageRating);
+        return this;
+    }
+
+    public void setAverageRating(Double averageRating) {
+        this.averageRating = averageRating;
+    }
+
+    public Long getTotalReviews() {
+        return this.totalReviews;
+    }
+
+    public Book totalReviews(Long totalReviews) {
+        this.setTotalReviews(totalReviews);
+        return this;
+    }
+
+    public void setTotalReviews(Long totalReviews) {
+        this.totalReviews = totalReviews;
     }
 
     public Set<Chapter> getChapters() {
@@ -158,6 +214,37 @@ public class Book implements Serializable {
     public Book removeChapter(Chapter chapter) {
         this.chapters.remove(chapter);
         chapter.setBook(null);
+        return this;
+    }
+
+    public Set<BookReview> getBookReviews() {
+        return this.bookReviews;
+    }
+
+    public void setBookReviews(Set<BookReview> bookReviews) {
+        if (this.bookReviews != null) {
+            this.bookReviews.forEach(i -> i.setBook(null));
+        }
+        if (bookReviews != null) {
+            bookReviews.forEach(i -> i.setBook(this));
+        }
+        this.bookReviews = bookReviews;
+    }
+
+    public Book bookReviews(Set<BookReview> bookReviews) {
+        this.setBookReviews(bookReviews);
+        return this;
+    }
+
+    public Book addBookReview(BookReview bookReview) {
+        this.bookReviews.add(bookReview);
+        bookReview.setBook(this);
+        return this;
+    }
+
+    public Book removeBookReview(BookReview bookReview) {
+        this.bookReviews.remove(bookReview);
+        bookReview.setBook(null);
         return this;
     }
 

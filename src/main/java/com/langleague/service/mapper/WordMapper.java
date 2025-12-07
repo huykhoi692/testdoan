@@ -1,24 +1,21 @@
 package com.langleague.service.mapper;
 
+import com.langleague.domain.Chapter;
 import com.langleague.domain.Word;
+import com.langleague.service.dto.ChapterDTO;
 import com.langleague.service.dto.WordDTO;
 import org.mapstruct.*;
 
+/**
+ * Mapper for the entity {@link Word} and its DTO {@link WordDTO}.
+ */
 @Mapper(componentModel = "spring")
 public interface WordMapper extends EntityMapper<WordDTO, Word> {
-    @Mapping(target = "id", source = "id")
-    @Mapping(target = "text", source = "text")
-    @Mapping(target = "meaning", source = "meaning")
-    @Mapping(target = "pronunciation", source = "pronunciation")
-    @Mapping(target = "partOfSpeech", source = "partOfSpeech")
-    @Mapping(target = "imageUrl", source = "imageUrl")
-    WordDTO toDto(Word word);
+    @Mapping(target = "chapter", source = "chapter", qualifiedByName = "chapterId")
+    WordDTO toDto(Word s);
 
+    @Named("chapterId")
+    @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
-    @Mapping(target = "text", source = "text")
-    @Mapping(target = "meaning", source = "meaning")
-    @Mapping(target = "pronunciation", source = "pronunciation")
-    @Mapping(target = "partOfSpeech", source = "partOfSpeech")
-    @Mapping(target = "imageUrl", source = "imageUrl")
-    Word toEntity(WordDTO wordDTO);
+    ChapterDTO toDtoChapterId(Chapter chapter);
 }

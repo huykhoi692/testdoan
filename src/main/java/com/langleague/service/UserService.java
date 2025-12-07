@@ -9,8 +9,6 @@ import com.langleague.security.AuthoritiesConstants;
 import com.langleague.security.SecurityUtils;
 import com.langleague.service.dto.AdminUserDTO;
 import com.langleague.service.dto.UserDTO;
-import com.langleague.web.rest.errors.EmailAlreadyUsedException;
-import com.langleague.web.rest.errors.LoginAlreadyUsedException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -39,24 +37,24 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final AppUserService appUserService;
-
     private final AuthorityRepository authorityRepository;
 
     private final CacheManager cacheManager;
 
+    private final AppUserService appUserService;
+
     public UserService(
         UserRepository userRepository,
         PasswordEncoder passwordEncoder,
-        AppUserService appUserService,
         AuthorityRepository authorityRepository,
-        CacheManager cacheManager
+        CacheManager cacheManager,
+        AppUserService appUserService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.appUserService = appUserService;
         this.authorityRepository = authorityRepository;
         this.cacheManager = cacheManager;
+        this.appUserService = appUserService;
     }
 
     public Optional<User> activateRegistration(String key) {
@@ -105,7 +103,7 @@ public class UserService {
             .ifPresent(existingUser -> {
                 boolean removed = removeNonActivatedUser(existingUser);
                 if (!removed) {
-                    throw new LoginAlreadyUsedException();
+                    throw new UsernameAlreadyUsedException();
                 }
             });
         userRepository
@@ -136,11 +134,19 @@ public class UserService {
         authorityRepository.findById(AuthoritiesConstants.USER).ifPresent(authorities::add);
         newUser.setAuthorities(authorities);
         userRepository.save(newUser);
-        appUserService.createAppUserForNewUser(newUser);
-        LOG.debug("AppUser created for User: {}", newUser.getLogin());
         this.clearUserCaches(newUser);
-
         LOG.debug("Created Information for User: {}", newUser);
+
+        //  Tạo AppUser tương ứng cho user mới đăng ký
+        try {
+            appUserService.createAppUserForNewUser(newUser);
+            LOG.info("AppUser created successfully for new registration: {}", newUser.getLogin());
+        } catch (Exception e) {
+            LOG.error("Failed to create AppUser for user: {}", newUser.getLogin(), e);
+            // Không throw exception để không làm fail cả quá trình đăng ký
+            // AppUser có thể tạo sau qua background job nếu cần
+        }
+
         return newUser;
     }
 
@@ -148,20 +154,6 @@ public class UserService {
         if (existingUser.isActivated()) {
             return false;
         }
-
-        // Xóa AppUser trước (nếu có) để tránh foreign key constraint
-        try {
-            appUserService
-                .findByUserLogin(existingUser.getLogin())
-                .ifPresent(appUserDTO -> {
-                    LOG.debug("Deleting AppUser for non-activated user: {}", existingUser.getLogin());
-                    appUserService.delete(appUserDTO.getId());
-                });
-        } catch (Exception e) {
-            LOG.warn("Error deleting AppUser for user {}: {}", existingUser.getLogin(), e.getMessage());
-        }
-
-        // Sau đó mới xóa User
         userRepository.delete(existingUser);
         userRepository.flush();
         this.clearUserCaches(existingUser);
@@ -200,6 +192,15 @@ public class UserService {
         userRepository.save(user);
         this.clearUserCaches(user);
         LOG.debug("Created Information for User: {}", user);
+
+        // ✅ FIX: Tạo AppUser tương ứng cho user mới (admin created)
+        try {
+            appUserService.createAppUserForNewUser(user);
+            LOG.info("AppUser created successfully for admin-created user: {}", user.getLogin());
+        } catch (Exception e) {
+            LOG.error("Failed to create AppUser for admin-created user: {}", user.getLogin(), e);
+        }
+
         return user;
     }
 
@@ -223,16 +224,13 @@ public class UserService {
                 }
                 user.setImageUrl(userDTO.getImageUrl());
                 user.setActivated(userDTO.isActivated());
+                user.setLocked(userDTO.isLocked());
                 user.setLangKey(userDTO.getLangKey());
                 Set<Authority> managedAuthorities = user.getAuthorities();
                 managedAuthorities.clear();
-                userDTO
-                    .getAuthorities()
-                    .stream()
-                    .map(authorityRepository::findById)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .forEach(managedAuthorities::add);
+                // Batch load authorities instead of N queries
+                Set<Authority> authorities = authorityRepository.findByNameIn(userDTO.getAuthorities());
+                managedAuthorities.addAll(authorities);
                 userRepository.save(user);
                 this.clearUserCaches(user);
                 LOG.debug("Changed Information for User: {}", user);
@@ -274,6 +272,31 @@ public class UserService {
                 userRepository.save(user);
                 this.clearUserCaches(user);
                 LOG.debug("Changed Information for User: {}", user);
+
+                //  Đồng bộ displayName trong AppUser khi update firstName/lastName
+                if (firstName != null || lastName != null) {
+                    String newDisplayName = (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
+                    appUserService.updateProfile(user.getLogin(), newDisplayName.trim(), null);
+                    LOG.debug("Updated AppUser displayName for user: {}", user.getLogin());
+                }
+            });
+    }
+
+    /**
+     * Update user's image URL (avatar).
+     *
+     * @param login user login
+     * @param imageUrl new image URL (can be external URL or base64 data URI)
+     */
+    @Transactional
+    public void updateUserImageUrl(String login, String imageUrl) {
+        userRepository
+            .findOneByLogin(login)
+            .ifPresent(user -> {
+                user.setImageUrl(imageUrl);
+                userRepository.save(user);
+                this.clearUserCaches(user);
+                LOG.debug("Updated imageUrl for user: {}", login);
             });
     }
 
@@ -338,147 +361,46 @@ public class UserService {
         return authorityRepository.findAll().stream().map(Authority::getName).toList();
     }
 
+    /**
+     * Lock a user account.
+     * Use case 12: Lock/Unlock account
+     *
+     * @param login the login of the user to lock
+     */
+    public void lockAccount(String login) {
+        LOG.debug("Request to lock account for user : {}", login);
+        userRepository
+            .findOneByLogin(login)
+            .ifPresent(user -> {
+                user.setActivated(false);
+                userRepository.save(user);
+                this.clearUserCaches(user);
+                LOG.info("Account locked for user: {}", login);
+            });
+    }
+
+    /**
+     * Unlock a user account.
+     * Use case 12: Lock/Unlock account
+     *
+     * @param login the login of the user to unlock
+     */
+    public void unlockAccount(String login) {
+        LOG.debug("Request to unlock account for user : {}", login);
+        userRepository
+            .findOneByLogin(login)
+            .ifPresent(user -> {
+                user.setActivated(true);
+                userRepository.save(user);
+                this.clearUserCaches(user);
+                LOG.info("Account unlocked for user: {}", login);
+            });
+    }
+
     private void clearUserCaches(User user) {
         Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE)).evictIfPresent(user.getLogin());
         if (user.getEmail() != null) {
             Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE)).evictIfPresent(user.getEmail());
         }
-    }
-
-    /**
-     * Find a user by email, case-insensitive.
-     * Returns an Optional to handle the case when the user is not found.
-     *
-     * @param email the email to search for
-     * @return Optional containing the User if found, or empty if not
-     */
-    public Optional<User> findOneByEmailIgnoreCase(String email) {
-        // Calls the Spring Data JPA repository method, query is generated based on method name
-        return userRepository.findOneByEmailIgnoreCase(email);
-    }
-
-    /**
-     * Create a new user from OAuth2 information (Google/GitHub)
-     * - email: used as both login and email of the user
-     * - name: display name of the user
-     * The new user is activated immediately and has the default language "en"
-     * The user is assigned the ROLE_USER authority
-     *
-     * @param email the user's email from the OAuth2 provider
-     * @param name the display name from the OAuth2 provider
-     * @return the newly created User saved in the database
-     */
-    @Transactional
-    public User createUserFromOAuth2(String email, String name) {
-        User user = new User();
-
-        // Use email as the login username
-        user.setLogin(email);
-
-        // Set the email
-        user.setEmail(email);
-
-        // Activate the user immediately
-        user.setActivated(true);
-
-        // Set default language
-        user.setLangKey("en");
-
-        // Assign ROLE_USER authority
-        user.setAuthorities(
-            Set.of(
-                authorityRepository
-                    .findById(AuthoritiesConstants.USER)
-                    .orElseThrow(() -> new RuntimeException("Default authority ROLE_USER not found"))
-            )
-        );
-
-        // Save the user to the database
-        userRepository.save(user);
-
-        return user;
-    }
-
-    /**
-     * Use case 12, 50, 51: Lock/Unlock account
-     * Lock a user account
-     *
-     * @param login the user login
-     * @return the locked user
-     */
-    @Transactional
-    public Optional<User> lockAccount(String login) {
-        LOG.debug("Request to lock account: {}", login);
-        return userRepository
-            .findOneByLogin(login)
-            .map(user -> {
-                user.setAccountLocked(true);
-                userRepository.save(user);
-                this.clearUserCaches(user);
-                LOG.debug("Locked account for User: {}", user);
-                return user;
-            });
-    }
-
-    /**
-     * Use case 12, 50, 51: Lock/Unlock account
-     * Unlock a user account
-     *
-     * @param login the user login
-     * @return the unlocked user
-     */
-    @Transactional
-    public Optional<User> unlockAccount(String login) {
-        LOG.debug("Request to unlock account: {}", login);
-        return userRepository
-            .findOneByLogin(login)
-            .map(user -> {
-                user.setAccountLocked(false);
-                userRepository.save(user);
-                this.clearUserCaches(user);
-                LOG.debug("Unlocked account for User: {}", user);
-                return user;
-            });
-    }
-
-    /**
-     * Use case 49: Create user (Admin)
-     * Admin manually creates a new user account
-     *
-     * @param userDTO the user data transfer object
-     * @param password the initial password
-     * @param activated whether the user is activated
-     * @return the created user
-     */
-    @Transactional
-    public User createUser(AdminUserDTO userDTO, String password, boolean activated) {
-        LOG.debug("Request to create user: {}", userDTO.getLogin());
-        User newUser = new User();
-        String encryptedPassword = passwordEncoder.encode(password);
-        newUser.setLogin(userDTO.getLogin().toLowerCase());
-        newUser.setPassword(encryptedPassword);
-        newUser.setFirstName(userDTO.getFirstName());
-        newUser.setLastName(userDTO.getLastName());
-        if (userDTO.getEmail() != null) {
-            newUser.setEmail(userDTO.getEmail().toLowerCase());
-        }
-        newUser.setImageUrl(userDTO.getImageUrl());
-        newUser.setLangKey(userDTO.getLangKey());
-        newUser.setActivated(activated);
-        if (userDTO.getAuthorities() != null) {
-            Set<Authority> authorities = userDTO
-                .getAuthorities()
-                .stream()
-                .map(authorityRepository::findById)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(java.util.stream.Collectors.toSet());
-            newUser.setAuthorities(authorities);
-        }
-        userRepository.save(newUser);
-        appUserService.createAppUserForNewUser(newUser);
-        this.clearUserCaches(newUser);
-        LOG.debug("Created User: {}", newUser);
-        return newUser;
     }
 }

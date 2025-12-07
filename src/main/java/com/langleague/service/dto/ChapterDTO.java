@@ -1,10 +1,13 @@
 package com.langleague.service.dto;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * A DTO for the {@link com.langleague.domain.Chapter} entity.
+ */
+@SuppressWarnings("common-java:DuplicatedBlocks")
 public class ChapterDTO implements Serializable {
 
     private Long id;
@@ -16,10 +19,7 @@ public class ChapterDTO implements Serializable {
     @NotNull
     private Integer orderIndex;
 
-    @NotNull
-    private Long bookId;
-
-    private String bookTitle; // For display purposes
+    private BookDTO book;
 
     public Long getId() {
         return id;
@@ -45,52 +45,43 @@ public class ChapterDTO implements Serializable {
         this.orderIndex = orderIndex;
     }
 
-    public Long getBookId() {
-        return bookId;
+    public BookDTO getBook() {
+        return book;
     }
 
-    public void setBookId(Long bookId) {
-        this.bookId = bookId;
-    }
-
-    public String getBookTitle() {
-        return bookTitle;
-    }
-
-    public void setBookTitle(String bookTitle) {
-        this.bookTitle = bookTitle;
+    public void setBook(BookDTO book) {
+        this.book = book;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ChapterDTO)) return false;
-        ChapterDTO that = (ChapterDTO) o;
-        return Objects.equals(id, that.id);
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ChapterDTO)) {
+            return false;
+        }
+
+        ChapterDTO chapterDTO = (ChapterDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, chapterDTO.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(this.id);
     }
 
+    // prettier-ignore
     @Override
     public String toString() {
-        return (
-            "ChapterDTO{" +
-            "id=" +
-            id +
-            ", title='" +
-            title +
-            '\'' +
-            ", orderIndex=" +
-            orderIndex +
-            ", bookId=" +
-            bookId +
-            ", bookTitle='" +
-            bookTitle +
-            '\'' +
-            '}'
-        );
+        return "ChapterDTO{" +
+            "id=" + getId() +
+            ", title='" + getTitle() + "'" +
+            ", orderIndex=" + getOrderIndex() +
+            ", book=" + getBook() +
+            "}";
     }
 }

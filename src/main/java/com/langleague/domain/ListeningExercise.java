@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -23,47 +25,59 @@ public class ListeningExercise implements Serializable {
     @Column(name = "id")
     private Long id;
 
+    @NotNull
     @Size(max = 512)
-    @Column(name = "audio_path", length = 512)
+    @Column(name = "audio_path", length = 512, nullable = false)
     private String audioPath;
+
+    @Size(max = 512)
+    @Column(name = "image_url", length = 512)
+    private String imageUrl;
 
     @Lob
     @Column(name = "transcript")
     private String transcript;
 
     @Lob
-    @Column(name = "question")
+    @Column(name = "question", nullable = false)
     private String question;
 
     @Size(max = 255)
-    @Column(name = "option_a", length = 255)
-    private String optionA;
+    @Column(name = "correct_answer", length = 255)
+    private String correctAnswer;
 
-    @Size(max = 255)
-    @Column(name = "option_b", length = 255)
-    private String optionB;
+    @NotNull
+    @Column(name = "max_score", nullable = false)
+    private Integer maxScore;
 
-    @Size(max = 255)
-    @Column(name = "option_c", length = 255)
-    private String optionC;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "listeningExercise")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "listeningExercise" }, allowSetters = true)
+    private Set<ListeningOption> options = new HashSet<>();
 
-    @Size(max = 255)
-    @Column(name = "correct_option", length = 255)
-    private String correctOption;
-
-    @Column(name = "chart")
-    private Integer chart;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "listeningExercise")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(
+        value = { "appUser", "listeningExercise", "speakingExercise", "readingExercise", "writingExercise" },
+        allowSetters = true
+    )
+    private Set<ExerciseResult> exerciseResults = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(
-        value = { "listeningExercises", "speakingExercises", "readingExercises", "writingExercises", "lesson", "skill" },
+        value = {
+            "words",
+            "grammars",
+            "listeningExercises",
+            "speakingExercises",
+            "readingExercises",
+            "writingExercises",
+            "chapterProgresses",
+            "book",
+        },
         allowSetters = true
     )
-    private LessonSkill lessonSkill;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "lesson_id")
-    private Lesson lesson;
+    private Chapter chapter;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -93,6 +107,19 @@ public class ListeningExercise implements Serializable {
         this.audioPath = audioPath;
     }
 
+    public String getImageUrl() {
+        return this.imageUrl;
+    }
+
+    public ListeningExercise imageUrl(String imageUrl) {
+        this.setImageUrl(imageUrl);
+        return this;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
     public String getTranscript() {
         return this.transcript;
     }
@@ -119,94 +146,104 @@ public class ListeningExercise implements Serializable {
         this.question = question;
     }
 
-    public String getOptionA() {
-        return this.optionA;
+    public String getCorrectAnswer() {
+        return this.correctAnswer;
     }
 
-    public ListeningExercise optionA(String optionA) {
-        this.setOptionA(optionA);
+    public ListeningExercise correctAnswer(String correctAnswer) {
+        this.setCorrectAnswer(correctAnswer);
         return this;
     }
 
-    public void setOptionA(String optionA) {
-        this.optionA = optionA;
+    public void setCorrectAnswer(String correctAnswer) {
+        this.correctAnswer = correctAnswer;
     }
 
-    public String getOptionB() {
-        return this.optionB;
+    public Integer getMaxScore() {
+        return this.maxScore;
     }
 
-    public ListeningExercise optionB(String optionB) {
-        this.setOptionB(optionB);
+    public ListeningExercise maxScore(Integer maxScore) {
+        this.setMaxScore(maxScore);
         return this;
     }
 
-    public void setOptionB(String optionB) {
-        this.optionB = optionB;
+    public void setMaxScore(Integer maxScore) {
+        this.maxScore = maxScore;
     }
 
-    public String getOptionC() {
-        return this.optionC;
+    public Set<ListeningOption> getOptions() {
+        return this.options;
     }
 
-    public ListeningExercise optionC(String optionC) {
-        this.setOptionC(optionC);
+    public void setOptions(Set<ListeningOption> listeningOptions) {
+        if (this.options != null) {
+            this.options.forEach(i -> i.setListeningExercise(null));
+        }
+        if (listeningOptions != null) {
+            listeningOptions.forEach(i -> i.setListeningExercise(this));
+        }
+        this.options = listeningOptions;
+    }
+
+    public ListeningExercise options(Set<ListeningOption> listeningOptions) {
+        this.setOptions(listeningOptions);
         return this;
     }
 
-    public void setOptionC(String optionC) {
-        this.optionC = optionC;
-    }
-
-    public String getCorrectOption() {
-        return this.correctOption;
-    }
-
-    public ListeningExercise correctOption(String correctOption) {
-        this.setCorrectOption(correctOption);
+    public ListeningExercise addOption(ListeningOption listeningOption) {
+        this.options.add(listeningOption);
+        listeningOption.setListeningExercise(this);
         return this;
     }
 
-    public void setCorrectOption(String correctOption) {
-        this.correctOption = correctOption;
-    }
-
-    public Integer getChart() {
-        return this.chart;
-    }
-
-    public ListeningExercise chart(Integer chart) {
-        this.setChart(chart);
+    public ListeningExercise removeOption(ListeningOption listeningOption) {
+        this.options.remove(listeningOption);
+        listeningOption.setListeningExercise(null);
         return this;
     }
 
-    public void setChart(Integer chart) {
-        this.chart = chart;
+    public Set<ExerciseResult> getExerciseResults() {
+        return this.exerciseResults;
     }
 
-    public LessonSkill getLessonSkill() {
-        return this.lessonSkill;
+    public void setExerciseResults(Set<ExerciseResult> exerciseResults) {
+        if (this.exerciseResults != null) {
+            this.exerciseResults.forEach(i -> i.setListeningExercise(null));
+        }
+        if (exerciseResults != null) {
+            exerciseResults.forEach(i -> i.setListeningExercise(this));
+        }
+        this.exerciseResults = exerciseResults;
     }
 
-    public void setLessonSkill(LessonSkill lessonSkill) {
-        this.lessonSkill = lessonSkill;
-    }
-
-    public ListeningExercise lessonSkill(LessonSkill lessonSkill) {
-        this.setLessonSkill(lessonSkill);
+    public ListeningExercise exerciseResults(Set<ExerciseResult> exerciseResults) {
+        this.setExerciseResults(exerciseResults);
         return this;
     }
 
-    public Lesson getLesson() {
-        return this.lesson;
+    public ListeningExercise addExerciseResult(ExerciseResult exerciseResult) {
+        this.exerciseResults.add(exerciseResult);
+        exerciseResult.setListeningExercise(this);
+        return this;
     }
 
-    public void setLesson(Lesson lesson) {
-        this.lesson = lesson;
+    public ListeningExercise removeExerciseResult(ExerciseResult exerciseResult) {
+        this.exerciseResults.remove(exerciseResult);
+        exerciseResult.setListeningExercise(null);
+        return this;
     }
 
-    public ListeningExercise lesson(Lesson lesson) {
-        this.setLesson(lesson);
+    public Chapter getChapter() {
+        return this.chapter;
+    }
+
+    public void setChapter(Chapter chapter) {
+        this.chapter = chapter;
+    }
+
+    public ListeningExercise chapter(Chapter chapter) {
+        this.setChapter(chapter);
         return this;
     }
 
@@ -235,13 +272,11 @@ public class ListeningExercise implements Serializable {
         return "ListeningExercise{" +
             "id=" + getId() +
             ", audioPath='" + getAudioPath() + "'" +
+            ", imageUrl='" + getImageUrl() + "'" +
             ", transcript='" + getTranscript() + "'" +
             ", question='" + getQuestion() + "'" +
-            ", optionA='" + getOptionA() + "'" +
-            ", optionB='" + getOptionB() + "'" +
-            ", optionC='" + getOptionC() + "'" +
-            ", correctOption='" + getCorrectOption() + "'" +
-            ", chart=" + getChart() +
+            ", correctAnswer='" + getCorrectAnswer() + "'" +
+            ", maxScore=" + getMaxScore() +
             "}";
     }
 }

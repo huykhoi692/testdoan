@@ -2,6 +2,7 @@ package com.langleague.config;
 
 import static java.net.URLDecoder.decode;
 
+import com.langleague.web.rest.interceptor.SimpleRateLimitInterceptor;
 import jakarta.servlet.*;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -18,6 +19,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import tech.jhipster.config.JHipsterProperties;
 
@@ -33,9 +35,21 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
 
     private final JHipsterProperties jHipsterProperties;
 
-    public WebConfigurer(Environment env, JHipsterProperties jHipsterProperties) {
+    private final SimpleRateLimitInterceptor simpleRateLimitInterceptor;
+
+    public WebConfigurer(Environment env, JHipsterProperties jHipsterProperties, SimpleRateLimitInterceptor simpleRateLimitInterceptor) {
         this.env = env;
         this.jHipsterProperties = jHipsterProperties;
+        this.simpleRateLimitInterceptor = simpleRateLimitInterceptor;
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        // Add rate limiting interceptor for sensitive endpoints
+        registry
+            .addInterceptor(simpleRateLimitInterceptor)
+            .addPathPatterns("/api/authenticate", "/api/register", "/api/account/**", "/api/admin/**", "/api/files/upload/**");
+        LOG.info("Rate limiting interceptor registered");
     }
 
     @Override

@@ -16,15 +16,13 @@ public class WritingExerciseDTO implements Serializable {
     @Lob
     private String prompt;
 
-    @Size(max = 255)
-    private String wordLimit;
-
-    private Integer maxLength;
-
     @Lob
     private String sampleAnswer;
 
-    private LessonSkillDTO lessonSkill;
+    @NotNull
+    private Integer maxScore;
+
+    private ChapterDTO chapter;
 
     public Long getId() {
         return id;
@@ -42,22 +40,6 @@ public class WritingExerciseDTO implements Serializable {
         this.prompt = prompt;
     }
 
-    public String getWordLimit() {
-        return wordLimit;
-    }
-
-    public void setWordLimit(String wordLimit) {
-        this.wordLimit = wordLimit;
-    }
-
-    public Integer getMaxLength() {
-        return maxLength;
-    }
-
-    public void setMaxLength(Integer maxLength) {
-        this.maxLength = maxLength;
-    }
-
     public String getSampleAnswer() {
         return sampleAnswer;
     }
@@ -66,12 +48,20 @@ public class WritingExerciseDTO implements Serializable {
         this.sampleAnswer = sampleAnswer;
     }
 
-    public LessonSkillDTO getLessonSkill() {
-        return lessonSkill;
+    public Integer getMaxScore() {
+        return maxScore;
     }
 
-    public void setLessonSkill(LessonSkillDTO lessonSkill) {
-        this.lessonSkill = lessonSkill;
+    public void setMaxScore(Integer maxScore) {
+        this.maxScore = maxScore;
+    }
+
+    public ChapterDTO getChapter() {
+        return chapter;
+    }
+
+    public void setChapter(ChapterDTO chapter) {
+        this.chapter = chapter;
     }
 
     @Override
@@ -101,10 +91,9 @@ public class WritingExerciseDTO implements Serializable {
         return "WritingExerciseDTO{" +
             "id=" + getId() +
             ", prompt='" + getPrompt() + "'" +
-            ", wordLimit='" + getWordLimit() + "'" +
-            ", maxLength=" + getMaxLength() +
             ", sampleAnswer='" + getSampleAnswer() + "'" +
-            ", lessonSkill=" + getLessonSkill() +
+            ", maxScore=" + getMaxScore() +
+            ", chapter=" + getChapter() +
             "}";
     }
 }

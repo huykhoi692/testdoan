@@ -1,9 +1,11 @@
-import React from 'react';
+import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Form, Input, Button, Checkbox, Typography, Space, Divider, message } from 'antd';
 import { FacebookOutlined, GoogleOutlined, InstagramOutlined, ReloadOutlined } from '@ant-design/icons';
-import axios from 'axios';
+import { useTranslation } from 'react-i18next';
+import { useAppDispatch } from 'app/config/store';
+import { authenticate } from 'app/shared/services/account.service';
 
 const { Title, Text } = Typography;
 
@@ -13,12 +15,14 @@ interface CaptchaData {
 }
 
 const LoginPage = () => {
+  const { t } = useTranslation('login');
   const [form] = Form.useForm();
   const [captchaData, setCaptchaData] = useState<CaptchaData | null>(null);
   const [loading, setLoading] = useState(false);
   const [isLoadingCaptcha, setIsLoadingCaptcha] = useState(true);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -75,90 +79,45 @@ const LoginPage = () => {
   const onFinish = async (values: any) => {
     setLoading(true);
     try {
-      // Validate captcha trước khi gửi request authenticate
-      if (captchaData) {
-        if (!values.captchaAnswer) {
-          message.error({
-            content: 'Please fill in the captcha code.',
-            duration: 4,
-            style: {
-              marginTop: '20vh',
-            },
-          });
-          setLoading(false);
-          return;
-        }
+      // Clear old tokens before login
+      localStorage.removeItem('authToken');
+      sessionStorage.removeItem('jhi-authenticationToken');
+
+      // Use account.service authenticate
+      const result = await dispatch(
+        authenticate({
+          username: values.email,
+          password: values.password,
+          rememberMe: values.remember || false,
+          captchaId: captchaData?.captchaId || '',
+          captchaValue: values.captchaAnswer,
+        }),
+      ).unwrap();
+
+      const token = result.id_token;
+      console.log('JWT:', token);
+      message.success(t('login.success'));
+
+      localStorage.setItem('authToken', token);
+      sessionStorage.setItem('jhi-authenticationToken', token);
+
+      // Decode JWT to check user role
+      const tokenParts = token.split('.');
+      const payload = JSON.parse(atob(tokenParts[1]));
+      const authorities = payload.auth || '';
+
+      // Redirect based on role
+      if (authorities.includes('ROLE_ADMIN')) {
+        navigate('/admin');
+      } else if (authorities.includes('ROLE_STAFF')) {
+        navigate('/staff');
+      } else {
+        navigate('/dashboard');
       }
-
-      // Gửi request authenticate với captchaId và captchaValue
-      const authResponse = await axios.post('/api/authenticate', {
-        username: values.email,
-        password: values.password,
-        rememberMe: values.remember || false,
-        captchaId: captchaData?.captchaId || '',
-        captchaValue: values.captchaAnswer || '',
-      });
-
-      console.log('JWT:', authResponse.data.id_token);
-      message.success({
-        content: 'Login successful! Redirecting to dashboard...',
-        duration: 3,
-        style: {
-          marginTop: '20vh',
-        },
-      });
-
-      localStorage.setItem('authToken', authResponse.data.id_token);
-      sessionStorage.setItem('jhi-authenticationToken', authResponse.data.id_token);
-      navigate('/dashboard');
     } catch (err: any) {
       console.error('Login error', err);
-
-      if (err.response?.status === 401) {
-        message.error({
-          content: 'Invalid email, password or captcha. Please check your credentials and try again.',
-          duration: 5,
-          style: {
-            marginTop: '20vh',
-          },
-        });
-      } else if (err.response?.status === 400) {
-        const errorDetail = err.response?.data?.detail || '';
-        if (errorDetail.includes('captcha')) {
-          message.error({
-            content: 'Invalid captcha. Please try again.',
-            duration: 5,
-            style: {
-              marginTop: '20vh',
-            },
-          });
-        } else {
-          message.error({
-            content: 'Login failed. Please check your information.',
-            duration: 5,
-            style: {
-              marginTop: '20vh',
-            },
-          });
-        }
-      } else if (err.code === 'ERR_NETWORK') {
-        message.error({
-          content: 'Network error. Please check your internet connection.',
-          duration: 5,
-          style: {
-            marginTop: '20vh',
-          },
-        });
-      } else {
-        message.error({
-          content: 'Login failed. Please try again later.',
-          duration: 5,
-          style: {
-            marginTop: '20vh',
-          },
-        });
-      }
-
+      const errorMessage = err.response?.data?.message || err.response?.data?.detail || 'Invalid username, password or captcha.';
+      message.error(errorMessage);
       if (captchaData) {
         loadCaptcha();
       }
@@ -179,7 +138,7 @@ const LoginPage = () => {
       <div
         style={{
           flex: windowWidth <= 768 ? 'none' : '0 0 50%',
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          background: 'linear-gradient(135deg, #667eea 0%, #081edfff 100%)',
           display: windowWidth <= 480 ? 'none' : 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -190,7 +149,7 @@ const LoginPage = () => {
       >
         <div style={{ maxWidth: '480px', width: '100%' }}>
           <img
-            src="content/images/Langleague.jpg"
+            src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600"
             alt="Students learning"
             style={{
               width: '100%',
@@ -210,7 +169,7 @@ const LoginPage = () => {
               textAlign: windowWidth <= 768 ? 'center' : 'left',
             }}
           >
-            Welcome, explore the way to learn faster
+            {t('login.welcomeMessage')}
           </Title>
         </div>
       </div>
@@ -227,96 +186,80 @@ const LoginPage = () => {
       >
         <div style={{ marginBottom: windowWidth <= 768 ? 32 : 48 }}>
           <Title level={2} style={{ marginBottom: 8, fontSize: windowWidth <= 768 ? '24px' : '32px', fontWeight: 600 }}>
-            Log in
+            {t('login.title')}
           </Title>
           <Text style={{ fontSize: '15px', color: '#6c757d' }}>
-            New to Langleague?{' '}
+            {t('login.newToLangleague')}{' '}
             <Link to="/register" style={{ color: '#1890ff', fontWeight: 500 }}>
-              Sign Up
+              {t('login.signUp')}
             </Link>
           </Text>
         </div>
 
         <Form form={form} onFinish={onFinish} layout="vertical">
           <Form.Item
-            label={<span style={{ fontSize: '14px', fontWeight: 500 }}>Username</span>}
+            label={<span style={{ fontSize: '14px', fontWeight: 500 }}>{t('login.email')}</span>}
             name="email"
-            rules={[{ required: true, message: 'Please input your username!' }]}
+            rules={[{ required: true, message: t('login.validation.emailRequired') }]}
           >
-            <Input placeholder="Username" size="large" style={{ height: '48px', fontSize: '15px' }} />
+            <Input placeholder={t('login.email')} size="large" style={{ height: '48px', fontSize: '15px' }} />
           </Form.Item>
 
           <Form.Item
-            label={<span style={{ fontSize: '14px', fontWeight: 500 }}>Password</span>}
+            label={<span style={{ fontSize: '14px', fontWeight: 500 }}>{t('login.password')}</span>}
             name="password"
-            rules={[{ required: true, message: 'Please input your password!' }]}
+            rules={[{ required: true, message: t('login.validation.passwordRequired') }]}
             style={{ marginBottom: '12px' }}
           >
-            <Input.Password placeholder="Password" size="large" style={{ height: '48px', fontSize: '15px' }} />
+            <Input.Password placeholder={t('login.password')} size="large" style={{ height: '48px', fontSize: '15px' }} />
           </Form.Item>
 
-          <Form.Item label={<span style={{ fontSize: '14px', fontWeight: 500 }}>Captcha</span>} required>
-            <div style={{ display: 'flex', gap: '8px', marginBottom: 8 }}>
-              {captchaData ? (
-                <img
-                  src={captchaData.captchaImage}
-                  alt="captcha"
-                  onClick={loadCaptcha}
-                  style={{
-                    cursor: 'pointer',
-                    border: '1px solid #d9d9d9',
-                    borderRadius: 6,
-                    height: '48px',
-                    flex: 1,
-                    backgroundColor: 'white',
-                    padding: '0 12px',
-                    objectFit: 'contain',
-                  }}
-                />
-              ) : (
+          {captchaData && (
+            <Form.Item
+              label={<span style={{ fontSize: '14px', fontWeight: 500 }}>{t('login.captcha')}</span>}
+              style={{ marginBottom: '16px' }}
+            >
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
                 <div
                   style={{
+                    flex: 1,
+                    border: '1px solid #d9d9d9',
+                    borderRadius: '6px',
+                    padding: '8px',
+                    background: '#f5f5f5',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    border: '1px solid #d9d9d9',
-                    borderRadius: 6,
-                    height: '48px',
-                    flex: 1,
-                    backgroundColor: '#f5f5f5',
-                    color: '#8c8c8c',
-                    fontSize: '13px',
+                    minHeight: '60px',
                   }}
                 >
-                  {isLoadingCaptcha ? 'Loading captcha...' : 'Captcha not available'}
+                  {isLoadingCaptcha ? (
+                    <span style={{ color: '#999' }}>{t('common.loading')}</span>
+                  ) : (
+                    <img src={captchaData.captchaImage} alt="Captcha" style={{ maxWidth: '100%', height: 'auto', display: 'block' }} />
+                  )}
                 </div>
-              )}
-              <Button
-                icon={<ReloadOutlined spin={isLoadingCaptcha} />}
-                onClick={loadCaptcha}
-                disabled={isLoadingCaptcha}
-                size="large"
-                title="Reload captcha"
-                style={{ height: '48px', width: '48px' }}
-              />
-            </div>
-            <Form.Item name="captchaAnswer" noStyle rules={[{ required: captchaData !== null, message: 'Please enter captcha!' }]}>
-              <Input
-                placeholder={captchaData ? 'Enter captcha' : 'Captcha loading...'}
-                size="large"
-                style={{ height: '48px', fontSize: '15px' }}
-                disabled={!captchaData}
-              />
+                <Button icon={<ReloadOutlined />} onClick={loadCaptcha} size="large" style={{ height: '48px' }} loading={isLoadingCaptcha}>
+                  {t('login.refreshCaptcha')}
+                </Button>
+              </div>
+              <Form.Item
+                name="captchaAnswer"
+                rules={[{ required: true, message: t('login.validation.captchaRequired') }]}
+                style={{ marginTop: '12px', marginBottom: 0 }}
+              >
+                <Input placeholder={t('login.captcha')} size="large" style={{ height: '48px', fontSize: '15px' }} />
+              </Form.Item>
             </Form.Item>
-          </Form.Item>
+          )}
 
           <Form.Item style={{ marginBottom: '24px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Form.Item name="remember" valuePropName="checked" noStyle>
-                <Checkbox style={{ fontSize: '14px' }}>Remember me</Checkbox>
+                <Checkbox style={{ fontSize: '14px' }}>{t('login.rememberMe')}</Checkbox>
               </Form.Item>
               <Link to="/forgot-password" style={{ fontSize: '14px', color: '#1890ff' }}>
-                Forgot password?
+                {t('login.forgotPassword')}
               </Link>
             </div>
           </Form.Item>
@@ -337,12 +280,12 @@ const LoginPage = () => {
                 borderRadius: '6px',
               }}
             >
-              Log In
+              {t('login.loginButton')}
             </Button>
           </Form.Item>
 
           <Divider plain style={{ margin: '24px 0', fontSize: '14px', color: '#9ca3af' }}>
-            Or continue with
+            {t('login.orContinueWith')}
           </Divider>
 
           <Space style={{ width: '100%', justifyContent: 'center' }} size={windowWidth <= 480 ? 'small' : 'middle'}>

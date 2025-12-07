@@ -109,4 +109,20 @@ public class GrammarService {
         LOG.debug("Request to delete Grammar : {}", id);
         grammarRepository.deleteById(id);
     }
+
+    /**
+     * Get all grammars by chapter ID.
+     *
+     * @param chapterId the chapter ID
+     * @return the list of grammars
+     */
+    @Transactional(readOnly = true)
+    public java.util.List<GrammarDTO> findByChapterId(Long chapterId) {
+        LOG.debug("Request to get grammars by chapter : {}", chapterId);
+        return grammarRepository
+            .findByChapterId(chapterId)
+            .stream()
+            .map(grammarMapper::toDto)
+            .collect(java.util.stream.Collectors.toList());
+    }
 }

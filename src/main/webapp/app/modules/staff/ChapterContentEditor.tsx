@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'app/shared/utils/useTranslation';
 import {
   Card,
   Tabs,
@@ -13,6 +14,7 @@ import {
   Typography,
   message,
   Popconfirm,
+  Upload,
   Row,
   Col,
   Tag,
@@ -21,30 +23,51 @@ import {
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
+  SaveOutlined,
   BookOutlined,
   FileTextOutlined,
   AudioOutlined,
   SoundOutlined,
   ReadOutlined,
   FormOutlined,
+  UploadOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppDispatch } from 'app/config/store';
 import { getChapter, getChapterWords, getChapterGrammars, getChapterExercises } from 'app/shared/services/chapter.service';
-import { IChapter } from 'app/shared/model/chapter.model';
-import { IWord } from 'app/shared/model/word.model';
-import { IGrammar } from 'app/shared/model/grammar.model';
-import { IListeningExercise } from 'app/shared/model/listening-exercise.model';
-import { ISpeakingExercise } from 'app/shared/model/speaking-exercise.model';
-import { IReadingExercise } from 'app/shared/model/reading-exercise.model';
-import { IWritingExercise } from 'app/shared/model/writing-exercise.model';
+import { createWord, updateWord, deleteWord } from 'app/shared/services/word.service';
+import { createGrammar, updateGrammar, deleteGrammar } from 'app/shared/services/grammar.service';
+import {
+  createListeningExercise,
+  updateListeningExercise,
+  deleteListeningExercise,
+  createSpeakingExercise,
+  updateSpeakingExercise,
+  deleteSpeakingExercise,
+  createReadingExercise,
+  updateReadingExercise,
+  deleteReadingExercise,
+  createWritingExercise,
+  updateWritingExercise,
+  deleteWritingExercise,
+} from 'app/shared/services/exercise.service';
+import {
+  IChapter,
+  IWord,
+  IGrammar,
+  IListeningExercise,
+  ISpeakingExercise,
+  IReadingExercise,
+  IWritingExercise,
+} from 'app/shared/model/models';
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
 
 const ChapterContentEditor: React.FC = () => {
+  const { t } = useTranslation('staff');
   const { chapterId } = useParams<{ chapterId: string }>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -66,7 +89,12 @@ const ChapterContentEditor: React.FC = () => {
 
   const [form] = Form.useForm();
 
-  const fetchData = useCallback(async () => {
+  useEffect(() => {
+    if (!chapterId) return;
+    fetchData();
+  }, [chapterId]);
+
+  const fetchData = async () => {
     if (!chapterId) return;
     setLoading(true);
     try {
@@ -86,12 +114,7 @@ const ChapterContentEditor: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [chapterId, dispatch]);
-
-  useEffect(() => {
-    if (!chapterId) return;
-    fetchData();
-  }, [chapterId, fetchData]); // Added fetchData to the dependency array
+  };
 
   // Show modal for create/edit
   const showModal = (type: typeof modalType, item?: any) => {
@@ -112,45 +135,177 @@ const ChapterContentEditor: React.FC = () => {
       const values = await form.validateFields();
       setLoading(true);
 
-      // TODO: Call API to create/update based on modalType and values
-      console.log('Saving:', modalType, values);
-      message.success(editingItem ? 'Cập nhật thành công' : 'Thêm mới thành công');
+      const currentChapterId = parseInt(chapterId, 10);
+
+      switch (modalType) {
+        case 'word': {
+          const wordData: IWord = {
+            ...editingItem,
+            ...values,
+            chapterId: currentChapterId,
+          };
+          if (editingItem?.id) {
+            await dispatch(updateWord({ id: editingItem.id, word: wordData })).unwrap();
+            message.success('Cập nhật từ vựng thành công');
+          } else {
+            await dispatch(createWord(wordData)).unwrap();
+            message.success('Thêm từ vựng thành công');
+          }
+          break;
+        }
+
+        case 'grammar': {
+          const grammarData: IGrammar = {
+            ...editingItem,
+            ...values,
+            chapterId: currentChapterId,
+          };
+          if (editingItem?.id) {
+            await dispatch(updateGrammar({ id: editingItem.id, grammar: grammarData })).unwrap();
+            message.success('Cập nhật ngữ pháp thành công');
+          } else {
+            await dispatch(createGrammar(grammarData)).unwrap();
+            message.success('Thêm ngữ pháp thành công');
+          }
+          break;
+        }
+
+        case 'listening': {
+          const exerciseData: IListeningExercise = {
+            ...editingItem,
+            ...values,
+            chapterId: currentChapterId,
+          };
+          if (editingItem?.id) {
+            await dispatch(updateListeningExercise({ id: editingItem.id, exercise: exerciseData })).unwrap();
+            message.success('Cập nhật bài nghe thành công');
+          } else {
+            await dispatch(createListeningExercise(exerciseData)).unwrap();
+            message.success('Thêm bài nghe thành công');
+          }
+          break;
+        }
+
+        case 'speaking': {
+          const exerciseData: ISpeakingExercise = {
+            ...editingItem,
+            ...values,
+            chapterId: currentChapterId,
+          };
+          if (editingItem?.id) {
+            await dispatch(updateSpeakingExercise({ id: editingItem.id, exercise: exerciseData })).unwrap();
+            message.success('Cập nhật bài nói thành công');
+          } else {
+            await dispatch(createSpeakingExercise(exerciseData)).unwrap();
+            message.success('Thêm bài nói thành công');
+          }
+          break;
+        }
+
+        case 'reading': {
+          const exerciseData: IReadingExercise = {
+            ...editingItem,
+            ...values,
+            chapterId: currentChapterId,
+          };
+          if (editingItem?.id) {
+            await dispatch(updateReadingExercise({ id: editingItem.id, exercise: exerciseData })).unwrap();
+            message.success('Cập nhật bài đọc thành công');
+          } else {
+            await dispatch(createReadingExercise(exerciseData)).unwrap();
+            message.success('Thêm bài đọc thành công');
+          }
+          break;
+        }
+
+        case 'writing': {
+          const exerciseData: IWritingExercise = {
+            ...editingItem,
+            ...values,
+            chapterId: currentChapterId,
+          };
+          if (editingItem?.id) {
+            await dispatch(updateWritingExercise({ id: editingItem.id, exercise: exerciseData })).unwrap();
+            message.success('Cập nhật bài viết thành công');
+          } else {
+            await dispatch(createWritingExercise(exerciseData)).unwrap();
+            message.success('Thêm bài viết thành công');
+          }
+          break;
+        }
+        default:
+          message.error('Invalid modal type');
+          break;
+      }
 
       setIsModalVisible(false);
       form.resetFields();
       fetchData();
     } catch (error: any) {
       message.error(error.message || 'Có lỗi xảy ra');
+      console.error('Error saving content:', error);
     } finally {
       setLoading(false);
     }
   };
 
   // Handle delete
-  const handleDelete = useCallback(
-    (_type: string, _id: number) => {
-      try {
-        setLoading(true);
-        // TODO: Call API to delete based on type and id
-        console.log('Deleting:', _type, _id);
-        message.success('Xóa thành công');
-        fetchData();
-      } catch (error) {
-        message.error('Không thể xóa');
-      } finally {
-        setLoading(false);
+  const handleDelete = async (type: string, id: number) => {
+    try {
+      setLoading(true);
+
+      switch (type) {
+        case 'word':
+          await dispatch(deleteWord(id)).unwrap();
+          message.success('Xóa từ vựng thành công');
+          break;
+
+        case 'grammar':
+          await dispatch(deleteGrammar(id)).unwrap();
+          message.success('Xóa ngữ pháp thành công');
+          break;
+
+        case 'listening':
+          await dispatch(deleteListeningExercise(id)).unwrap();
+          message.success('Xóa bài nghe thành công');
+          break;
+
+        case 'speaking':
+          await dispatch(deleteSpeakingExercise(id)).unwrap();
+          message.success('Xóa bài nói thành công');
+          break;
+
+        case 'reading':
+          await dispatch(deleteReadingExercise(id)).unwrap();
+          message.success('Xóa bài đọc thành công');
+          break;
+
+        case 'writing':
+          await dispatch(deleteWritingExercise(id)).unwrap();
+          message.success('Xóa bài viết thành công');
+          break;
+
+        default:
+          throw new Error('Unknown type');
       }
-    },
-    [fetchData],
-  );
+
+      fetchData();
+    } catch (error: any) {
+      message.error(error.message || 'Không thể xóa');
+      console.error('Error deleting content:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Vocabulary columns
   const vocabularyColumns: ColumnsType<IWord> = [
     {
       title: 'STT',
-      key: 'stt',
+      dataIndex: 'orderIndex',
+      key: 'orderIndex',
       width: 60,
-      render: (_text, _record, index) => index + 1,
+      sorter: (a, b) => (a.orderIndex || 0) - (b.orderIndex || 0),
     },
     {
       title: 'Từ tiếng Hàn',
@@ -202,15 +357,22 @@ const ChapterContentEditor: React.FC = () => {
   const grammarColumns: ColumnsType<IGrammar> = [
     {
       title: 'STT',
-      key: 'stt',
+      dataIndex: 'orderIndex',
+      key: 'orderIndex',
       width: 60,
-      render: (_text, _record, index) => index + 1,
+      sorter: (a, b) => (a.orderIndex || 0) - (b.orderIndex || 0),
     },
     {
       title: 'Tiêu đề',
       dataIndex: 'title',
       key: 'title',
       render: text => <Text strong>{text}</Text>,
+    },
+    {
+      title: 'Công thức',
+      dataIndex: 'pattern',
+      key: 'pattern',
+      render: text => <Tag color="purple">{text}</Tag>,
     },
     {
       title: 'Ý nghĩa',
@@ -241,9 +403,10 @@ const ChapterContentEditor: React.FC = () => {
   const exerciseColumns = (type: string): ColumnsType<any> => [
     {
       title: 'STT',
-      key: 'stt',
+      dataIndex: 'orderIndex',
+      key: 'orderIndex',
       width: 60,
-      render: (_text, _record, index) => index + 1,
+      sorter: (a, b) => (a.orderIndex || 0) - (b.orderIndex || 0),
     },
     {
       title: 'Câu hỏi/Yêu cầu',
@@ -321,6 +484,9 @@ const ChapterContentEditor: React.FC = () => {
           <>
             <Form.Item label="Tiêu đề" name="title" rules={[{ required: true, message: 'Vui lòng nhập tiêu đề' }]}>
               <Input placeholder="예: -았/었어요 (Thì quá khứ)" size="large" />
+            </Form.Item>
+            <Form.Item label="Công thức" name="pattern" rules={[{ required: true, message: 'Vui lòng nhập công thức' }]}>
+              <Input placeholder="Động từ + 았/었어요" />
             </Form.Item>
             <Form.Item label="Ý nghĩa" name="meaning">
               <Input placeholder="Diễn tả hành động đã xảy ra trong quá khứ" />
@@ -467,7 +633,7 @@ const ChapterContentEditor: React.FC = () => {
   return (
     <div style={{ padding: '24px' }}>
       {/* Header */}
-      <Card style={{ marginBottom: 16, borderRadius: 12, border: 'none' }}>
+      <Card bordered={false} style={{ marginBottom: 16, borderRadius: 12 }}>
         <Row justify="space-between" align="middle">
           <Col>
             <Button type="link" onClick={() => navigate(-1)} style={{ padding: 0, marginBottom: 8 }}>
@@ -476,16 +642,16 @@ const ChapterContentEditor: React.FC = () => {
             <Title level={3} style={{ margin: 0 }}>
               {chapter?.title || 'Chỉnh sửa nội dung chương'}
             </Title>
-            <Text type="secondary">{chapter?.content}</Text>
+            <Text type="secondary">{chapter?.description}</Text>
           </Col>
           <Col>
-            <Tag color="blue">Chương {chapter?.id}</Tag>
+            <Tag color="blue">Chương {chapter?.orderIndex}</Tag>
           </Col>
         </Row>
       </Card>
 
       {/* Content Tabs */}
-      <Card style={{ borderRadius: 12, border: 'none' }}>
+      <Card bordered={false} style={{ borderRadius: 12 }}>
         <Tabs activeKey={activeTab} onChange={setActiveTab} size="large">
           {/* Vocabulary Tab */}
           <Tabs.TabPane

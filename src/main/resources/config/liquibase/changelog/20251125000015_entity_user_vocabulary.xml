@@ -40,10 +40,29 @@
     </changeSet>
 
     <changeSet id="20251125000015-2" author="system">
-        <addForeignKeyConstraint baseColumnNames="app_user_id" baseTableName="user_vocabulary" 
+        <addForeignKeyConstraint baseColumnNames="app_user_id" baseTableName="user_vocabulary"
             constraintName="fk_user_vocabulary_app_user_id" referencedColumnNames="id" referencedTableName="app_user"/>
-        <addForeignKeyConstraint baseColumnNames="word_id" baseTableName="user_vocabulary" 
+        <addForeignKeyConstraint baseColumnNames="word_id" baseTableName="user_vocabulary"
             constraintName="fk_user_vocabulary_word_id" referencedColumnNames="id" referencedTableName="word"/>
+    </changeSet>
+
+    <!-- Add indexes -->
+    <changeSet id="20251125000015-3" author="system">
+        <preConditions onFail="MARK_RAN">
+            <not><indexExists indexName="idx_user_vocabulary_app_user_id"/></not>
+        </preConditions>
+        <createIndex indexName="idx_user_vocabulary_app_user_id" tableName="user_vocabulary">
+            <column name="app_user_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20251125000015-4" author="system">
+        <preConditions onFail="MARK_RAN">
+            <not><indexExists indexName="idx_user_vocabulary_next_review"/></not>
+        </preConditions>
+        <createIndex indexName="idx_user_vocabulary_next_review" tableName="user_vocabulary">
+            <column name="next_review_date"/>
+        </createIndex>
     </changeSet>
 
 </databaseChangeLog>

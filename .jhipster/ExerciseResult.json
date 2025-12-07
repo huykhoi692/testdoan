@@ -1,29 +1,22 @@
 {
   "annotations": {
-    "changelogDate": "20251021152357"
+    "changelogDate": "20251122061537"
   },
-  "applications": ["Langleague"],
+  "applications": "*",
   "dto": "mapstruct",
   "fields": [
     {
       "fieldName": "exerciseType",
-      "fieldType": "String",
-      "fieldValidateRules": ["maxlength"],
-      "fieldValidateRulesMaxlength": "50"
+      "fieldType": "ExerciseType",
+      "fieldValues": "LISTENING,SPEAKING,READING,WRITING"
     },
     {
       "fieldName": "score",
       "fieldType": "Integer"
     },
     {
-      "fieldName": "answer",
+      "fieldName": "userAnswer",
       "fieldType": "TextBlob"
-    },
-    {
-      "fieldName": "audioPath",
-      "fieldType": "String",
-      "fieldValidateRules": ["maxlength"],
-      "fieldValidateRulesMaxlength": "512"
     },
     {
       "fieldName": "submittedAt",

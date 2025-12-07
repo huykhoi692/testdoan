@@ -22,12 +22,20 @@ public class CommentService {
     private static final Logger LOG = LoggerFactory.getLogger(CommentService.class);
 
     private final CommentRepository commentRepository;
-
     private final CommentMapper commentMapper;
+    private final com.langleague.repository.AppUserRepository appUserRepository;
+    private final com.langleague.repository.ChapterRepository chapterRepository;
 
-    public CommentService(CommentRepository commentRepository, CommentMapper commentMapper) {
+    public CommentService(
+        CommentRepository commentRepository,
+        CommentMapper commentMapper,
+        com.langleague.repository.AppUserRepository appUserRepository,
+        com.langleague.repository.ChapterRepository chapterRepository
+    ) {
         this.commentRepository = commentRepository;
         this.commentMapper = commentMapper;
+        this.appUserRepository = appUserRepository;
+        this.chapterRepository = chapterRepository;
     }
 
     /**
@@ -111,44 +119,50 @@ public class CommentService {
     }
 
     /**
+     * Post a comment on a chapter.
      * Use case 34: Post question/comment
-     * Ask questions or leave comments in a lesson
      *
-     * @param lessonId lesson ID
-     * @param appUserId user ID
-     * @param content comment content
+     * @param chapterId chapter ID
+     * @param userId    internal user ID
+     * @param content   comment content
      * @return the saved comment
      */
-    public CommentDTO postComment(Long lessonId, Long appUserId, String content) {
-        LOG.debug("Request to post comment on lesson {} by user {}", lessonId, appUserId);
+    public CommentDTO postComment(Long chapterId, Long userId, String content) {
+        LOG.debug("Request to post comment on chapter {} by user {}", chapterId, userId);
 
-        CommentDTO commentDTO = new CommentDTO();
-        commentDTO.setContent(content);
-        commentDTO.setCreatedAt(java.time.Instant.now());
-        // Set lesson and appUser references
+        com.langleague.domain.Comment comment = new com.langleague.domain.Comment();
+        comment.setContent(content);
+        comment.setCreatedAt(java.time.Instant.now());
 
-        Comment comment = commentMapper.toEntity(commentDTO);
+        // Set AppUser
+        com.langleague.domain.AppUser appUser = appUserRepository
+            .findByInternalUserId(userId)
+            .orElseThrow(() -> new RuntimeException("AppUser not found for user: " + userId));
+        comment.setAppUser(appUser);
+
+        // Note: Comment entity doesn't have chapter field in the current model
+        // If you need to associate with chapter, you'll need to add that field to
+        // Comment entity
+
         comment = commentRepository.save(comment);
         return commentMapper.toDto(comment);
     }
 
     /**
-     * Use case 35, 36: Join discussion / Reply to comments
-     * Get all comments for a lesson
+     * Get all comments for a chapter.
      *
-     * @param lessonId lesson ID
-     * @param pageable pagination info
+     * @param chapterId chapter ID
+     * @param pageable  pagination info
      * @return page of comments
      */
     @Transactional(readOnly = true)
-    public Page<CommentDTO> findByLessonId(Long lessonId, Pageable pageable) {
-        LOG.debug("Request to get comments for lesson {}", lessonId);
-        return commentRepository.findByLessonId(lessonId, pageable).map(commentMapper::toDto);
+    public Page<CommentDTO> findByChapterId(Long chapterId, Pageable pageable) {
+        LOG.debug("Request to get comments for chapter {}", chapterId);
+        return commentRepository.findByChapterId(chapterId, pageable).map(commentMapper::toDto);
     }
 
     /**
-     * Use case 61: Moderate comments/discussions (Admin)
-     * Delete comment by admin
+     * Delete comment by admin.
      *
      * @param id comment ID
      */
@@ -158,10 +172,9 @@ public class CommentService {
     }
 
     /**
-     * Use case 61: Moderate comments/discussions (Admin)
-     * Edit comment content by admin
+     * Edit comment content by admin.
      *
-     * @param id comment ID
+     * @param id         comment ID
      * @param newContent new content
      * @return updated comment
      */

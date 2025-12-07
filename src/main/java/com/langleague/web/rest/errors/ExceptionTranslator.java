@@ -1,5 +1,7 @@
 package com.langleague.web.rest.errors;
 
+import com.langleague.security.UserAccountLockedException;
+import com.langleague.security.UserNotActivatedException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.Arrays;
@@ -14,6 +16,7 @@ import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConversionException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -28,7 +31,6 @@ import org.zalando.problem.spring.web.advice.ProblemHandling;
 import org.zalando.problem.spring.web.advice.security.SecurityAdviceTrait;
 import org.zalando.problem.violations.ConstraintViolationProblem;
 import tech.jhipster.config.JHipsterConstants;
-import tech.jhipster.web.util.HeaderUtil;
 
 @ControllerAdvice
 public class ExceptionTranslator implements ProblemHandling, SecurityAdviceTrait {
@@ -118,6 +120,36 @@ public class ExceptionTranslator implements ProblemHandling, SecurityAdviceTrait
     @ExceptionHandler
     public ResponseEntity<Problem> handleConcurrencyFailure(ConcurrencyFailureException ex, NativeWebRequest request) {
         Problem problem = Problem.builder().withStatus(Status.CONFLICT).with(MESSAGE_KEY, ErrorConstants.ERR_CONCURRENCY_FAILURE).build();
+        return create(ex, problem, request);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<Problem> handleUserNotActivated(UserNotActivatedException ex, NativeWebRequest request) {
+        Problem problem = Problem.builder()
+            .withStatus(Status.UNAUTHORIZED)
+            .withTitle("Account not activated")
+            .with(MESSAGE_KEY, "error.user.not.activated")
+            .build();
+        return create(ex, problem, request);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<Problem> handleUserAccountLocked(UserAccountLockedException ex, NativeWebRequest request) {
+        Problem problem = Problem.builder()
+            .withStatus(Status.UNAUTHORIZED)
+            .withTitle("Account locked")
+            .with(MESSAGE_KEY, "error.user.account.locked")
+            .build();
+        return create(ex, problem, request);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<Problem> handleBadCredentials(BadCredentialsException ex, NativeWebRequest request) {
+        Problem problem = Problem.builder()
+            .withStatus(Status.UNAUTHORIZED)
+            .withTitle("Bad credentials")
+            .with(MESSAGE_KEY, "error.authentication.bad.credentials")
+            .build();
         return create(ex, problem, request);
     }
 

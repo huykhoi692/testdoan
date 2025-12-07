@@ -1,18 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Tabs, Typography, Row, Col, Button, Space, Tag, Spin, Empty, Collapse, List, Progress, message } from 'antd';
-import { ReadOutlined, SoundOutlined, FileTextOutlined, BookOutlined, AudioOutlined, FormOutlined } from '@ant-design/icons';
+﻿import React, { useState, useEffect } from 'react';
+import { Card, Tabs, Typography, Row, Col, Button, Space, Tag, Spin, Empty, Collapse, List, Progress, message, Statistic } from 'antd';
+import {
+  ReadOutlined,
+  SoundOutlined,
+  FileTextOutlined,
+  CheckCircleOutlined,
+  BookOutlined,
+  AudioOutlined,
+  FormOutlined,
+} from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppDispatch } from 'app/config/store';
 import { getChapter, getChapterWords, getChapterGrammars, getChapterExercises } from 'app/shared/services/chapter.service';
 import { getChapterProgress } from 'app/shared/services/progress.service';
-import { IChapter } from 'app/shared/model/chapter.model';
-import { IWord } from 'app/shared/model/word.model';
-import { IGrammar } from 'app/shared/model/grammar.model';
-import { IListeningExercise } from 'app/shared/model/listening-exercise.model';
-import { ISpeakingExercise } from 'app/shared/model/speaking-exercise.model';
-import { IReadingExercise } from 'app/shared/model/reading-exercise.model';
-import { IWritingExercise } from 'app/shared/model/writing-exercise.model';
-import { IChapterProgress } from 'app/shared/model/chapter-progress.model';
+import {
+  IChapter,
+  IWord,
+  IGrammar,
+  IListeningExercise,
+  ISpeakingExercise,
+  IReadingExercise,
+  IWritingExercise,
+  IChapterProgress,
+} from 'app/shared/model/models';
 
 const { Title, Text, Paragraph } = Typography;
 const { TabPane } = Tabs;
@@ -77,7 +87,10 @@ const ChapterLearning: React.FC = () => {
 
   const calculateProgress = () => {
     if (!progress) return 0;
-    return progress.percent || 0;
+    const total = (chapter?.totalWords || 0) + (chapter?.totalGrammars || 0) + (chapter?.totalExercises || 0);
+    if (total === 0) return 0;
+    const completed = (progress.wordsLearned || 0) + (progress.grammarsLearned || 0) + (progress.exercisesCompleted || 0);
+    return Math.round((completed / total) * 100);
   };
 
   return (
@@ -86,7 +99,7 @@ const ChapterLearning: React.FC = () => {
         {chapter && (
           <>
             {/* Chapter Header */}
-            <Card style={{ marginBottom: 24, borderRadius: 12 }}>
+            <Card variant="borderless" style={{ marginBottom: 24, borderRadius: 12 }}>
               <Row justify="space-between" align="middle">
                 <Col>
                   <Space direction="vertical" size={8}>
@@ -105,7 +118,7 @@ const ChapterLearning: React.FC = () => {
                     <Progress
                       type="circle"
                       percent={calculateProgress()}
-                      width={80}
+                      size={80}
                       strokeColor={{
                         '0%': '#108ee9',
                         '100%': '#87d068',
@@ -114,10 +127,45 @@ const ChapterLearning: React.FC = () => {
                   </Space>
                 </Col>
               </Row>
+
+              {progress && (
+                <Row gutter={16} style={{ marginTop: 24 }}>
+                  <Col span={8}>
+                    <Card size="small" variant="borderless" style={{ backgroundColor: '#f6ffed' }}>
+                      <Statistic
+                        title="Từ vựng đã học"
+                        value={progress.wordsLearned || 0}
+                        suffix={`/ ${chapter.totalWords || words.length}`}
+                        prefix={<BookOutlined />}
+                      />
+                    </Card>
+                  </Col>
+                  <Col span={8}>
+                    <Card size="small" variant="borderless" style={{ backgroundColor: '#e6f7ff' }}>
+                      <Statistic
+                        title="Ngữ pháp đã học"
+                        value={progress.grammarsLearned || 0}
+                        suffix={`/ ${chapter.totalGrammars || grammars.length}`}
+                        prefix={<FileTextOutlined />}
+                      />
+                    </Card>
+                  </Col>
+                  <Col span={8}>
+                    <Card size="small" variant="borderless" style={{ backgroundColor: '#fff7e6' }}>
+                      <Statistic
+                        title="Bài tập hoàn thành"
+                        value={progress.exercisesCompleted || 0}
+                        suffix={`/ ${chapter.totalExercises || 0}`}
+                        prefix={<CheckCircleOutlined />}
+                      />
+                    </Card>
+                  </Col>
+                </Row>
+              )}
             </Card>
 
             {/* Content Tabs */}
-            <Card style={{ borderRadius: 12 }}>
+            <Card variant="borderless" style={{ borderRadius: 12 }}>
               <Tabs activeKey={activeTab} onChange={handleTabChange} size="large">
                 {/* Vocabulary Tab */}
                 <TabPane
@@ -197,37 +245,28 @@ const ChapterLearning: React.FC = () => {
                               <span style={{ fontWeight: 500 }}>
                                 {index + 1}. {grammar.title}
                               </span>
-                              {grammar.level && <Tag color="purple">{grammar.level}</Tag>}
+                              <Tag color="purple">{grammar.pattern}</Tag>
                             </Space>
                           }
                           key={grammar.id || index}
                         >
                           <Space direction="vertical" size={12} style={{ width: '100%' }}>
-                            {grammar.description && (
+                            <div>
+                              <Text strong>Công thức:</Text>
+                              <Paragraph style={{ marginTop: 8, padding: 12, backgroundColor: '#f5f5f5', borderRadius: 4 }}>
+                                <code>{grammar.pattern}</code>
+                              </Paragraph>
+                            </div>
+                            {grammar.meaning && (
                               <div>
-                                <Text strong>Nội dung:</Text>
-                                <Paragraph style={{ marginTop: 8 }}>{grammar.description}</Paragraph>
+                                <Text strong>Ý nghĩa:</Text>
+                                <Paragraph style={{ marginTop: 8 }}>{grammar.meaning}</Paragraph>
                               </div>
                             )}
-                            {grammar.grammarExamples && grammar.grammarExamples.length > 0 && (
+                            {grammar.explanation && (
                               <div>
-                                <Text strong>Ví dụ:</Text>
-                                <List
-                                  size="small"
-                                  dataSource={grammar.grammarExamples}
-                                  renderItem={example => (
-                                    <List.Item>
-                                      <div>
-                                        <div>{example.exampleSentence}</div>
-                                        {example.explanation && (
-                                          <Text type="secondary" style={{ fontSize: 12 }}>
-                                            {example.explanation}
-                                          </Text>
-                                        )}
-                                      </div>
-                                    </List.Item>
-                                  )}
-                                />
+                                <Text strong>Giải thích:</Text>
+                                <Paragraph style={{ marginTop: 8 }}>{grammar.explanation}</Paragraph>
                               </div>
                             )}
                           </Space>

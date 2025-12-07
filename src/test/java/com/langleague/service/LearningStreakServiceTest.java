@@ -166,8 +166,8 @@ class LearningStreakServiceTest {
 
         // Then
         assertThat(result).isPresent();
-        assertThat(result.get().getId()).isEqualTo(1L);
-        assertThat(result.get().getCurrentStreak()).isEqualTo(5);
+        assertThat(result.orElseThrow().getId()).isEqualTo(1L);
+        assertThat(result.orElseThrow().getCurrentStreak()).isEqualTo(5);
         verify(learningStreakRepository, times(1)).findById(1L);
     }
 

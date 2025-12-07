@@ -2,8 +2,8 @@
   "activate": {
     "title": "Kích hoạt",
     "messages": {
-      "success": "Tài khoản của bạn đã được kích hoạt. Vui lòng ",
-      "error": "Tài khoản của bạn không thể được kích hoạt. Vui lòng sử dụng mẫu đăng ký để đăng ký."
+      "success": "<strong>Tài khoản của bạn đã được kích hoạt.</strong> Vui lòng ",
+      "error": "<strong>Không thể kích hoạt tài khoản của bạn.</strong> Vui lòng sử dụng biểu mẫu đăng ký để đăng ký."
     }
   }
 }

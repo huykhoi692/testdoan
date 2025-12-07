@@ -45,47 +45,74 @@
     <!-- 2. ENHANCE USER.IMAGE_URL                -->
     <!-- ========================================= -->
 
-    <changeSet id="20251125000001-3" author="system">
+    <!-- MySQL/MariaDB -->
+    <changeSet id="20251125000001-3-mysql" author="system" dbms="mysql,mariadb">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="jhi_user" columnName="image_url"/>
         </preConditions>
 
-        <comment>Modify User.image_url to support base64 data URIs (LONGTEXT/CLOB)</comment>
+        <comment>Modify User.image_url to support base64 data URIs (MySQL/MariaDB)</comment>
 
-        <!-- MySQL/MariaDB -->
         <modifyDataType
             tableName="jhi_user"
             columnName="image_url"
-            newDataType="LONGTEXT"
-            dbms="mysql,mariadb"/>
+            newDataType="LONGTEXT"/>
+    </changeSet>
 
-        <!-- PostgreSQL -->
+    <!-- PostgreSQL -->
+    <changeSet id="20251125000001-3-postgresql" author="system" dbms="postgresql">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="jhi_user" columnName="image_url"/>
+        </preConditions>
+
+        <comment>Modify User.image_url to support base64 data URIs (PostgreSQL)</comment>
+
         <modifyDataType
             tableName="jhi_user"
             columnName="image_url"
-            newDataType="TEXT"
-            dbms="postgresql"/>
+            newDataType="TEXT"/>
+    </changeSet>
 
-        <!-- Oracle -->
+    <!-- Oracle -->
+    <changeSet id="20251125000001-3-oracle" author="system" dbms="oracle">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="jhi_user" columnName="image_url"/>
+        </preConditions>
+
+        <comment>Modify User.image_url to support base64 data URIs (Oracle)</comment>
+
         <modifyDataType
             tableName="jhi_user"
             columnName="image_url"
-            newDataType="CLOB"
-            dbms="oracle"/>
+            newDataType="CLOB"/>
+    </changeSet>
 
-        <!-- H2 (for testing) -->
+    <!-- H2 (for testing) -->
+    <changeSet id="20251125000001-3-h2" author="system" dbms="h2">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="jhi_user" columnName="image_url"/>
+        </preConditions>
+
+        <comment>Modify User.image_url to support base64 data URIs (H2)</comment>
+
         <modifyDataType
             tableName="jhi_user"
             columnName="image_url"
-            newDataType="CLOB"
-            dbms="h2"/>
+            newDataType="CLOB"/>
+    </changeSet>
 
-        <!-- SQL Server -->
+    <!-- SQL Server -->
+    <changeSet id="20251125000001-3-mssql" author="system" dbms="mssql">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="jhi_user" columnName="image_url"/>
+        </preConditions>
+
+        <comment>Modify User.image_url to support base64 data URIs (SQL Server)</comment>
+
         <modifyDataType
             tableName="jhi_user"
             columnName="image_url"
-            newDataType="NVARCHAR(MAX)"
-            dbms="mssql"/>
+            newDataType="NVARCHAR(MAX)"/>
     </changeSet>
 
 </databaseChangeLog>

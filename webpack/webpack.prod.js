@@ -36,14 +36,23 @@ module.exports = async () =>
             },
             {
               loader: 'css-loader',
-              options: { url: false },
+              options: {
+                url: false,
+                sourceMap: false,
+              },
             },
             {
               loader: 'postcss-loader',
+              options: {
+                sourceMap: false,
+              },
             },
             {
               loader: 'sass-loader',
-              options: { implementation: sass },
+              options: {
+                implementation: sass,
+                sourceMap: false,
+              },
             },
           ],
         },

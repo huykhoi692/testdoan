@@ -232,4 +232,3 @@ public class Notification implements Serializable {
         );
     }
 }
-

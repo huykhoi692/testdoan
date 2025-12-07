@@ -10,7 +10,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A Word.
+ * Vocabulary Definitions
  */
 @Entity
 @Table(name = "word")
@@ -53,13 +53,24 @@ public class Word implements Serializable {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "word")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "appUser", "lesson", "word" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "appUser", "word" }, allowSetters = true)
     private Set<UserVocabulary> userVocabularies = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "word")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "lesson", "word" }, allowSetters = true)
-    private Set<LessonWord> lessonWords = new HashSet<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(
+        value = {
+            "words",
+            "grammars",
+            "listeningExercises",
+            "speakingExercises",
+            "readingExercises",
+            "writingExercises",
+            "chapterProgresses",
+            "book",
+        },
+        allowSetters = true
+    )
+    private Chapter chapter;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -203,34 +214,16 @@ public class Word implements Serializable {
         return this;
     }
 
-    public Set<LessonWord> getLessonWords() {
-        return this.lessonWords;
+    public Chapter getChapter() {
+        return this.chapter;
     }
 
-    public void setLessonWords(Set<LessonWord> lessonWords) {
-        if (this.lessonWords != null) {
-            this.lessonWords.forEach(i -> i.setWord(null));
-        }
-        if (lessonWords != null) {
-            lessonWords.forEach(i -> i.setWord(this));
-        }
-        this.lessonWords = lessonWords;
+    public void setChapter(Chapter chapter) {
+        this.chapter = chapter;
     }
 
-    public Word lessonWords(Set<LessonWord> lessonWords) {
-        this.setLessonWords(lessonWords);
-        return this;
-    }
-
-    public Word addLessonWord(LessonWord lessonWord) {
-        this.lessonWords.add(lessonWord);
-        lessonWord.setWord(this);
-        return this;
-    }
-
-    public Word removeLessonWord(LessonWord lessonWord) {
-        this.lessonWords.remove(lessonWord);
-        lessonWord.setWord(null);
+    public Word chapter(Chapter chapter) {
+        this.setChapter(chapter);
         return this;
     }
 

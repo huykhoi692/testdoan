@@ -1,13 +1,14 @@
 {
   "annotations": {
-    "changelogDate": "20251021152352"
+    "changelogDate": "20251122061531"
   },
-  "applications": ["Langleague"],
+  "applications": "*",
   "dto": "mapstruct",
   "fields": [
     {
       "fieldName": "prompt",
-      "fieldType": "TextBlob"
+      "fieldType": "TextBlob",
+      "fieldValidateRules": ["required"]
     },
     {
       "fieldName": "sampleAudio",
@@ -16,21 +17,21 @@
       "fieldValidateRulesMaxlength": "512"
     },
     {
-      "fieldName": "targetPhrase",
-      "fieldType": "String",
-      "fieldValidateRules": ["maxlength"],
-      "fieldValidateRulesMaxlength": "255"
-    },
-    {
-      "fieldName": "evaluationMethod",
-      "fieldType": "String",
-      "fieldValidateRules": ["maxlength"],
-      "fieldValidateRulesMaxlength": "255"
+      "fieldName": "maxScore",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
     }
   ],
   "name": "SpeakingExercise",
   "pagination": "pagination",
-  "relationships": [],
+  "relationships": [
+    {
+      "otherEntityName": "exerciseResult",
+      "relationshipName": "exerciseResult",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    }
+  ],
   "searchEngine": "no",
   "service": "serviceClass"
 }

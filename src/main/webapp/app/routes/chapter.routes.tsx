@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { RouteObject } from 'react-router-dom';
 import ChapterList from 'app/components/ChapterList';
 import LessonList from 'app/components/LessonList';

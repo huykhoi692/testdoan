@@ -11,17 +11,29 @@ import com.langleague.service.dto.PasswordChangeDTO;
 import com.langleague.web.rest.errors.*;
 import com.langleague.web.rest.vm.KeyAndPasswordVM;
 import com.langleague.web.rest.vm.ManagedUserVM;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 /**
  * REST controller for managing the current user's account.
+ * Use case 3: Register account
+ * Use case 6: Reset password
+ * Use case 7: Verify email/phone
+ * Use case 10: Edit profile
+ * Use case 11: Change password
+ * Use case 13: Change avatar
  */
+@Tag(name = "Account", description = "User account management and profile settings")
 @RestController
 @RequestMapping("/api")
 public class AccountResource {
@@ -113,7 +125,17 @@ public class AccountResource {
     public AdminUserDTO getAccount() {
         return userService
             .getUserWithAuthorities()
-            .map(AdminUserDTO::new)
+            .map(user -> {
+                AdminUserDTO dto = new AdminUserDTO(user);
+                // Try to populate AppUser profile fields into the session DTO
+                appUserService
+                    .findByUserLogin(user.getLogin())
+                    .ifPresent(appUserDTO -> {
+                        if (appUserDTO.getDisplayName() != null) dto.setDisplayName(appUserDTO.getDisplayName());
+                        if (appUserDTO.getBio() != null) dto.setBio(appUserDTO.getBio());
+                    });
+                return dto;
+            })
             .orElseThrow(() -> new AccountResourceException("User could not be found"));
     }
 
@@ -124,17 +146,27 @@ public class AccountResource {
      * @throws EmailAlreadyUsedException {@code 400 (Bad Request)} if the email is already used.
      * @throws RuntimeException {@code 500 (Internal Server Error)} if the user login wasn't found.
      */
-    @PostMapping("/account")
-    public void saveAccount(@Valid @RequestBody AdminUserDTO userDTO) {
+    @RequestMapping(value = "/account", method = { RequestMethod.POST, RequestMethod.PUT })
+    // Accept partial AdminUserDTO for current user updates; don't trigger @Valid validation
+    public void saveAccount(@RequestBody AdminUserDTO userDTO) {
         String userLogin = SecurityUtils.getCurrentUserLogin()
             .orElseThrow(() -> new AccountResourceException("Current user login not found"));
+        LOG.debug(
+            "Saving account for userLogin={} with payload email={}, firstName={}, lastName={}",
+            userLogin,
+            userDTO.getEmail(),
+            userDTO.getFirstName(),
+            userDTO.getLastName()
+        );
         Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userDTO.getEmail());
+        LOG.debug("Existing user for email {}: {}", userDTO.getEmail(), existingUser.map(User::getLogin).orElse("<none>"));
         if (
             existingUser.isPresent() &&
             (!existingUser.orElseThrow(() -> new AccountResourceException("User not found")).getLogin().equalsIgnoreCase(userLogin))
         ) {
             throw new EmailAlreadyUsedException();
         }
+        LOG.debug("Proceeding to find logged-in user by login: {}", userLogin);
         Optional<User> user = userRepository.findOneByLogin(userLogin);
         if (user.isEmpty()) {
             throw new AccountResourceException("User could not be found");
@@ -146,6 +178,12 @@ public class AccountResource {
             userDTO.getLangKey(),
             userDTO.getImageUrl()
         );
+
+        //  Update AppUser fields if provided (displayName, bio)
+        if (userDTO.getDisplayName() != null || userDTO.getBio() != null) {
+            appUserService.updateProfile(userLogin, userDTO.getDisplayName(), userDTO.getBio());
+            LOG.debug("Updated AppUser profile for user: {}", userLogin);
+        }
     }
 
     /**
@@ -251,12 +289,68 @@ public class AccountResource {
     /**
      * {@code PUT /account/avatar} : Update current user's avatar.
      * Use case 13: Change avatar
+     * Updates User.imageUrl field (supports both URLs and base64)
      */
     @PutMapping("/account/avatar")
-    public void updateAvatar(@RequestBody String avatarUrl) {
+    public Map<String, String> updateAvatar(@RequestBody String imageUrl) {
         String userLogin = SecurityUtils.getCurrentUserLogin()
             .orElseThrow(() -> new AccountResourceException("Current user login not found"));
-        appUserService.changeAvatar(userLogin, avatarUrl);
+        LOG.debug("Received avatar update for userLogin={} payloadLength={}", userLogin, imageUrl == null ? 0 : imageUrl.length());
+
+        // Option 1: If it's already a URL (http/https), use it directly
+        if (imageUrl != null && (imageUrl.startsWith("http://") || imageUrl.startsWith("https://"))) {
+            userService.updateUserImageUrl(userLogin, imageUrl);
+            LOG.debug("User.imageUrl updated with external URL: {}", imageUrl);
+            Map<String, String> res = new HashMap<>();
+            res.put("url", imageUrl);
+            return res;
+        }
+
+        // Option 2: If it's base64, save to file system and store URL
+        String base64 = imageUrl;
+        String extension = "png";
+        if (base64 != null && base64.startsWith("data:")) {
+            int semi = base64.indexOf(';');
+            int comma = base64.indexOf(',');
+            if (semi > 5 && comma > semi) {
+                String mime = base64.substring(5, semi);
+                if (mime.contains("/")) {
+                    extension = mime.substring(mime.indexOf('/') + 1);
+                    // normalize jpeg -> jpg
+                    if (extension.equalsIgnoreCase("jpeg")) extension = "jpg";
+                }
+                base64 = base64.substring(comma + 1);
+            }
+        }
+
+        try {
+            if (base64 != null && !base64.isBlank()) {
+                byte[] data = Base64.getDecoder().decode(base64);
+                // Use a stable directory under the user's home so uploads survive working dir changes
+                Path uploads = Path.of(System.getProperty("user.home"), ".langleague", "uploads", "avatars");
+                Files.createDirectories(uploads);
+                String fileName = userLogin + "." + extension;
+                Path target = uploads.resolve(fileName);
+                Files.write(target, data);
+                // Build an absolute URL using the current request context so the frontend can fetch it
+                String publicUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path("/content/avatars/")
+                    .path(fileName)
+                    .toUriString();
+                userService.updateUserImageUrl(userLogin, publicUrl);
+                LOG.debug("Avatar saved to {} and User.imageUrl updated with url={}", target.toAbsolutePath(), publicUrl);
+                Map<String, String> res = new HashMap<>();
+                res.put("url", publicUrl);
+                return res;
+            } else {
+                LOG.warn("Empty avatar payload for userLogin={}", userLogin);
+            }
+        } catch (Exception e) {
+            LOG.error("Failed to save avatar for user {}: {}", userLogin, e.getMessage(), e);
+            throw new AccountResourceException("Failed to update avatar");
+        }
+        Map<String, String> empty = new HashMap<>();
+        return empty;
     }
 
     /**
@@ -264,10 +358,25 @@ public class AccountResource {
      * Use case 10: Edit profile
      */
     @PutMapping("/account/profile")
-    public void updateProfile(@RequestBody Map<String, String> profileData) {
+    public AdminUserDTO updateProfile(@RequestBody Map<String, String> profileData) {
         String userLogin = SecurityUtils.getCurrentUserLogin()
             .orElseThrow(() -> new AccountResourceException("Current user login not found"));
+        LOG.debug("Updating profile for userLogin={} with displayName={}", userLogin, profileData.get("displayName"));
         appUserService.updateProfile(userLogin, profileData.get("displayName"), profileData.get("bio"));
+        // Return refreshed session DTO so frontend can immediately update UI without an extra GET
+        return userService
+            .getUserWithAuthorities()
+            .map(user -> {
+                AdminUserDTO dto = new AdminUserDTO(user);
+                appUserService
+                    .findByUserLogin(user.getLogin())
+                    .ifPresent(appUserDTO -> {
+                        if (appUserDTO.getDisplayName() != null) dto.setDisplayName(appUserDTO.getDisplayName());
+                        if (appUserDTO.getBio() != null) dto.setBio(appUserDTO.getBio());
+                    });
+                return dto;
+            })
+            .orElseThrow(() -> new AccountResourceException("User could not be found"));
     }
     // TODO: Use case 14, 15, 7 (notifications, learning goals, phone verification)
     // Will be handled in separate logic layer as requested by user

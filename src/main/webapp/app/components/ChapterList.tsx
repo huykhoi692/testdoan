@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+﻿import React, { useEffect } from 'react';
+import { useTranslation } from 'app/shared/utils/useTranslation';
 import { Link } from 'react-router-dom';
 import { Card, Row, Col, Typography, Button, Space, Spin } from 'antd';
 import { useAppDispatch, useAppSelector } from '../config/store';
@@ -11,6 +12,7 @@ interface ChapterListProps {
 }
 
 const ChapterList: React.FC<ChapterListProps> = ({ bookId }) => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const chapters = useAppSelector(state => state.chapter.entities);
   const loading = useAppSelector(state => state.chapter.loading);

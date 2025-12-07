@@ -1,7 +1,7 @@
 package com.langleague.service.mapper;
 
+import com.langleague.domain.AppUser;
 import com.langleague.domain.StudySession;
-import com.langleague.domain.User;
 import com.langleague.service.dto.AppUserDTO;
 import com.langleague.service.dto.StudySessionDTO;
 import org.mapstruct.*;
@@ -11,14 +11,11 @@ import org.mapstruct.*;
  */
 @Mapper(componentModel = "spring")
 public interface StudySessionMapper extends EntityMapper<StudySessionDTO, StudySession> {
-    @Mapping(target = "appUser", source = "user", qualifiedByName = "appUserId")
+    @Mapping(target = "appUser", source = "appUser", qualifiedByName = "appUserId")
     StudySessionDTO toDto(StudySession s);
-
-    @Mapping(target = "user", source = "appUser")
-    StudySession toEntity(StudySessionDTO dto);
 
     @Named("appUserId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
-    AppUserDTO toDtoAppUserId(User user);
+    AppUserDTO toDtoAppUserId(AppUser appUser);
 }

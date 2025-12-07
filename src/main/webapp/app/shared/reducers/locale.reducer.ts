@@ -15,6 +15,10 @@ const localeSlice = createSlice({
     setLocale(state, action: PayloadAction<string>) {
       state.currentLocale = action.payload;
       localStorage.setItem('locale', action.payload);
+      // Sync with i18next - dynamic import to avoid circular dependency
+      import('../../config/i18n-loader').then(({ default: i18n }) => {
+        i18n.changeLanguage(action.payload);
+      });
     },
   },
 });

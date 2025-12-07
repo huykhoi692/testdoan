@@ -1,30 +1,25 @@
 {
   "reset": {
     "request": {
-      "title": "Đặt lại mật khẩu của bạn",
+      "title": "Đặt lại mật khẩu",
       "form": {
-        "email": "Email",
-        "email.placeholder": "Email của bạn",
         "button": "Đặt lại mật khẩu"
       },
       "messages": {
-        "info": "Nhập địa chỉ email bạn đã sử dụng để đăng ký.",
-        "success": "Kiểm tra email của bạn để biết chi tiết về cách đặt lại mật khẩu của bạn."
+        "info": "Nhập địa chỉ email bạn đã sử dụng để đăng ký",
+        "success": "Kiểm tra email của bạn để biết chi tiết cách đặt lại mật khẩu."
       }
     },
     "finish": {
       "title": "Đặt lại mật khẩu",
       "form": {
-        "newpassword": "Mật khẩu mới",
-        "newpassword.placeholder": "Mật khẩu mới của bạn",
-        "confirmpassword": "Xác nhận mật khẩu mới",
-        "confirmpassword.placeholder": "Xác nhận mật khẩu mới của bạn",
         "button": "Xác nhận mật khẩu mới"
       },
       "messages": {
-        "info": "Chọn mật khẩu mới.",
-        "success": "Mật khẩu của bạn đã được đặt lại thành công. Vui lòng đăng nhập.",
-        "keymissing": "Không có khóa đặt lại."
+        "info": "Chọn mật khẩu mới",
+        "success": "<strong>Mật khẩu của bạn đã được đặt lại.</strong> Vui lòng ",
+        "keymissing": "Thiếu khóa đặt lại.",
+        "error": "Không thể đặt lại mật khẩu của bạn. Lưu ý rằng yêu cầu đặt lại mật khẩu chỉ có hiệu lực trong 24 giờ."
       }
     }
   }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Card, Row, Col, Statistic, Table, Tag, Button, Progress, Typography, Space } from 'antd';
 import {
   BookOutlined,
@@ -10,12 +10,11 @@ import {
   EditOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { useAppDispatch } from 'app/config/store';
+import { getBooks } from 'app/shared/services/book.service';
+import { IBook } from 'app/shared/model/models';
 import dayjs from 'dayjs';
 import type { ColumnsType } from 'antd/es/table';
-
-import { useAppDispatch } from 'app/config/store';
-import { getAllBooks } from 'app/shared/services/book.service';
-import { IBook } from 'app/shared/model/book.model';
 
 const { Title, Text } = Typography;
 
@@ -25,34 +24,36 @@ const StaffOverview: React.FC = () => {
   const [books, setBooks] = useState<IBook[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchBooks = useCallback(async () => {
+  useEffect(() => {
+    fetchBooks();
+  }, []);
+
+  const fetchBooks = async () => {
     setLoading(true);
     try {
-      const result = await dispatch(getAllBooks()).unwrap();
+      const result = await dispatch(getBooks({})).unwrap();
       setBooks(Array.isArray(result) ? result : []);
     } catch (error) {
       console.error('Failed to fetch books:', error);
     } finally {
       setLoading(false);
     }
-  }, [dispatch]);
-
-  useEffect(() => {
-    fetchBooks();
-  }, [fetchBooks]); // Added fetchBooks to the dependency array
+  };
 
   // Calculate statistics
   const totalBooks = books.length;
-  const completedBooks = books.length; // All books are considered completed
-  const totalChapters = 0; // Not available in DTO
-  const totalPages = 0; // Not available in DTO
+  const completedBooks = books.filter(b => b.processingStatus === 'COMPLETED').length;
+  const totalChapters = books.reduce((sum, book) => sum + (book.totalChapters || 0), 0);
+  const totalPages = books.reduce((sum, book) => sum + (book.totalPages || 0), 0);
+
+  // Calculate growth (books created in last 14 days)
+  const twoWeeksAgo = dayjs().subtract(14, 'day');
+  const recentBooksCount = books.filter(b => b.createdDate && dayjs(b.createdDate).isAfter(twoWeeksAgo)).length;
 
   // Books by level
   const booksByLevel = {
     BEGINNER: books.filter(b => b.level === 'BEGINNER').length,
-    ELEMENTARY: books.filter(b => b.level === 'ELEMENTARY').length,
     INTERMEDIATE: books.filter(b => b.level === 'INTERMEDIATE').length,
-    UPPER_INTERMEDIATE: books.filter(b => b.level === 'UPPER_INTERMEDIATE').length,
     ADVANCED: books.filter(b => b.level === 'ADVANCED').length,
   };
 
@@ -91,17 +92,17 @@ const StaffOverview: React.FC = () => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundImage: record.thumbnailUrl ? `url(${record.thumbnailUrl})` : 'none',
+              backgroundImage: record.thumbnail ? `url(${record.thumbnail})` : 'none',
               backgroundSize: 'cover',
             }}
           >
-            {!record.thumbnailUrl && <BookOutlined style={{ fontSize: 20, color: '#999' }} />}
+            {!record.thumbnail && <BookOutlined style={{ fontSize: 20, color: '#999' }} />}
           </div>
           <div>
             <Text strong>{record.title}</Text>
             <br />
             <Text type="secondary" style={{ fontSize: 12 }}>
-              Cấp độ: {record.level || 'Không rõ'}
+              {record.author || 'Không rõ tác giả'}
             </Text>
           </div>
         </Space>
@@ -116,21 +117,22 @@ const StaffOverview: React.FC = () => {
     },
     {
       title: 'Trạng thái',
-      dataIndex: 'level',
+      dataIndex: 'processingStatus',
       key: 'status',
-      render: level => <Tag color="success">{level || 'N/A'}</Tag>,
+      render: status => getStatusTag(status),
       width: 120,
     },
     {
       title: 'Chương',
+      dataIndex: 'totalChapters',
       key: 'chapters',
-      render: () => '-',
+      render: total => total || 0,
       width: 80,
     },
     {
       title: 'Hành động',
       key: 'actions',
-      render: (_, record) => (
+      render: (_, _record) => (
         <Space>
           <Button type="link" icon={<EyeOutlined />} size="small" onClick={() => navigate(`/staff/books`)}>
             Xem
@@ -157,7 +159,7 @@ const StaffOverview: React.FC = () => {
       {/* Statistics Cards */}
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
         <Col xs={24} sm={12} lg={6}>
-          <Card bordered={false} style={{ borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+          <Card variant="borderless" style={{ borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
             <Statistic
               title="Tổng số sách"
               value={totalBooks}
@@ -166,14 +168,14 @@ const StaffOverview: React.FC = () => {
             />
             <div style={{ marginTop: 8 }}>
               <Text type="secondary" style={{ fontSize: 12 }}>
-                <ArrowUpOutlined style={{ color: '#52c41a' }} /> +2 tuần này
+                <ArrowUpOutlined style={{ color: '#52c41a' }} /> +{recentBooksCount} trong 2 tuần
               </Text>
             </div>
           </Card>
         </Col>
 
         <Col xs={24} sm={12} lg={6}>
-          <Card bordered={false} style={{ borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+          <Card variant="borderless" style={{ borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
             <Statistic
               title="Sách hoàn thành"
               value={completedBooks}
@@ -192,7 +194,7 @@ const StaffOverview: React.FC = () => {
         </Col>
 
         <Col xs={24} sm={12} lg={6}>
-          <Card bordered={false} style={{ borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+          <Card variant="borderless" style={{ borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
             <Statistic
               title="Tổng chương"
               value={totalChapters}
@@ -208,7 +210,7 @@ const StaffOverview: React.FC = () => {
         </Col>
 
         <Col xs={24} sm={12} lg={6}>
-          <Card bordered={false} style={{ borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+          <Card variant="borderless" style={{ borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
             <Statistic
               title="Tổng trang"
               value={totalPages}
@@ -227,7 +229,7 @@ const StaffOverview: React.FC = () => {
       {/* Books by Level */}
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
         <Col xs={24} lg={12}>
-          <Card title="Phân bổ sách theo cấp độ" bordered={false} style={{ borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+          <Card title="Phân bổ sách theo cấp độ" variant="borderless" style={{ borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
             <Space direction="vertical" style={{ width: '100%' }} size="middle">
               {Object.entries(booksByLevel).map(([level, count]) => (
                 <div key={level}>
@@ -250,7 +252,7 @@ const StaffOverview: React.FC = () => {
         </Col>
 
         <Col xs={24} lg={12}>
-          <Card title="Trạng thái xử lý" bordered={false} style={{ borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+          <Card title="Trạng thái xử lý" variant="borderless" style={{ borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
             <Space direction="vertical" style={{ width: '100%' }} size="large">
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
@@ -259,7 +261,7 @@ const StaffOverview: React.FC = () => {
                     <Text>Hoàn thành</Text>
                   </Space>
                   <Text strong style={{ fontSize: 18 }}>
-                    {books.length}
+                    {books.filter(b => b.processingStatus === 'COMPLETED').length}
                   </Text>
                 </div>
               </div>
@@ -271,7 +273,7 @@ const StaffOverview: React.FC = () => {
                     <Text>Đang xử lý</Text>
                   </Space>
                   <Text strong style={{ fontSize: 18 }}>
-                    0
+                    {books.filter(b => b.processingStatus === 'PROCESSING').length}
                   </Text>
                 </div>
               </div>
@@ -283,7 +285,7 @@ const StaffOverview: React.FC = () => {
                     <Text>Chờ xử lý</Text>
                   </Space>
                   <Text strong style={{ fontSize: 18 }}>
-                    0
+                    {books.filter(b => b.processingStatus === 'PENDING').length}
                   </Text>
                 </div>
               </div>
@@ -302,7 +304,7 @@ const StaffOverview: React.FC = () => {
             </Button>
           </div>
         }
-        bordered={false}
+        variant="borderless"
         style={{ borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
       >
         <Table columns={columns} dataSource={recentBooks} rowKey="id" pagination={false} loading={loading} />

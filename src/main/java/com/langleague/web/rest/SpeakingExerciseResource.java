@@ -182,4 +182,17 @@ public class SpeakingExerciseResource {
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
+
+    /**
+     * {@code GET  /speaking-exercises/chapter/:chapterId} : get all speaking exercises for a specific chapter.
+     *
+     * @param chapterId the chapter ID
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of exercises in body.
+     */
+    @GetMapping("/chapter/{chapterId}")
+    public ResponseEntity<List<SpeakingExerciseDTO>> getSpeakingExercisesByChapter(@PathVariable Long chapterId) {
+        LOG.debug("REST request to get speaking exercises by chapter : {}", chapterId);
+        List<SpeakingExerciseDTO> exercises = speakingExerciseService.findByChapterId(chapterId);
+        return ResponseEntity.ok().body(exercises);
+    }
 }

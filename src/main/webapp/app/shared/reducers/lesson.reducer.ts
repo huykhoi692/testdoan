@@ -1,6 +1,15 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { ILesson } from '../services/lesson.service';
-import { getLessons, getLessonsByChapterId, getLesson, createLesson, updateLesson, deleteLesson } from '../services/lesson.service';
+import { ILesson } from '../model/models';
+// Backend only uses chapters - lesson.service.ts has been removed
+import { getChapters, getChaptersByBookId, getChapter, createChapter, updateChapter, deleteChapter } from '../services/chapter.service';
+
+// Create aliases for backward compatibility with existing code
+export const getLessons = getChapters;
+export const getLessonsByChapterId = getChaptersByBookId;
+export const getLesson = getChapter;
+export const createLesson = createChapter;
+export const updateLesson = updateChapter;
+export const deleteLesson = deleteChapter;
 
 export interface LessonState {
   loading: boolean;
@@ -86,4 +95,4 @@ export const LessonSlice = createSlice({
 
 export const { resetLesson } = LessonSlice.actions;
 export default LessonSlice.reducer;
-export { getLesson, getLessons, getLessonsByChapterId, createLesson, updateLesson, deleteLesson };
+// Exports are already defined at the top as aliases to chapter actions

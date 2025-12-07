@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Card, Button, Typography, Space, Row, Col, Alert, message, Spin, Input, Tag } from 'antd';
 import { EditOutlined, CheckCircleOutlined, LeftOutlined, FormOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppDispatch } from 'app/config/store';
-import { updateChapterProgress } from 'app/shared/services/progress.service';
-import { getWritingExercise, submitWritingAnswer } from 'app/shared/services/exercise.service';
-import { IWritingExercise } from 'app/shared/model/writing-exercise.model';
+import { upsertChapterProgress } from 'app/shared/services/progress.service';
+import { IWritingExercise } from 'app/shared/model/models';
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -24,12 +23,23 @@ const WritingExercise: React.FC = () => {
   useEffect(() => {
     if (!exerciseId) return;
 
-    const fetchExercise = async () => {
+    const fetchExercise = () => {
       setLoading(true);
       try {
-        // Fetch real exercise from API
-        const exerciseData = await dispatch(getWritingExercise(parseInt(exerciseId, 10))).unwrap();
-        setExercise(exerciseData);
+        // Mock: Get writing exercise for demo
+        const mockExercise: IWritingExercise = {
+          id: parseInt(exerciseId, 10),
+          chapterId: 1,
+          skillType: 'WRITING',
+          orderIndex: 1,
+          prompt:
+            'Viết một đoạn văn ngắn (50-80 từ) về cuộc gặp gỡ đầu tiên đáng nhớ của bạn. Sử dụng ít nhất 3 từ vựng đã học: 만남, 설레다, 인상',
+          sampleAnswer:
+            '작년 봄에 친구 소개로 새로운 사람을 만났어요. 첫 만남이었지만 정말 설렜어요. 그 사람의 첫 인상이 너무 좋았고 대화도 잘 통했어요. 지금은 제일 친한 친구가 되었어요.',
+          minWords: 50,
+          maxScore: 20,
+        };
+        setExercise(mockExercise);
       } catch (error) {
         console.error('Error fetching exercise:', error);
         message.error('Không thể tải bài tập');
@@ -48,7 +58,7 @@ const WritingExercise: React.FC = () => {
   };
 
   const wordCount = countWords(userAnswer);
-  const minWords = 50; // Minimum Korean characters required
+  const minWords = exercise?.minWords || 50;
   const isEnoughWords = wordCount >= minWords;
 
   const handleSubmit = () => {
@@ -66,22 +76,11 @@ const WritingExercise: React.FC = () => {
     message.success('Bài viết đã được gửi! 🎉');
 
     // Update progress
-    if (exercise?.chapter?.id) {
+    if (exercise?.chapterId) {
       dispatch(
-        updateChapterProgress({
-          chapterId: exercise.chapter.id,
-          completed: true,
-        }),
-      );
-    }
-
-    // Submit result to backend
-    if (exercise) {
-      dispatch(
-        submitWritingAnswer({
-          exerciseId: exercise.id,
-          answer: userAnswer,
-          score: exercise.maxScore, // Assuming full score for completion in this demo
+        upsertChapterProgress({
+          chapterId: exercise.chapterId,
+          exercisesCompleted: 1,
         }),
       );
     }

@@ -1,12 +1,8 @@
-id;example_sentence;translation;grammar_id
-1;이것은 책입니다.;Đây là sách.;2
-2;저는 한국 사람입니다.;Tôi là người Hàn Quốc.;2
-3;오늘이 월요일입니다.;Hôm nay là thứ hai.;3
-4;그 사람이 선생님입니다.;Người đó là giáo viên.;3
-5;하나, 둘, 셋, 넷, 다섯;Một, hai, ba, bốn, năm;4
-6;일, 이, 삼, 사, 오;Một, hai, ba, bốn, năm (số Hán);5
-7;어제 학교에 갔어요.;Hôm qua tôi đã đi học.;6
-8;내일 영화 볼 거예요.;Ngày mai tôi sẽ xem phim.;7
-9;비가 오면 집에 있을게요.;Nếu trời mưa thì tôi sẽ ở nhà.;8
-10;이 책은 선생님께서 쓰셨습니다.;Cuốn sách này được viết bởi giáo viên.;9
+id;example_text;translation;explanation;grammar_id
+1;저는 학생이에요.;I am a student.;Topic marker used for general statements.;1
+2;커피를 마셔요.;I drink coffee.;Object marker indicates what is being consumed.;2
+3;도서관에서 책을 읽어요.;I read books at the library.;Location marker for where action happens.;3
+4;할아버지께서 오십니다.;Grandfather is coming.;Honorific form showing respect.;4
+5;학교에 가요.;I go to school.;Basic polite present tense.;5
+6;어제 영화를 봤어요.;I watched a movie yesterday.;Past tense marker.;6
 

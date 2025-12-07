@@ -1,11 +1,5 @@
-id;prompt;sample_audio;target_phrase;evaluation_method
-1;../fake-data/blob/hipster.txt;whirlwind before failing;overload hmph;savour
-2;../fake-data/blob/hipster.txt;expert;solution whereas hutch;unpleasant ew and
-3;../fake-data/blob/hipster.txt;phooey inwardly once;wholly sham;exterior upwardly whup
-4;../fake-data/blob/hipster.txt;retract;mild;hm gadzooks dowse
-5;../fake-data/blob/hipster.txt;towards badly famously;lazy angrily;serenade off
-6;../fake-data/blob/hipster.txt;if;oh;whether
-7;../fake-data/blob/hipster.txt;snarling underneath uh-huh;bouncy;austere
-8;../fake-data/blob/hipster.txt;wetly birdbath however;afore excitedly redress;upright amid beyond
-9;../fake-data/blob/hipster.txt;near;whoa;fooey
-10;../fake-data/blob/hipster.txt;hollow;ack although;flowery
+id;prompt;sample_audio;max_score;chapter_id
+1;Introduce yourself in Korean;/audio/speaking/sample_intro.mp3;20;3
+2;Count from 1 to 10 in Korean;/audio/speaking/sample_counting.mp3;15;4
+3;Order food at a Korean restaurant;/audio/speaking/sample_order.mp3;20;6
+4;Ask for directions to the subway station;/audio/speaking/sample_directions.mp3;20;7

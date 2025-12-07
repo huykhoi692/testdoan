@@ -9,10 +9,13 @@
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="example_sentence" type="${clobType}">
+            <column name="example_text" type="${clobType}">
                 <constraints nullable="true"/>
             </column>
             <column name="translation" type="${clobType}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="explanation" type="${clobType}">
                 <constraints nullable="true"/>
             </column>
             <column name="grammar_id" type="bigint">

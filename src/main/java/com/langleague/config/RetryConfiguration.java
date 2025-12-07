@@ -13,4 +13,3 @@ public class RetryConfiguration {
     // Spring Retry is now enabled
     // Methods can use @Retryable annotation
 }
-

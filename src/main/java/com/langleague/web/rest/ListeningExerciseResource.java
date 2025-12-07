@@ -1,9 +1,11 @@
 package com.langleague.web.rest;
 
 import com.langleague.repository.ListeningExerciseRepository;
+import com.langleague.security.AuthoritiesConstants;
 import com.langleague.service.ListeningExerciseService;
 import com.langleague.service.dto.ListeningExerciseDTO;
 import com.langleague.web.rest.errors.BadRequestAlertException;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.net.URI;
@@ -18,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -26,7 +29,10 @@ import tech.jhipster.web.util.ResponseUtil;
 
 /**
  * REST controller for managing {@link com.langleague.domain.ListeningExercise}.
+ * Use case 23: Do quizzes/games
+ * Use case 45: Attach quizzes/games (Staff/Admin)
  */
+@Tag(name = "Exercises - Listening", description = "Listening exercises and comprehension")
 @RestController
 @RequestMapping("/api/listening-exercises")
 public class ListeningExerciseResource {
@@ -52,11 +58,13 @@ public class ListeningExerciseResource {
 
     /**
      * {@code POST  /listening-exercises} : Create a new listeningExercise.
+     * Use case 45: Attach quizzes/games (Staff/Admin only)
      *
      * @param listeningExerciseDTO the listeningExerciseDTO to create.
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new listeningExerciseDTO, or with status {@code 400 (Bad Request)} if the listeningExercise has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.ADMIN + "', '" + AuthoritiesConstants.STAFF + "')")
     @PostMapping("")
     public ResponseEntity<ListeningExerciseDTO> createListeningExercise(@Valid @RequestBody ListeningExerciseDTO listeningExerciseDTO)
         throws URISyntaxException {
@@ -181,5 +189,19 @@ public class ListeningExerciseResource {
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    /**
+     * {@code GET  /listening-exercises/chapter/:chapterId} : get all listening exercises for a specific chapter.
+     * Use case 23: Do quizzes/games
+     *
+     * @param chapterId the chapter ID
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of exercises in body.
+     */
+    @GetMapping("/chapter/{chapterId}")
+    public ResponseEntity<List<ListeningExerciseDTO>> getListeningExercisesByChapter(@PathVariable Long chapterId) {
+        LOG.debug("REST request to get listening exercises by chapter : {}", chapterId);
+        List<ListeningExerciseDTO> exercises = listeningExerciseService.findByChapterId(chapterId);
+        return ResponseEntity.ok().body(exercises);
     }
 }

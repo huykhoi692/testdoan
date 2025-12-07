@@ -1,11 +1,4 @@
-id;current_streak;longest_streak;last_study_date;icon_url
-1;31630;12210;2025-10-20T22:48:25;who
-2;18032;9054;2025-10-21T02:28:11;pulse beside ugh
-3;5372;3877;2025-10-20T21:07:47;tenement
-4;25730;1534;2025-10-20T15:27:10;wire eek incidentally
-5;14306;25691;2025-10-20T21:13:43;quicker bah
-6;10597;31682;2025-10-21T09:52:59;except
-7;12021;634;2025-10-21T09:08:33;emphasize meh
-8;11345;22498;2025-10-21T05:05:53;idealistic whup proofread
-9;23638;15275;2025-10-21T03:13:07;fixed deselect rigidly
-10;24686;18626;2025-10-21T12:41:53;deployment
+id;current_streak;longest_streak;last_study_date;version;app_user_id
+1;7;10;2025-12-05 14:30:00;1;2
+2;3;5;2025-12-05 10:15:00;1;3
+

@@ -1,5 +1,6 @@
 package com.langleague.service.dto;
 
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
@@ -16,6 +17,7 @@ public class UserAchievementDTO implements Serializable {
 
     private AppUserDTO appUser;
 
+    @NotNull(message = "Achievement is required")
     private AchievementDTO achievement;
 
     public Long getId() {

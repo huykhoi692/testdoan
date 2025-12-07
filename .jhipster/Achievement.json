@@ -1,8 +1,8 @@
 {
   "annotations": {
-    "changelogDate": "20251021152400"
+    "changelogDate": "20251122061540"
   },
-  "applications": ["Langleague"],
+  "applications": "*",
   "dto": "mapstruct",
   "fields": [
     {

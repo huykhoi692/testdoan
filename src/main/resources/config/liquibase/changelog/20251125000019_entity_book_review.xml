@@ -10,12 +10,18 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="rating" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="varchar(255)">
                 <constraints nullable="true"/>
             </column>
-            <column name="comment" type="${clobType}">
+            <column name="content" type="${clobType}">
                 <constraints nullable="true"/>
             </column>
             <column name="created_at" type="${datetimeType}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="updated_at" type="${datetimeType}">
                 <constraints nullable="true"/>
             </column>
             <column name="app_user_id" type="bigint">
@@ -28,10 +34,20 @@
     </changeSet>
 
     <changeSet id="20251125000019-2" author="system">
-        <addForeignKeyConstraint baseColumnNames="app_user_id" baseTableName="book_review" 
+        <addForeignKeyConstraint baseColumnNames="app_user_id" baseTableName="book_review"
             constraintName="fk_book_review_app_user_id" referencedColumnNames="id" referencedTableName="app_user"/>
-        <addForeignKeyConstraint baseColumnNames="book_id" baseTableName="book_review" 
+        <addForeignKeyConstraint baseColumnNames="book_id" baseTableName="book_review"
             constraintName="fk_book_review_book_id" referencedColumnNames="id" referencedTableName="book"/>
+    </changeSet>
+
+    <!-- Add index -->
+    <changeSet id="20251125000019-3" author="system">
+        <preConditions onFail="MARK_RAN">
+            <not><indexExists indexName="idx_book_review_book_id"/></not>
+        </preConditions>
+        <createIndex indexName="idx_book_review_book_id" tableName="book_review">
+            <column name="book_id"/>
+        </createIndex>
     </changeSet>
 
 </databaseChangeLog>

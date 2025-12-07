@@ -3,11 +3,15 @@ package com.langleague.service;
 import com.langleague.domain.AppUser;
 import com.langleague.domain.User;
 import com.langleague.repository.AppUserRepository;
+import com.langleague.repository.UserRepository;
 import com.langleague.service.dto.AppUserDTO;
 import com.langleague.service.mapper.AppUserMapper;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,26 +30,38 @@ public class AppUserService {
 
     private final AppUserMapper appUserMapper;
 
-    public AppUserService(AppUserRepository appUserRepository, AppUserMapper appUserMapper) {
+    private final UserRepository userRepository;
+
+    public AppUserService(AppUserRepository appUserRepository, AppUserMapper appUserMapper, UserRepository userRepository) {
         this.appUserRepository = appUserRepository;
         this.appUserMapper = appUserMapper;
+        this.userRepository = userRepository;
     }
 
+    /**
+     * Create AppUser for new User with race condition protection.
+     * FIXED: Uses database unique constraint instead of synchronized block
+     * to support multi-instance deployments (cluster-safe).
+     */
     public AppUser createAppUserForNewUser(User user) {
         LOG.debug("Creating AppUser for new User: {}", user.getLogin());
-        // Nếu AppUser đã tồn tại → trả về luôn
-        Optional<AppUser> existing = appUserRepository.findByUser_Login(user.getLogin());
-        if (existing.isPresent()) {
-            LOG.warn("AppUser already exists for login: {}", user.getLogin());
-            return existing.orElseThrow();
+
+        try {
+            // Try to create directly, rely on DB unique constraint on user_id
+            AppUser appUser = new AppUser();
+            appUser.setInternalUser(user);
+            appUser.setDisplayName(user.getFirstName() + " " + user.getLastName());
+            appUser.setBio("Hello, I'm new here!");
+            appUser = appUserRepository.save(appUser);
+            LOG.info("Created new AppUser (id={} login={})", appUser.getId(), user.getLogin());
+            return appUser;
+        } catch (DataIntegrityViolationException e) {
+            // Another thread/instance already created this AppUser, fetch and return
+            LOG.warn("AppUser already exists for user {} (caught DataIntegrityViolation), fetching existing", user.getLogin());
+            return appUserRepository
+                .findByUser_Login(user.getLogin())
+                .orElseThrow(() -> new RuntimeException("Failed to create or fetch AppUser for login: " + user.getLogin()));
         }
-        AppUser appUser = new AppUser();
-        appUser.setUser(user);
-        appUser.setDisplayName(user.getFirstName() + " " + user.getLastName());
-        appUser.setBio("Hello, I'm new here!");
-        appUser = appUserRepository.save(appUser);
-        LOG.info("Created new AppUser (id={} login={})", appUser.getId(), user.getLogin());
-        return appUser;
     }
 
     /**
@@ -57,6 +73,30 @@ public class AppUserService {
     public AppUserDTO save(AppUserDTO appUserDTO) {
         LOG.debug("Request to save AppUser : {}", appUserDTO);
         AppUser appUser = appUserMapper.toEntity(appUserDTO);
+
+        // Handle the case where internalUser is provided with login instead of ID
+        if (appUserDTO.getInternalUser() != null) {
+            User user = null;
+
+            // Try to find by ID first
+            if (appUserDTO.getInternalUser().getId() != null) {
+                user = userRepository
+                    .findById(appUserDTO.getInternalUser().getId())
+                    .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + appUserDTO.getInternalUser().getId()));
+            }
+            // If ID not provided, try to find by login
+            else if (appUserDTO.getInternalUser().getLogin() != null) {
+                user = userRepository
+                    .findOneByLogin(appUserDTO.getInternalUser().getLogin())
+                    .orElseThrow(() -> new IllegalArgumentException("User not found with login: " + appUserDTO.getInternalUser().getLogin())
+                    );
+            } else {
+                throw new IllegalArgumentException("Either user ID or login must be provided");
+            }
+
+            appUser.setInternalUser(user);
+        }
+
         appUser = appUserRepository.save(appUser);
         return appUserMapper.toDto(appUser);
     }
@@ -67,6 +107,11 @@ public class AppUserService {
      * @param appUserDTO the entity to save.
      * @return the persisted entity.
      */
+    @CacheEvict(
+        value = "appUserByLogin",
+        key = "#appUserDTO.internalUser != null ? #appUserDTO.internalUser.login : ''",
+        condition = "#appUserDTO.internalUser != null"
+    )
     public AppUserDTO update(AppUserDTO appUserDTO) {
         LOG.debug("Request to update AppUser : {}", appUserDTO);
         AppUser appUser = appUserMapper.toEntity(appUserDTO);
@@ -80,6 +125,7 @@ public class AppUserService {
      * @param appUserDTO the entity to update partially.
      * @return the persisted entity.
      */
+    @CacheEvict(value = "appUserByLogin", allEntries = true) // Safer to evict all on partial update
     public Optional<AppUserDTO> partialUpdate(AppUserDTO appUserDTO) {
         LOG.debug("Request to partially update AppUser : {}", appUserDTO);
 
@@ -125,6 +171,7 @@ public class AppUserService {
      * @return the entity.
      */
     @Transactional(readOnly = true)
+    @Cacheable(value = "appUserByLogin", key = "#login", unless = "#result == null")
     public Optional<AppUserDTO> findByUserLogin(String login) {
         LOG.debug("Request to get AppUser by user login : {}", login);
         return appUserRepository.findByUser_Login(login).map(appUserMapper::toDto);
@@ -135,6 +182,7 @@ public class AppUserService {
      *
      * @param id the id of the entity.
      */
+    @CacheEvict(value = "appUserByLogin", allEntries = true)
     public void delete(Long id) {
         LOG.debug("Request to delete AppUser : {}", id);
         appUserRepository.deleteById(id);
@@ -149,6 +197,7 @@ public class AppUserService {
      * @param bio biography
      * @return updated AppUser
      */
+    @CacheEvict(value = "appUserByLogin", key = "#login")
     public Optional<AppUser> updateProfile(String login, String displayName, String bio) {
         LOG.debug("Request to update profile for user : {}", login);
         return appUserRepository
@@ -156,24 +205,6 @@ public class AppUserService {
             .map(appUser -> {
                 if (displayName != null) appUser.setDisplayName(displayName);
                 if (bio != null) appUser.setBio(bio);
-                return appUserRepository.save(appUser);
-            });
-    }
-
-    /**
-     * Use case 13: Change avatar
-     * Upload a new profile picture
-     *
-     * @param login user login
-     * @param avatarUrl new avatar URL
-     * @return updated AppUser
-     */
-    public Optional<AppUser> changeAvatar(String login, String avatarUrl) {
-        LOG.debug("Request to change avatar for user : {}", login);
-        return appUserRepository
-            .findByUser_Login(login)
-            .map(appUser -> {
-                appUser.setAvatarUrl(avatarUrl);
                 return appUserRepository.save(appUser);
             });
     }

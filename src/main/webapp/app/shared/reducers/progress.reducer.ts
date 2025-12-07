@@ -2,13 +2,12 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   getBookProgress,
   updateBookProgress,
-  getUserBookProgresses,
+  getMyBooks,
   getChapterProgress,
   updateChapterProgress,
   getChapterProgressesByBook,
 } from '../services/progress.service';
-import { IBookProgress } from '../model/book-progress.model';
-import { IChapterProgress } from '../model/chapter-progress.model';
+import { IBookProgress, IChapterProgress } from '../model/models';
 
 export interface ProgressState {
   loading: boolean;
@@ -53,7 +52,7 @@ export const ProgressSlice = createSlice({
       .addCase(updateBookProgress.fulfilled, (state, action: PayloadAction<IBookProgress>) => {
         state.bookProgress = action.payload;
       })
-      .addCase(getUserBookProgresses.fulfilled, (state, action: PayloadAction<IBookProgress[]>) => {
+      .addCase(getMyBooks.fulfilled, (state, action: PayloadAction<IBookProgress[]>) => {
         state.userBooks = action.payload;
       })
       // Chapter Progress

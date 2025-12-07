@@ -4,6 +4,7 @@ import com.langleague.repository.UserAchievementRepository;
 import com.langleague.service.UserAchievementService;
 import com.langleague.service.dto.UserAchievementDTO;
 import com.langleague.web.rest.errors.BadRequestAlertException;
+import jakarta.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -46,71 +47,14 @@ public class UserAchievementResource {
     }
 
     /**
-     * {@code POST  /user-achievements/award} : Award an achievement to a user.
-     *
-     * @param appUserId the ID of the app user.
-     * @param achievementId the ID of the achievement.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)}.
-     */
-    @PostMapping("/award")
-    public ResponseEntity<Void> awardAchievement(@RequestParam Long appUserId, @RequestParam Long achievementId) {
-        LOG.debug("REST request to award Achievement {} to AppUser {}", achievementId, appUserId);
-        userAchievementService.awardAchievement(appUserId, achievementId);
-        return ResponseEntity.ok().build();
-    }
-
-    /**
-     * {@code DELETE  /user-achievements/revoke} : Revoke an achievement from a user.
-     *
-     * @param appUserId the ID of the app user.
-     * @param achievementId the ID of the achievement.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)}.
-     */
-    @DeleteMapping("/revoke")
-    public ResponseEntity<Void> revokeAchievement(@RequestParam Long appUserId, @RequestParam Long achievementId) {
-        LOG.debug("REST request to revoke Achievement {} from AppUser {}", achievementId, appUserId);
-        userAchievementService.revokeAchievement(appUserId, achievementId);
-        return ResponseEntity.ok().build();
-    }
-
-    /**
-     * {@code GET  /user-achievements/current} : Get current user's achievements.
-     *
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of achievements.
-     */
-    @GetMapping("/current")
-    public ResponseEntity<List<?>> getCurrentUserAchievements() {
-        LOG.debug("REST request to get current user's achievements");
-        return ResponseEntity.ok(userAchievementService.getCurrentUserAchievements());
-    }
-
-    /**
-     * {@code GET  /user-achievements/user/:appUserId} : Get achievements for a specific user.
-     *
-     * @param appUserId the ID of the app user.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of achievements.
-     */
-    @GetMapping("/user/{appUserId}")
-    public ResponseEntity<List<?>> getUserAchievements(@PathVariable Long appUserId) {
-        LOG.debug("REST request to get achievements for AppUser {}", appUserId);
-        return ResponseEntity.ok(userAchievementService.getUserAchievements(appUserId));
-    }
-    /*
-     * Standard CRUD operations are commented out as UserAchievement
-     * should be managed through award/revoke operations
-     */
-
-    /*
-    /**
      * {@code POST  /user-achievements} : Create a new userAchievement.
      *
      * @param userAchievementDTO the userAchievementDTO to create.
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new userAchievementDTO, or with status {@code 400 (Bad Request)} if the userAchievement has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    /*
     @PostMapping("")
-    public ResponseEntity<UserAchievementDTO> createUserAchievement(@RequestBody UserAchievementDTO userAchievementDTO)
+    public ResponseEntity<UserAchievementDTO> createUserAchievement(@Valid @RequestBody UserAchievementDTO userAchievementDTO)
         throws URISyntaxException {
         LOG.debug("REST request to save UserAchievement : {}", userAchievementDTO);
         if (userAchievementDTO.getId() != null) {
@@ -132,7 +76,6 @@ public class UserAchievementResource {
      * or with status {@code 500 (Internal Server Error)} if the userAchievementDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    /*
     @PutMapping("/{id}")
     public ResponseEntity<UserAchievementDTO> updateUserAchievement(
         @PathVariable(value = "id", required = false) final Long id,
@@ -167,7 +110,6 @@ public class UserAchievementResource {
      * or with status {@code 500 (Internal Server Error)} if the userAchievementDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    /*
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<UserAchievementDTO> partialUpdateUserAchievement(
         @PathVariable(value = "id", required = false) final Long id,
@@ -199,7 +141,6 @@ public class UserAchievementResource {
      * @param pageable the pagination information.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of userAchievements in body.
      */
-    /*
     @GetMapping("")
     public ResponseEntity<List<UserAchievementDTO>> getAllUserAchievements(
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
@@ -216,7 +157,6 @@ public class UserAchievementResource {
      * @param id the id of the userAchievementDTO to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the userAchievementDTO, or with status {@code 404 (Not Found)}.
      */
-    /*
     @GetMapping("/{id}")
     public ResponseEntity<UserAchievementDTO> getUserAchievement(@PathVariable("id") Long id) {
         LOG.debug("REST request to get UserAchievement : {}", id);
@@ -230,7 +170,6 @@ public class UserAchievementResource {
      * @param id the id of the userAchievementDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    /*
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUserAchievement(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete UserAchievement : {}", id);
@@ -239,5 +178,44 @@ public class UserAchievementResource {
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
-    */
+
+    /**
+     * {@code GET  /user-achievements/user/:userId} : get all achievements for a user.
+     *
+     * @param userId the user ID
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of achievements in body.
+     */
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<UserAchievementDTO>> getUserAchievementsByUserId(@PathVariable Long userId) {
+        LOG.debug("REST request to get achievements for user : {}", userId);
+        List<UserAchievementDTO> achievements = userAchievementService.findByUserId(userId);
+        return ResponseEntity.ok().body(achievements);
+    }
+
+    /**
+     * {@code GET  /user-achievements/user/:userId/count} : count achievements for a user.
+     *
+     * @param userId the user ID
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
+    @GetMapping("/user/{userId}/count")
+    public ResponseEntity<Long> countUserAchievements(@PathVariable Long userId) {
+        LOG.debug("REST request to count achievements for user : {}", userId);
+        long count = userAchievementService.countByUserId(userId);
+        return ResponseEntity.ok().body(count);
+    }
+
+    /**
+     * {@code GET  /user-achievements/check/:userId/:achievementId} : check if user has achievement.
+     *
+     * @param userId the user ID
+     * @param achievementId the achievement ID
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and boolean in body.
+     */
+    @GetMapping("/check/{userId}/{achievementId}")
+    public ResponseEntity<Boolean> checkUserHasAchievement(@PathVariable Long userId, @PathVariable Long achievementId) {
+        LOG.debug("REST request to check if user {} has achievement {}", userId, achievementId);
+        boolean hasAchievement = userAchievementService.hasAchievement(userId, achievementId);
+        return ResponseEntity.ok().body(hasAchievement);
+    }
 }

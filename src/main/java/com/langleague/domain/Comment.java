@@ -33,7 +33,16 @@ public class Comment implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(
         value = {
-            "comments", "exerciseResults", "userProgresses", "userVocabularies", "userAchievements", "learningStreaks", "studySessions",
+            "internalUser",
+            "userVocabularies",
+            "userGrammars",
+            "bookReviews",
+            "comments",
+            "exerciseResults",
+            "chapterProgresses",
+            "userAchievements",
+            "learningStreaks",
+            "studySessions",
         },
         allowSetters = true
     )
@@ -41,10 +50,19 @@ public class Comment implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(
-        value = { "lessonWords", "lessonSkills", "mediaFiles", "comments", "userProgresses", "userVocabularies", "chapter" },
+        value = {
+            "book",
+            "words",
+            "listeningExercises",
+            "speakingExercises",
+            "readingExercises",
+            "writingExercises",
+            "comments",
+            "chapterProgresses",
+        },
         allowSetters = true
     )
-    private Lesson lesson;
+    private Chapter chapter;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -100,16 +118,16 @@ public class Comment implements Serializable {
         return this;
     }
 
-    public Lesson getLesson() {
-        return this.lesson;
+    public Chapter getChapter() {
+        return this.chapter;
     }
 
-    public void setLesson(Lesson lesson) {
-        this.lesson = lesson;
+    public void setChapter(Chapter chapter) {
+        this.chapter = chapter;
     }
 
-    public Comment lesson(Lesson lesson) {
-        this.setLesson(lesson);
+    public Comment chapter(Chapter chapter) {
+        this.setChapter(chapter);
         return this;
     }
 

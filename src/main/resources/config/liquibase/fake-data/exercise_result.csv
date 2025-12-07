@@ -1,11 +1,19 @@
-id;exercise_type;score;answer;audio_path;submitted_at
-1;blend woefully;30806;../fake-data/blob/hipster.txt;masticate lest;2025-10-20T18:18:56
-2;times;1897;../fake-data/blob/hipster.txt;similar;2025-10-21T06:15:25
-3;however anenst;17481;../fake-data/blob/hipster.txt;circa;2025-10-21T00:58:06
-4;pixellate;17187;../fake-data/blob/hipster.txt;how ugh like;2025-10-21T02:29:26
-5;amidst ugh oxidize;1510;../fake-data/blob/hipster.txt;qua;2025-10-21T00:29:12
-6;consign fixed shrill;22740;../fake-data/blob/hipster.txt;amid throughout loose;2025-10-20T20:15:10
-7;sunny furthermore harp;7124;../fake-data/blob/hipster.txt;bench than;2025-10-20T17:31:47
-8;finally down plus;7256;../fake-data/blob/hipster.txt;unto;2025-10-21T09:53:37
-9;optimal oval;19484;../fake-data/blob/hipster.txt;punctuation sweatshop yum;2025-10-20T17:39:45
-10;beyond downright onto;23200;../fake-data/blob/hipster.txt;perfectly;2025-10-20T21:29:17
+id;exercise_type;score;user_answer;submitted_at;app_user_id;listening_exercise_id;speaking_exercise_id;reading_exercise_id;writing_exercise_id
+1;LISTENING;10;A;2025-11-25 14:30:00;2;1;;;
+2;READING;10;B;2025-11-25 15:45:00;2;;;1;
+3;SPEAKING;18;;2025-11-26 10:20:00;3;;1;;
+4;WRITING;22;안녕하세요? 저는 이수진입니다.;2025-11-26 16:15:00;2;;;;1
+5;LISTENING;15;C;2025-11-27 09:30:00;3;3;;;
+6;LISTENING;12;B;2025-11-28 10:00:00;2;2;;;
+7;READING;14;D;2025-11-28 11:15:00;3;;;2;
+8;SPEAKING;20;;2025-11-29 09:45:00;2;;2;;
+9;WRITING;25;안녕하세요? 저는 김철수입니다.;2025-11-29 14:00:00;3;;;;2
+10;LISTENING;18;A;2025-11-30 10:30:00;2;4;;;
+11;READING;16;C;2025-11-30 11:45:00;3;;;3;
+12;SPEAKING;22;;2025-12-01 10:15:00;2;;3;;
+13;WRITING;27;안녕하세요? 저는 박영희입니다.;2025-12-01 15:00:00;3;;;;3
+14;LISTENING;20;D;2025-12-02 09:00:00;2;5;;;
+15;READING;18;B;2025-12-02 10:15:00;3;;;4;
+16;SPEAKING;25;;2025-12-03 09:45:00;2;;4;;
+17;WRITING;30;안녕하세요? 저는 이민호입니다.;2025-12-03 14:30:00;3;;;;4
+

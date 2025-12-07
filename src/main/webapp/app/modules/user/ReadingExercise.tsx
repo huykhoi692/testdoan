@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Card, Button, Typography, Space, Radio, Row, Col, Alert, message, Spin, Divider } from 'antd';
 import { ReadOutlined, CheckCircleOutlined, CloseCircleOutlined, LeftOutlined, BookOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppDispatch } from 'app/config/store';
-import { updateChapterProgress } from 'app/shared/services/progress.service';
-import { getReadingExercise } from 'app/shared/services/exercise.service';
-import { IReadingExercise } from 'app/shared/model/reading-exercise.model';
+import { upsertChapterProgress } from 'app/shared/services/progress.service';
+import { IReadingExercise } from 'app/shared/model/models';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -23,12 +22,22 @@ const ReadingExercise: React.FC = () => {
   useEffect(() => {
     if (!exerciseId) return;
 
-    const fetchExercise = async () => {
+    const fetchExercise = () => {
       setLoading(true);
       try {
-        // Fetch real exercise from API
-        const exerciseData = await dispatch(getReadingExercise(parseInt(exerciseId, 10))).unwrap();
-        setExercise(exerciseData);
+        // Mock: Get reading exercise for demo
+        const mockExercise: IReadingExercise = {
+          id: parseInt(exerciseId, 10),
+          chapterId: 1,
+          skillType: 'READING',
+          orderIndex: 1,
+          passage:
+            '김지영은 대학교에서 처음 그를 만났다. 그날 날씨가 정말 좋았고 캠퍼스의 벚꽃이 활짝 피어 있었다. 그는 도서관 앞에서 책을 읽고 있었고, 지영은 그의 집중하는 모습에 첫눈에 반했다.',
+          question: '김지영은 어디서 그를 처음 만났나요?',
+          correctAnswer: 'A',
+          maxScore: 10,
+        };
+        setExercise(mockExercise);
       } catch (error) {
         console.error('Error fetching exercise:', error);
         message.error('Không thể tải bài tập');
@@ -53,11 +62,11 @@ const ReadingExercise: React.FC = () => {
     if (correct) {
       message.success('Chính xác! Bạn đã trả lời đúng! 🎉');
       // Update progress
-      if (exercise?.chapter?.id) {
+      if (exercise?.chapterId) {
         dispatch(
-          updateChapterProgress({
-            chapterId: exercise.chapter.id,
-            completed: true,
+          upsertChapterProgress({
+            chapterId: exercise.chapterId,
+            exercisesCompleted: 1,
           }),
         );
       }

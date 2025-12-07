@@ -14,10 +14,6 @@ public interface LearningStreakMapper extends EntityMapper<LearningStreakDTO, Le
     @Mapping(target = "appUser", source = "appUser", qualifiedByName = "appUserId")
     LearningStreakDTO toDto(LearningStreak s);
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "appUser", ignore = true)
-    void partialUpdate(@MappingTarget LearningStreak entity, LearningStreakDTO dto);
-
     @Named("appUserId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")

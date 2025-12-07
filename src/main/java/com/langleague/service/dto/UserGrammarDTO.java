@@ -1,6 +1,7 @@
 package com.langleague.service.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
@@ -24,6 +25,7 @@ public class UserGrammarDTO implements Serializable {
 
     private AppUserDTO appUser;
 
+    @NotNull(message = "Grammar is required")
     private GrammarDTO grammar;
 
     public Long getId() {

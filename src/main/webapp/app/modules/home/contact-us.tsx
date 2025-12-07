@@ -1,4 +1,5 @@
-import React from 'react';
+﻿import * as React from 'react';
+import { useTranslation } from 'app/shared/utils/useTranslation';
 import { Form, Input, Button, Row, Col, Card, Typography } from 'antd';
 import {
   PhoneOutlined,
@@ -14,6 +15,7 @@ const { TextArea } = Input;
 const { Title, Text } = Typography;
 
 const ContactUs: React.FC = () => {
+  const { t } = useTranslation();
   const [form] = Form.useForm();
 
   const onFinish = (values: any) => {

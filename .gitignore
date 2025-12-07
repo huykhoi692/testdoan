@@ -7,7 +7,13 @@ node_modules/
 npm-debug.log.*
 /.awcache/*
 /.cache-loader/*
-*.yml
+
+######################
+# Environment Variables
+######################
+.env
+.env.local
+.env.*.local
 ######################
 # SASS
 ######################

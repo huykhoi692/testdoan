@@ -4,24 +4,24 @@
       "title": "Người dùng",
       "refreshListLabel": "Làm mới danh sách",
       "createLabel": "Tạo người dùng mới",
-      "createOrEditLabel": "Tạo hoặc chỉnh sửa người dùng"
+      "createOrEditLabel": "Tạo hoặc sửa người dùng"
     },
-    "created": "Một người dùng mới đã được tạo với định danh {{ param }}",
-    "updated": "Người dùng với định danh {{ param }} đã được cập nhật",
-    "deleted": "Người dùng với định danh {{ param }} đã bị xóa",
+    "created": "Đã tạo người dùng mới với định danh {{ param }}",
+    "updated": "Đã cập nhật người dùng với định danh {{ param }}",
+    "deleted": "Đã xóa người dùng với định danh {{ param }}",
     "delete": {
-      "question": "Bạn có chắc chắn muốn xóa người dùng {{ id }}?"
+      "question": "Bạn có chắc chắn muốn xóa người dùng {{ login }}?"
     },
     "detail": {
       "title": "Người dùng"
     },
-    "login": "Đăng nhập",
+    "login": "Tên đăng nhập",
     "firstName": "Tên",
     "lastName": "Họ",
     "email": "Email",
     "activated": "Đã kích hoạt",
-    "deactivated": "Đã hủy kích hoạt",
-    "profiles": "Hồ sơ",
+    "deactivated": "Đã vô hiệu hóa",
+    "profiles": "Vai trò",
     "langKey": "Ngôn ngữ",
     "createdBy": "Tạo bởi",
     "createdDate": "Ngày tạo",

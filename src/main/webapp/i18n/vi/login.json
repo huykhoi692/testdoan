@@ -1,20 +1,35 @@
 {
   "login": {
     "title": "Đăng nhập",
+    "subtitle": "Đăng nhập để tiếp tục hành trình học tập",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "captcha": "Mã xác nhận",
+    "refreshCaptcha": "Làm mới",
+    "rememberMe": "Ghi nhớ đăng nhập",
+    "forgotPassword": "Quên mật khẩu?",
+    "loginButton": "Đăng nhập",
+    "orContinueWith": "Hoặc tiếp tục với",
+    "success": "Đăng nhập thành công!",
+    "welcomeMessage": "Chào mừng đến với LangLeague",
+    "newToLangleague": "Chưa có tài khoản?",
+    "signUp": "Đăng ký",
+    "error": "Đăng nhập thất bại. Vui lòng kiểm tra thông tin đăng nhập.",
+    "invalidCaptcha": "Mã xác nhận không đúng",
     "form": {
-      "password": "Mật khẩu",
       "password.placeholder": "Mật khẩu của bạn",
-      "rememberme": "Ghi nhớ tôi",
+      "rememberme": "Ghi nhớ đăng nhập",
       "button": "Đăng nhập"
     },
     "messages": {
       "error": {
-        "authentication": "Xác thực thất bại! Vui lòng kiểm tra lại thông tin đăng nhập của bạn và thử lại."
+        "authentication": "<strong>Đăng nhập thất bại!</strong> Vui lòng kiểm tra lại thông tin đăng nhập."
       }
     },
-    "password": {
-      "forgot": "Bạn quên mật khẩu?"
-    },
-    "register": "Bạn chưa có tài khoản? Đăng ký ngay!"
+    "validation": {
+      "emailRequired": "Vui lòng nhập email của bạn",
+      "passwordRequired": "Vui lòng nhập mật khẩu của bạn",
+      "captchaRequired": "Vui lòng nhập mã xác nhận"
+    }
   }
 }

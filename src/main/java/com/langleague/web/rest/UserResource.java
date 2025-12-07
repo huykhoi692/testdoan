@@ -231,7 +231,7 @@ public class UserResource {
         String password = userData.get("password").toString();
         boolean activated = userData.get("activated") != null ? (Boolean) userData.get("activated") : true;
 
-        User newUser = userService.createUser(userDTO, password, activated);
+        User newUser = userService.createUser(userDTO);
         return ResponseEntity.created(new URI("/api/admin/users/" + newUser.getLogin()))
             .headers(HeaderUtil.createAlert(applicationName, "userManagement.created", newUser.getLogin()))
             .body(newUser);
@@ -246,12 +246,10 @@ public class UserResource {
      */
     @PutMapping("/users/{login}/lock")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<User> lockUser(@PathVariable @Pattern(regexp = Constants.LOGIN_REGEX) String login) {
+    public ResponseEntity<Void> lockUser(@PathVariable @Pattern(regexp = Constants.LOGIN_REGEX) String login) {
         LOG.debug("REST request to lock User : {}", login);
-        Optional<User> lockedUser = userService.lockAccount(login);
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createAlert(applicationName, "userManagement.locked", login))
-            .body(lockedUser.orElseThrow());
+        userService.lockAccount(login);
+        return ResponseEntity.ok().headers(HeaderUtil.createAlert(applicationName, "userManagement.locked", login)).build();
     }
 
     /**
@@ -263,11 +261,9 @@ public class UserResource {
      */
     @PutMapping("/users/{login}/unlock")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<User> unlockUser(@PathVariable @Pattern(regexp = Constants.LOGIN_REGEX) String login) {
+    public ResponseEntity<Void> unlockUser(@PathVariable @Pattern(regexp = Constants.LOGIN_REGEX) String login) {
         LOG.debug("REST request to unlock User : {}", login);
-        Optional<User> unlockedUser = userService.unlockAccount(login);
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createAlert(applicationName, "userManagement.unlocked", login))
-            .body(unlockedUser.orElseThrow());
+        userService.unlockAccount(login);
+        return ResponseEntity.ok().headers(HeaderUtil.createAlert(applicationName, "userManagement.unlocked", login)).build();
     }
 }

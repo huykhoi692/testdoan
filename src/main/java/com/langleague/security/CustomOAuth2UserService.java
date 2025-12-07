@@ -1,22 +1,30 @@
 package com.langleague.security;
 
 import com.langleague.domain.AppUser;
+import com.langleague.domain.Authority;
 import com.langleague.domain.User;
 import com.langleague.repository.AppUserRepository;
 import com.langleague.repository.UserRepository;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Custom OAuth2 User Service to handle OAuth2 authentication
- * Creates both User (admin managed) and AppUser (actual user) with 1:1 relationship
+ * Creates both User (admin managed) and AppUser (actual user) with 1:1
+ * relationship
  */
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
@@ -37,13 +45,22 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
         // Process OAuth2 user info and sync with local database
-        processOAuth2User(userRequest, oAuth2User);
+        User user = processOAuth2User(userRequest, oAuth2User);
 
-        return oAuth2User;
+        // Get authorities from the local user
+        Set<GrantedAuthority> authorities = user
+            .getAuthorities()
+            .stream()
+            .map(Authority::getName)
+            .map(SimpleGrantedAuthority::new)
+            .collect(Collectors.toSet());
+
+        // Create a new OAuth2User with the authorities from our database
+        return new DefaultOAuth2User(authorities, oAuth2User.getAttributes(), "email");
     }
 
-    private void processOAuth2User(OAuth2UserRequest userRequest, OAuth2User oAuth2User) {
-        String registrationId = userRequest.getClientRegistration().getRegistrationId();
+    @SuppressWarnings("unused") // userRequest may be used for provider-specific logic in the future
+    private User processOAuth2User(OAuth2UserRequest userRequest, OAuth2User oAuth2User) {
         String email = oAuth2User.getAttribute("email");
 
         if (email == null || email.isEmpty()) {
@@ -62,19 +79,20 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             log.debug("Found existing user: {}", user.getLogin());
 
             // Find or create AppUser for this User
-            appUser = appUserRepository.findByUserId(user.getId()).orElseGet(() -> createAppUserForExistingUser(user, oAuth2User));
+            appUser = appUserRepository.findByInternalUserId(user.getId()).orElseGet(() -> createAppUserForExistingUser(user, oAuth2User));
 
             // Update user info from OAuth2 if needed
-            updateExistingUser(user, appUser, oAuth2User, registrationId);
+            updateExistingUser(user, appUser, oAuth2User);
         } else {
             // Create new User and AppUser
             log.debug("Creating new user for email: {}", email);
-            user = createNewUser(oAuth2User, registrationId);
-            appUser = createAppUserForNewUser(user, oAuth2User);
+            user = createNewUser(oAuth2User);
+            createAppUserForNewUser(user, oAuth2User);
         }
+        return user;
     }
 
-    private void updateExistingUser(User user, AppUser appUser, OAuth2User oAuth2User, String registrationId) {
+    private void updateExistingUser(User user, AppUser appUser, OAuth2User oAuth2User) {
         // Update User information if needed
         String firstName = oAuth2User.getAttribute("given_name");
         String lastName = oAuth2User.getAttribute("family_name");
@@ -96,15 +114,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         // Update AppUser information
         String name = oAuth2User.getAttribute("name");
-        String picture = oAuth2User.getAttribute("picture");
 
         boolean appUserUpdated = false;
         if (name != null && !name.equals(appUser.getDisplayName())) {
             appUser.setDisplayName(name);
-            appUserUpdated = true;
-        }
-        if (picture != null && !picture.equals(appUser.getAvatarUrl())) {
-            appUser.setAvatarUrl(picture);
             appUserUpdated = true;
         }
 
@@ -114,13 +127,20 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
     }
 
-    private User createNewUser(OAuth2User oAuth2User, String registrationId) {
+    private User createNewUser(OAuth2User oAuth2User) {
         User user = new User();
         user.setEmail(oAuth2User.getAttribute("email"));
         user.setFirstName(oAuth2User.getAttribute("given_name"));
         user.setLastName(oAuth2User.getAttribute("family_name"));
         user.setActivated(true);
         user.setLangKey("en");
+
+        // Assign default "ROLE_USER" authority
+        Set<Authority> authorities = new HashSet<>();
+        Authority userAuthority = new Authority();
+        userAuthority.setName("ROLE_USER");
+        authorities.add(userAuthority);
+        user.setAuthorities(authorities);
 
         // Generate unique login from email
         String email = user.getEmail();
@@ -143,22 +163,19 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         return user;
     }
 
-    private AppUser createAppUserForNewUser(User user, OAuth2User oAuth2User) {
+    private void createAppUserForNewUser(User user, OAuth2User oAuth2User) {
         AppUser appUser = new AppUser();
-        appUser.setUser(user);
+        appUser.setInternalUser(user);
         appUser.setDisplayName(oAuth2User.getAttribute("name"));
-        appUser.setAvatarUrl(oAuth2User.getAttribute("picture"));
 
-        appUser = appUserRepository.save(appUser);
+        appUserRepository.save(appUser);
         log.debug("Created new app user for: {}", user.getLogin());
-        return appUser;
     }
 
     private AppUser createAppUserForExistingUser(User user, OAuth2User oAuth2User) {
         AppUser appUser = new AppUser();
-        appUser.setUser(user);
+        appUser.setInternalUser(user);
         appUser.setDisplayName(oAuth2User.getAttribute("name"));
-        appUser.setAvatarUrl(oAuth2User.getAttribute("picture"));
 
         appUser = appUserRepository.save(appUser);
         log.debug("Created app user for existing user: {}", user.getLogin());

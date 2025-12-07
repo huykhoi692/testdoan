@@ -45,7 +45,6 @@ public class UserGrammar implements Serializable {
             "comments",
             "exerciseResults",
             "chapterProgresses",
-            "bookProgresses",
             "userAchievements",
             "learningStreaks",
             "studySessions",

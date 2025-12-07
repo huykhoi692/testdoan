@@ -38,6 +38,18 @@ public class WordExampleService {
      */
     public WordExampleDTO save(WordExampleDTO wordExampleDTO) {
         LOG.debug("Request to save WordExample : {}", wordExampleDTO);
+
+        // Validate required fields
+        if (wordExampleDTO == null) {
+            throw new IllegalArgumentException("WordExampleDTO cannot be null");
+        }
+        if (wordExampleDTO.getExampleText() == null || wordExampleDTO.getExampleText().trim().isEmpty()) {
+            throw new IllegalArgumentException("Example text is required");
+        }
+        if (wordExampleDTO.getWord() == null || wordExampleDTO.getWord().getId() == null) {
+            throw new IllegalArgumentException("Word is required");
+        }
+
         WordExample wordExample = wordExampleMapper.toEntity(wordExampleDTO);
         wordExample = wordExampleRepository.save(wordExample);
         return wordExampleMapper.toDto(wordExample);

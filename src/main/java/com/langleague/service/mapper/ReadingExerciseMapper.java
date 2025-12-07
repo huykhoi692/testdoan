@@ -1,8 +1,8 @@
 package com.langleague.service.mapper;
 
-import com.langleague.domain.LessonSkill;
+import com.langleague.domain.Chapter;
 import com.langleague.domain.ReadingExercise;
-import com.langleague.service.dto.LessonSkillDTO;
+import com.langleague.service.dto.ChapterDTO;
 import com.langleague.service.dto.ReadingExerciseDTO;
 import org.mapstruct.*;
 
@@ -11,15 +11,11 @@ import org.mapstruct.*;
  */
 @Mapper(componentModel = "spring")
 public interface ReadingExerciseMapper extends EntityMapper<ReadingExerciseDTO, ReadingExercise> {
-    @Mapping(target = "lessonSkill", source = "lessonSkill", qualifiedByName = "lessonSkillId")
+    @Mapping(target = "chapter", source = "chapter", qualifiedByName = "chapterId")
     ReadingExerciseDTO toDto(ReadingExercise s);
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "lessonSkill", ignore = true)
-    void partialUpdate(@MappingTarget ReadingExercise entity, ReadingExerciseDTO dto);
-
-    @Named("lessonSkillId")
+    @Named("chapterId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
-    LessonSkillDTO toDtoLessonSkillId(LessonSkill lessonSkill);
+    ChapterDTO toDtoChapterId(Chapter chapter);
 }

@@ -1,7 +1,7 @@
 package com.langleague.service.dto;
 
+import com.langleague.domain.enumeration.ExerciseType;
 import jakarta.persistence.Lob;
-import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
@@ -14,22 +14,24 @@ public class ExerciseResultDTO implements Serializable {
 
     private Long id;
 
-    @Size(max = 50)
-    private String exerciseType;
+    private ExerciseType exerciseType;
 
     private Integer score;
 
     @Lob
-    private String answer;
-
-    @Size(max = 512)
-    private String audioPath;
+    private String userAnswer;
 
     private Instant submittedAt;
 
     private AppUserDTO appUser;
 
-    private SkillDTO skill;
+    private ListeningExerciseDTO listeningExercise;
+
+    private SpeakingExerciseDTO speakingExercise;
+
+    private ReadingExerciseDTO readingExercise;
+
+    private WritingExerciseDTO writingExercise;
 
     public Long getId() {
         return id;
@@ -39,11 +41,11 @@ public class ExerciseResultDTO implements Serializable {
         this.id = id;
     }
 
-    public String getExerciseType() {
+    public ExerciseType getExerciseType() {
         return exerciseType;
     }
 
-    public void setExerciseType(String exerciseType) {
+    public void setExerciseType(ExerciseType exerciseType) {
         this.exerciseType = exerciseType;
     }
 
@@ -55,20 +57,12 @@ public class ExerciseResultDTO implements Serializable {
         this.score = score;
     }
 
-    public String getAnswer() {
-        return answer;
+    public String getUserAnswer() {
+        return userAnswer;
     }
 
-    public void setAnswer(String answer) {
-        this.answer = answer;
-    }
-
-    public String getAudioPath() {
-        return audioPath;
-    }
-
-    public void setAudioPath(String audioPath) {
-        this.audioPath = audioPath;
+    public void setUserAnswer(String userAnswer) {
+        this.userAnswer = userAnswer;
     }
 
     public Instant getSubmittedAt() {
@@ -87,12 +81,36 @@ public class ExerciseResultDTO implements Serializable {
         this.appUser = appUser;
     }
 
-    public SkillDTO getSkill() {
-        return skill;
+    public ListeningExerciseDTO getListeningExercise() {
+        return listeningExercise;
     }
 
-    public void setSkill(SkillDTO skill) {
-        this.skill = skill;
+    public void setListeningExercise(ListeningExerciseDTO listeningExercise) {
+        this.listeningExercise = listeningExercise;
+    }
+
+    public SpeakingExerciseDTO getSpeakingExercise() {
+        return speakingExercise;
+    }
+
+    public void setSpeakingExercise(SpeakingExerciseDTO speakingExercise) {
+        this.speakingExercise = speakingExercise;
+    }
+
+    public ReadingExerciseDTO getReadingExercise() {
+        return readingExercise;
+    }
+
+    public void setReadingExercise(ReadingExerciseDTO readingExercise) {
+        this.readingExercise = readingExercise;
+    }
+
+    public WritingExerciseDTO getWritingExercise() {
+        return writingExercise;
+    }
+
+    public void setWritingExercise(WritingExerciseDTO writingExercise) {
+        this.writingExercise = writingExercise;
     }
 
     @Override
@@ -123,11 +141,13 @@ public class ExerciseResultDTO implements Serializable {
             "id=" + getId() +
             ", exerciseType='" + getExerciseType() + "'" +
             ", score=" + getScore() +
-            ", answer='" + getAnswer() + "'" +
-            ", audioPath='" + getAudioPath() + "'" +
+            ", userAnswer='" + getUserAnswer() + "'" +
             ", submittedAt='" + getSubmittedAt() + "'" +
             ", appUser=" + getAppUser() +
-            ", skill=" + getSkill() +
+            ", listeningExercise=" + getListeningExercise() +
+            ", speakingExercise=" + getSpeakingExercise() +
+            ", readingExercise=" + getReadingExercise() +
+            ", writingExercise=" + getWritingExercise() +
             "}";
     }
 }

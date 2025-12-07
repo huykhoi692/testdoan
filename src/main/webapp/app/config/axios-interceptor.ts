@@ -3,28 +3,18 @@ import { Storage } from 'react-jhipster';
 
 const TIMEOUT = 1 * 60 * 1000;
 axios.defaults.timeout = TIMEOUT;
+axios.defaults.baseURL = SERVER_API_URL;
 axios.defaults.withCredentials = true;
 
 const setupAxiosInterceptors = onUnauthenticated => {
   const onRequestSuccess = config => {
-    // Public endpoints that don't need authentication
-    const publicEndpoints = [
-      '/api/authenticate',
-      '/api/register',
-      '/api/activate',
-      '/api/account/reset-password/init',
-      '/api/account/reset-password/finish',
-      '/api/captcha',
-      '/api/auth/',
-      '/api/oauth2/',
-    ];
+    // Don't add token to /authenticate and /register endpoints
+    const isAuthEndpoint = config.url && (config.url.includes('/api/authenticate') || config.url.includes('/api/register'));
 
-    // Check if this is a public endpoint
-    const isPublicEndpoint = publicEndpoints.some(endpoint => config.url?.includes(endpoint));
-
-    // Only add token if not a public endpoint
-    if (!isPublicEndpoint) {
-      const token = Storage.local.get('jhi-authenticationToken') || Storage.session.get('jhi-authenticationToken');
+    if (!isAuthEndpoint) {
+      // Check multiple token storage locations for compatibility
+      const token =
+        Storage.local.get('jhi-authenticationToken') || Storage.session.get('jhi-authenticationToken') || localStorage.getItem('authToken'); // Also check authToken from login page
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -41,6 +31,29 @@ const setupAxiosInterceptors = onUnauthenticated => {
   };
   axios.interceptors.request.use(onRequestSuccess);
   axios.interceptors.response.use(onResponseSuccess, onResponseError);
+  // Dev-only: fallback for network errors so frontend can run without backend
+  if (process.env.NODE_ENV !== 'production') {
+    axios.interceptors.response.use(undefined, error => {
+      // If there's already a response error, delegate to existing handler
+      if (error && error.response) {
+        return Promise.reject(error instanceof Error ? error : new Error(error));
+      }
+      // Network error (no response) - return a safe fake response to prevent unhandled rejections
+      // For GET requests return empty array, for others return null
+      const cfg = error.config || {};
+      const method = (cfg.method || 'get').toLowerCase();
+      const fallbackData = method === 'get' ? [] : null;
+      const fakeResponse = {
+        data: fallbackData,
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config: cfg,
+      };
+      console.warn('Axios dev fallback applied for network error:', error && error.message ? error.message : error);
+      return Promise.resolve(fakeResponse);
+    });
+  }
 };
 
 export default setupAxiosInterceptors;

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'app/shared/utils/useTranslation';
 import {
   Table,
   Button,
@@ -21,7 +22,7 @@ import { SearchOutlined, PlusOutlined, EditOutlined, DeleteOutlined, UserOutline
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { useAppDispatch } from 'app/config/store';
 import { getUsers, createUser, updateUser, deleteUser } from 'app/shared/services/user.service';
-import { IUser, UserRole } from 'app/shared/model/user.model';
+import { IUser, UserRole } from 'app/shared/model/models';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
@@ -31,6 +32,7 @@ const { Title, Text } = Typography;
 const { Option } = Select;
 
 const UserManagement: React.FC = () => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState('');
@@ -46,30 +48,46 @@ const UserManagement: React.FC = () => {
   });
   const [form] = Form.useForm();
 
-  // Load users - wrapped in useCallback to fix react-hooks/exhaustive-deps warning
-  const fetchUsers = React.useCallback(
-    async (page = 0, size = 20) => {
-      setLoading(true);
-      try {
-        const result = await dispatch(getUsers({ page, size })).unwrap();
-        setUsers(result.content || result);
-        setPagination({
-          current: page + 1,
-          pageSize: size,
-          total: result.totalElements || result.length,
-        });
-      } catch (error) {
-        message.error('Không thể tải danh sách người dùng');
-      } finally {
-        setLoading(false);
+  // Load users
+  const fetchUsers = async (page = 0, size = 20) => {
+    setLoading(true);
+    try {
+      const result = await dispatch(getUsers({ page, size })).unwrap();
+      // Handle the pageable response structure
+      const usersData = result.content || result;
+      setUsers(Array.isArray(usersData) ? usersData : []);
+      setPagination({
+        current: page + 1,
+        pageSize: size,
+        total: result.totalElements || (Array.isArray(usersData) ? usersData.length : 0),
+      });
+    } catch (error: any) {
+      console.error('Error fetching users:', error);
+      let errorMessage = t('admin.userManagement.loadError') || 'Failed to load users';
+
+      if (error.code === 'ERR_NETWORK' || error.message?.includes('Network Error')) {
+        errorMessage = t('error.network') || 'Cannot connect to server. Please check if backend is running (http://localhost:8080)';
+      } else if (error.response?.status === 401) {
+        errorMessage = t('error.sessionExpired') || 'Session expired. Please login again';
+      } else if (error.response?.status === 403) {
+        errorMessage = t('error.permission') || 'You do not have permission to access this function';
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
       }
-    },
-    [dispatch],
-  );
+
+      message.error(errorMessage);
+      // Set empty array to avoid undefined errors
+      setUsers([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchUsers();
-  }, [fetchUsers]);
+  }, []);
 
   // Handle table pagination
   const handleTableChange = (newPagination: TablePaginationConfig) => {
@@ -104,18 +122,47 @@ const UserManagement: React.FC = () => {
       setLoading(true);
 
       if (isEditMode && selectedUser) {
-        await dispatch(updateUser({ ...selectedUser, ...values })).unwrap();
-        message.success('Cập nhật người dùng thành công');
+        // For update, include the id and login
+        await dispatch(
+          updateUser({
+            id: selectedUser.id,
+            login: selectedUser.login,
+            ...values,
+          }),
+        ).unwrap();
+        message.success(t('admin.userManagement.updateSuccess') || 'User updated successfully');
       } else {
-        await dispatch(createUser(values)).unwrap();
-        message.success('Tạo người dùng thành công');
+        // For create, ensure authorities is an array
+        const createData = {
+          ...values,
+          authorities: Array.isArray(values.authorities) ? values.authorities : [values.authorities],
+        };
+        await dispatch(createUser(createData)).unwrap();
+        message.success(t('admin.userManagement.createSuccess') || 'User created successfully');
       }
 
       setIsModalVisible(false);
       form.resetFields();
       fetchUsers(pagination.current - 1, pagination.pageSize);
     } catch (error: any) {
-      message.error(error.message || 'Có lỗi xảy ra');
+      console.error('Error submitting user:', error);
+      let errorMessage = t('common.error') || 'An error occurred';
+
+      if (error.code === 'ERR_NETWORK' || error.message?.includes('Network Error')) {
+        errorMessage = t('error.network') || 'Cannot connect to server. Please check backend';
+      } else if (error.response?.status === 401) {
+        errorMessage = t('error.sessionExpired') || 'Session expired';
+      } else if (error.response?.status === 403) {
+        errorMessage = t('error.permission') || 'You do not have permission to perform this action';
+      } else if (error.response?.status === 400) {
+        errorMessage = error.response?.data?.message || t('common.error') || 'Invalid data';
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      message.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -124,12 +171,31 @@ const UserManagement: React.FC = () => {
   // Handle delete
   const handleDelete = async (user: IUser) => {
     try {
+      if (!user.login) {
+        message.error(t('admin.userManagement.userNotFound') || 'User information not found');
+        return;
+      }
       setLoading(true);
       await dispatch(deleteUser(user.login)).unwrap();
-      message.success('Xóa người dùng thành công');
+      message.success(t('admin.userManagement.deleteSuccess') || 'User deleted successfully');
       fetchUsers(pagination.current - 1, pagination.pageSize);
-    } catch (error) {
-      message.error('Không thể xóa người dùng');
+    } catch (error: any) {
+      console.error('Error deleting user:', error);
+      let errorMessage = t('admin.userManagement.deleteError') || 'Failed to delete user';
+
+      if (error.code === 'ERR_NETWORK' || error.message?.includes('Network Error')) {
+        errorMessage = t('error.network') || 'Cannot connect to server';
+      } else if (error.response?.status === 401) {
+        errorMessage = t('error.sessionExpired') || 'Session expired';
+      } else if (error.response?.status === 403) {
+        errorMessage = t('error.deletePermission') || 'You do not have permission to delete users';
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      message.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -153,20 +219,24 @@ const UserManagement: React.FC = () => {
     return 'User';
   };
 
-  // Table columns
+  // Table columns - Academic Style
   const columns: ColumnsType<IUser> = [
     {
-      title: 'Người dùng',
+      title: (
+        <Text strong style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+          {t('admin.userManagement.user') || 'User'}
+        </Text>
+      ),
       key: 'user',
       render: (_, record) => (
         <Space>
-          <Avatar size={40} src={record.imageUrl} icon={<UserOutlined />} style={{ backgroundColor: '#1890ff' }} />
+          <Avatar size={40} src={record.avatarUrl || record.imageUrl} icon={<UserOutlined />} style={{ backgroundColor: '#2c5282' }} />
           <div>
-            <Text strong>
+            <Text strong style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
               {record.firstName} {record.lastName}
             </Text>
             <br />
-            <Text type="secondary" style={{ fontSize: 12 }}>
+            <Text type="secondary" style={{ fontSize: 12, fontFamily: 'Inter, system-ui, sans-serif' }}>
               @{record.login}
             </Text>
           </div>
@@ -175,41 +245,68 @@ const UserManagement: React.FC = () => {
       width: 250,
     },
     {
-      title: 'Email',
+      title: (
+        <Text strong style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+          {t('admin.userManagement.email') || 'Email'}
+        </Text>
+      ),
       dataIndex: 'email',
       key: 'email',
       ellipsis: true,
     },
     {
-      title: 'Vai trò',
+      title: (
+        <Text strong style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+          {t('admin.userManagement.role') || 'Role'}
+        </Text>
+      ),
       key: 'role',
-      render: (_, record) => <Tag color={getRoleColor(record.authorities)}>{getRoleDisplay(record.authorities)}</Tag>,
+      render: (_, record) => (
+        <Tag color={getRoleColor(record.authorities)} style={{ borderRadius: '6px', fontFamily: 'Inter, system-ui, sans-serif' }}>
+          {getRoleDisplay(record.authorities)}
+        </Tag>
+      ),
       filters: [
-        { text: 'Admin', value: UserRole.ADMIN },
-        { text: 'Staff', value: UserRole.STAFF },
-        { text: 'User', value: UserRole.USER },
+        { text: t('admin.userManagement.roles.admin') || 'Admin', value: UserRole.ADMIN },
+        { text: t('admin.userManagement.roles.staff') || 'Staff', value: UserRole.STAFF },
+        { text: t('admin.userManagement.roles.user') || 'User', value: UserRole.USER },
       ],
       onFilter: (value: any, record) => record.authorities?.includes(value) || false,
       width: 120,
     },
     {
-      title: 'Trạng thái',
+      title: (
+        <Text strong style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+          {t('admin.userManagement.status') || 'Status'}
+        </Text>
+      ),
       key: 'status',
       render: (_, record) => (
-        <Badge status={record.activated ? 'success' : 'default'} text={record.activated ? 'Hoạt động' : 'Không hoạt động'} />
+        <Badge
+          status={record.activated ? 'success' : 'default'}
+          text={
+            <Text style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+              {record.activated ? t('admin.userManagement.active') || 'Active' : t('admin.userManagement.inactive') || 'Inactive'}
+            </Text>
+          }
+        />
       ),
       filters: [
-        { text: 'Hoạt động', value: true },
-        { text: 'Không hoạt động', value: false },
+        { text: t('admin.userManagement.active') || 'Active', value: true },
+        { text: t('admin.userManagement.inactive') || 'Inactive', value: false },
       ],
       onFilter: (value: any, record) => record.activated === value,
       width: 150,
     },
     {
-      title: 'Ngày tạo',
+      title: (
+        <Text strong style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+          {t('admin.userManagement.createdDate') || 'Created Date'}
+        </Text>
+      ),
       dataIndex: 'createdDate',
       key: 'createdDate',
-      render: date => (date ? dayjs(date).format('DD/MM/YYYY') : '-'),
+      render: date => <Text style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>{date ? dayjs(date).format('DD/MM/YYYY') : '-'}</Text>,
       sorter(a, b) {
         if (!a.createdDate || !b.createdDate) return 0;
         return dayjs(a.createdDate).unix() - dayjs(b.createdDate).unix();
@@ -217,23 +314,33 @@ const UserManagement: React.FC = () => {
       width: 120,
     },
     {
-      title: 'Hành động',
+      title: (
+        <Text strong style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+          {t('admin.userManagement.actions') || 'Actions'}
+        </Text>
+      ),
       key: 'actions',
       render: (_, record) => (
         <Space>
-          <Button type="link" icon={<EditOutlined />} onClick={() => showModal(record)} size="small">
-            Sửa
+          <Button
+            type="link"
+            icon={<EditOutlined />}
+            onClick={() => showModal(record)}
+            size="small"
+            style={{ color: '#2c5282', fontFamily: 'Inter, system-ui, sans-serif' }}
+          >
+            {t('common.edit') || 'Edit'}
           </Button>
           <Popconfirm
-            title="Xác nhận xóa?"
-            description="Bạn có chắc muốn xóa người dùng này?"
+            title={t('admin.userManagement.confirmDelete') || 'Confirm Delete?'}
+            description={t('admin.userManagement.deleteConfirmMessage') || 'Are you sure you want to delete this user?'}
             onConfirm={() => handleDelete(record)}
-            okText="Xóa"
-            cancelText="Hủy"
+            okText={t('common.delete') || 'Delete'}
+            cancelText={t('common.cancel') || 'Cancel'}
             okButtonProps={{ danger: true }}
           >
-            <Button type="link" danger icon={<DeleteOutlined />} size="small">
-              Xóa
+            <Button type="link" danger icon={<DeleteOutlined />} size="small" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+              {t('common.delete') || 'Delete'}
             </Button>
           </Popconfirm>
         </Space>
@@ -258,53 +365,78 @@ const UserManagement: React.FC = () => {
   });
 
   return (
-    <div style={{ padding: '24px' }}>
-      <Card bordered={false} style={{ borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-        {/* Header */}
+    <div style={{ padding: '24px', background: '#f8f9fa', minHeight: '100vh' }}>
+      <Card variant="borderless" style={{ borderRadius: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.08)', border: '1px solid #e8eaed' }}>
+        {/* Header - Academic Style */}
         <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
           <Col>
-            <Title level={3} style={{ margin: 0 }}>
+            <Title level={3} style={{ margin: 0, fontFamily: 'Inter, system-ui, sans-serif', fontWeight: 600, color: '#1e3a5f' }}>
               <UserOutlined style={{ marginRight: 8 }} />
-              Quản lý người dùng
+              {t('admin.userManagement.title') || 'Account Management'}
             </Title>
-            <Text type="secondary">Quản lý tài khoản và phân quyền</Text>
+            <Text type="secondary" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+              {t('admin.userManagement.subtitle') || 'Manage user accounts and permissions'}
+            </Text>
           </Col>
           <Col>
-            <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => showModal()} style={{ borderRadius: 8 }}>
-              Thêm người dùng
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              size="large"
+              onClick={() => showModal()}
+              style={{
+                borderRadius: 8,
+                background: '#2c5282',
+                borderColor: '#2c5282',
+                fontFamily: 'Inter, system-ui, sans-serif',
+                fontWeight: 500,
+              }}
+            >
+              {t('admin.userManagement.addUser') || 'Add User'}
             </Button>
           </Col>
         </Row>
 
-        {/* Filters */}
+        {/* Filters - Academic Style */}
         <Row gutter={16} style={{ marginBottom: 16 }}>
           <Col flex="auto">
             <Input
-              placeholder="Tìm kiếm theo tên, email, username..."
+              placeholder={t('admin.userManagement.searchPlaceholder') || 'Search by name, email, username...'}
               prefix={<SearchOutlined />}
               value={searchText}
               onChange={e => setSearchText(e.target.value)}
               size="large"
-              style={{ borderRadius: 8 }}
+              style={{ borderRadius: 8, fontFamily: 'Inter, system-ui, sans-serif' }}
               allowClear
             />
           </Col>
           <Col>
-            <Select placeholder="Vai trò" style={{ width: 150 }} size="large" value={selectedRole} onChange={setSelectedRole}>
-              <Option value="all">Tất cả</Option>
-              <Option value={UserRole.ADMIN}>Admin</Option>
-              <Option value={UserRole.STAFF}>Staff</Option>
-              <Option value={UserRole.USER}>User</Option>
+            <Select
+              placeholder={t('admin.userManagement.role') || 'Role'}
+              style={{ width: 150, fontFamily: 'Inter, system-ui, sans-serif' }}
+              size="large"
+              value={selectedRole}
+              onChange={setSelectedRole}
+            >
+              <Option value="all">{t('admin.userManagement.allRoles') || 'All Roles'}</Option>
+              <Option value={UserRole.ADMIN}>{t('admin.userManagement.roles.admin') || 'Admin'}</Option>
+              <Option value={UserRole.STAFF}>{t('admin.userManagement.roles.staff') || 'Staff'}</Option>
+              <Option value={UserRole.USER}>{t('admin.userManagement.roles.user') || 'User'}</Option>
             </Select>
           </Col>
           <Col>
-            <Button icon={<ReloadOutlined />} size="large" onClick={() => fetchUsers(0, pagination.pageSize)} style={{ borderRadius: 8 }}>
-              Làm mới
+            <Button
+              icon={<ReloadOutlined />}
+              size="large"
+              onClick={() => fetchUsers(0, pagination.pageSize)}
+              style={{ borderRadius: 8, fontFamily: 'Inter, system-ui, sans-serif' }}
+            >
+              Refresh
             </Button>
           </Col>
         </Row>
 
-        {/* Table */}
+        {/* Table - Academic Style */}
         <Table
           columns={columns}
           dataSource={filteredUsers}
@@ -313,75 +445,150 @@ const UserManagement: React.FC = () => {
           pagination={{
             ...pagination,
             showSizeChanger: true,
-            showTotal: total => `Tổng ${total} người dùng`,
+            showTotal: total => <Text style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>{`Total ${total} users`}</Text>,
           }}
           onChange={handleTableChange}
           scroll={{ x: 1200 }}
         />
       </Card>
 
-      {/* Create/Edit Modal */}
+      {/* Create/Edit Modal - Academic Style */}
       <Modal
-        title={isEditMode ? 'Chỉnh sửa người dùng' : 'Thêm người dùng mới'}
+        title={
+          <Text strong style={{ fontSize: '18px', fontFamily: 'Inter, system-ui, sans-serif', color: '#1e3a5f' }}>
+            {isEditMode ? t('admin.userManagement.editUser') || 'Edit User' : t('admin.userManagement.addNewUser') || 'Add New User'}
+          </Text>
+        }
         open={isModalVisible}
         onOk={handleSubmit}
         onCancel={() => {
           setIsModalVisible(false);
           form.resetFields();
         }}
-        okText={isEditMode ? 'Cập nhật' : 'Tạo mới'}
-        cancelText="Hủy"
+        okText={isEditMode ? t('common.update') || 'Update' : t('common.create') || 'Create'}
+        cancelText={t('common.cancel') || 'Cancel'}
         width={600}
         confirmLoading={loading}
+        okButtonProps={{ style: { background: '#2c5282', borderColor: '#2c5282', fontFamily: 'Inter, system-ui, sans-serif' } }}
+        cancelButtonProps={{ style: { fontFamily: 'Inter, system-ui, sans-serif' } }}
       >
         <Form form={form} layout="vertical" style={{ marginTop: 24 }}>
           <Form.Item
-            label="Username"
+            label={
+              <Text strong style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+                {t('admin.userManagement.username') || 'Username'}
+              </Text>
+            }
             name="login"
             rules={[
-              { required: true, message: 'Vui lòng nhập username' },
-              { min: 3, message: 'Username phải có ít nhất 3 ký tự' },
+              { required: true, message: t('admin.userManagement.validation.usernameRequired') || 'Please enter username' },
+              { min: 3, message: t('admin.userManagement.validation.usernameTooShort') || 'Username must be at least 3 characters' },
+              {
+                pattern: /^[a-z0-9_-]{3,50}$/,
+                message:
+                  t('admin.userManagement.validation.usernameInvalid') ||
+                  'Username can only contain lowercase letters, numbers, underscore and hyphen',
+              },
             ]}
           >
-            <Input placeholder="Username" disabled={isEditMode} />
+            <Input
+              placeholder={t('admin.userManagement.username') || 'Username'}
+              disabled={isEditMode}
+              style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+            />
           </Form.Item>
+
+          {!isEditMode && (
+            <Form.Item
+              label={
+                <Text strong style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+                  {t('admin.userManagement.password') || 'Password'}
+                </Text>
+              }
+              name="password"
+              rules={[
+                { required: true, message: t('admin.userManagement.validation.passwordRequired') || 'Please enter password' },
+                { min: 4, message: t('admin.userManagement.validation.passwordTooShort') || 'Password must be at least 4 characters' },
+                { max: 100, message: t('admin.userManagement.validation.passwordTooLong') || 'Password cannot exceed 100 characters' },
+              ]}
+            >
+              <Input.Password placeholder="Password" style={{ fontFamily: 'Inter, system-ui, sans-serif' }} />
+            </Form.Item>
+          )}
 
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item label="Họ" name="firstName" rules={[{ required: true, message: 'Vui lòng nhập họ' }]}>
-                <Input placeholder="Họ" />
+              <Form.Item
+                label={
+                  <Text strong style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+                    First Name
+                  </Text>
+                }
+                name="firstName"
+                rules={[{ required: true, message: 'Please enter first name' }]}
+              >
+                <Input placeholder="First Name" style={{ fontFamily: 'Inter, system-ui, sans-serif' }} />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item label="Tên" name="lastName" rules={[{ required: true, message: 'Vui lòng nhập tên' }]}>
-                <Input placeholder="Tên" />
+              <Form.Item
+                label={
+                  <Text strong style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+                    Last Name
+                  </Text>
+                }
+                name="lastName"
+                rules={[{ required: true, message: 'Please enter last name' }]}
+              >
+                <Input placeholder="Last Name" style={{ fontFamily: 'Inter, system-ui, sans-serif' }} />
               </Form.Item>
             </Col>
           </Row>
 
           <Form.Item
-            label="Email"
+            label={
+              <Text strong style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+                Email
+              </Text>
+            }
             name="email"
             rules={[
-              { required: true, message: 'Vui lòng nhập email' },
-              { type: 'email', message: 'Email không hợp lệ' },
+              { required: true, message: 'Please enter email' },
+              { type: 'email', message: 'Invalid email format' },
             ]}
           >
-            <Input placeholder="email@example.com" />
+            <Input placeholder="email@example.com" style={{ fontFamily: 'Inter, system-ui, sans-serif' }} />
           </Form.Item>
 
-          <Form.Item label="Vai trò" name="authorities" rules={[{ required: true, message: 'Vui lòng chọn vai trò' }]}>
-            <Select placeholder="Chọn vai trò" mode="multiple">
+          <Form.Item
+            label={
+              <Text strong style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+                Role
+              </Text>
+            }
+            name="authorities"
+            rules={[{ required: true, message: 'Please select role' }]}
+          >
+            <Select placeholder="Select role" mode="multiple" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
               <Option value={UserRole.ADMIN}>Admin</Option>
               <Option value={UserRole.STAFF}>Staff</Option>
               <Option value={UserRole.USER}>User</Option>
             </Select>
           </Form.Item>
 
-          <Form.Item label="Trạng thái" name="activated" valuePropName="checked" initialValue={true}>
-            <Select>
-              <Option value={true}>Hoạt động</Option>
-              <Option value={false}>Không hoạt động</Option>
+          <Form.Item
+            label={
+              <Text strong style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+                Status
+              </Text>
+            }
+            name="activated"
+            valuePropName="checked"
+            initialValue={true}
+          >
+            <Select style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+              <Option value={true}>Active</Option>
+              <Option value={false}>Inactive</Option>
             </Select>
           </Form.Item>
         </Form>

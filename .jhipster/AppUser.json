@@ -1,8 +1,9 @@
 {
   "annotations": {
-    "changelogDate": "20251021152341"
+    "changelogDate": "20251122061520"
   },
-  "applications": ["Langleague"],
+  "applications": "*",
+  "documentation": "Thông tin mở rộng cho User (Profile)",
   "dto": "mapstruct",
   "fields": [
     {
@@ -26,6 +27,31 @@
   "pagination": "pagination",
   "relationships": [
     {
+      "otherEntityName": "user",
+      "relationshipName": "internalUser",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-one",
+      "relationshipWithBuiltInEntity": true
+    },
+    {
+      "otherEntityName": "userVocabulary",
+      "relationshipName": "userVocabulary",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "userGrammar",
+      "relationshipName": "userGrammar",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "bookReview",
+      "relationshipName": "bookReview",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
       "otherEntityName": "comment",
       "relationshipName": "comment",
       "relationshipSide": "left",
@@ -38,14 +64,14 @@
       "relationshipType": "one-to-many"
     },
     {
-      "otherEntityName": "userProgress",
-      "relationshipName": "userProgress",
+      "otherEntityName": "chapterProgress",
+      "relationshipName": "chapterProgress",
       "relationshipSide": "left",
       "relationshipType": "one-to-many"
     },
     {
-      "otherEntityName": "userVocabulary",
-      "relationshipName": "userVocabulary",
+      "otherEntityName": "bookProgress",
+      "relationshipName": "bookProgress",
       "relationshipSide": "left",
       "relationshipType": "one-to-many"
     },

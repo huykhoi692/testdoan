@@ -1,110 +1,225 @@
 package com.langleague.service.dto;
 
-import jakarta.validation.constraints.*;
 import java.io.Serializable;
-import java.time.Instant;
-import java.util.Objects;
+import java.util.List;
 
 /**
- * A DTO for the {@link com.langleague.domain.BookProgress} entity.
+ * A DTO for book learning progress.
  */
-@SuppressWarnings("common-java:DuplicatedBlocks")
 public class BookProgressDTO implements Serializable {
 
-    private Long id;
+    private Long bookId;
+    private String bookTitle;
+    private Double overallProgress; // 0-100
+    private Integer totalChapters;
+    private Integer completedChapters;
+    private Integer totalExercises;
+    private Integer completedExercises;
+    private Double averageScore;
+    private List<ChapterProgressItemDTO> chapterProgress;
 
-    @NotNull(message = "Percent is required")
-    @Min(value = 0, message = "Percent must be at least 0")
-    @Max(value = 100, message = "Percent must not exceed 100")
-    private Integer percent;
+    public BookProgressDTO() {}
 
-    private Instant lastAccessed;
-
-    private Boolean completed;
-
-    private AppUserDTO appUser;
-
-    private BookDTO book;
-
-    public Long getId() {
-        return id;
+    public Long getBookId() {
+        return bookId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setBookId(Long bookId) {
+        this.bookId = bookId;
     }
 
-    public Integer getPercent() {
-        return percent;
+    public String getBookTitle() {
+        return bookTitle;
     }
 
-    public void setPercent(Integer percent) {
-        this.percent = percent;
+    public void setBookTitle(String bookTitle) {
+        this.bookTitle = bookTitle;
     }
 
-    public Instant getLastAccessed() {
-        return lastAccessed;
+    public Double getOverallProgress() {
+        return overallProgress;
     }
 
-    public void setLastAccessed(Instant lastAccessed) {
-        this.lastAccessed = lastAccessed;
+    public void setOverallProgress(Double overallProgress) {
+        this.overallProgress = overallProgress;
     }
 
-    public Boolean getCompleted() {
-        return completed;
+    public Integer getTotalChapters() {
+        return totalChapters;
     }
 
-    public void setCompleted(Boolean completed) {
-        this.completed = completed;
+    public void setTotalChapters(Integer totalChapters) {
+        this.totalChapters = totalChapters;
     }
 
-    public AppUserDTO getAppUser() {
-        return appUser;
+    public Integer getCompletedChapters() {
+        return completedChapters;
     }
 
-    public void setAppUser(AppUserDTO appUser) {
-        this.appUser = appUser;
+    public void setCompletedChapters(Integer completedChapters) {
+        this.completedChapters = completedChapters;
     }
 
-    public BookDTO getBook() {
-        return book;
+    public Integer getTotalExercises() {
+        return totalExercises;
     }
 
-    public void setBook(BookDTO book) {
-        this.book = book;
+    public void setTotalExercises(Integer totalExercises) {
+        this.totalExercises = totalExercises;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof BookProgressDTO)) {
-            return false;
-        }
-
-        BookProgressDTO bookProgressDTO = (BookProgressDTO) o;
-        if (this.id == null) {
-            return false;
-        }
-        return Objects.equals(this.id, bookProgressDTO.id);
+    public Integer getCompletedExercises() {
+        return completedExercises;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.id);
+    public void setCompletedExercises(Integer completedExercises) {
+        this.completedExercises = completedExercises;
     }
 
-    // prettier-ignore
+    public Double getAverageScore() {
+        return averageScore;
+    }
+
+    public void setAverageScore(Double averageScore) {
+        this.averageScore = averageScore;
+    }
+
+    public List<ChapterProgressItemDTO> getChapterProgress() {
+        return chapterProgress;
+    }
+
+    public void setChapterProgress(List<ChapterProgressItemDTO> chapterProgress) {
+        this.chapterProgress = chapterProgress;
+    }
+
     @Override
     public String toString() {
-        return "BookProgressDTO{" +
-            "id=" + getId() +
-            ", percent=" + getPercent() +
-            ", lastAccessed='" + getLastAccessed() + "'" +
-            ", completed='" + getCompleted() + "'" +
-            ", appUser=" + getAppUser() +
-            ", book=" + getBook() +
-            "}";
+        return (
+            "BookProgressDTO{" +
+            "bookId=" +
+            bookId +
+            ", bookTitle='" +
+            bookTitle +
+            '\'' +
+            ", overallProgress=" +
+            overallProgress +
+            ", completedChapters=" +
+            completedChapters +
+            "/" +
+            totalChapters +
+            ", completedExercises=" +
+            completedExercises +
+            "/" +
+            totalExercises +
+            ", averageScore=" +
+            averageScore +
+            '}'
+        );
+    }
+
+    /**
+     * Inner DTO for chapter progress item
+     */
+    public static class ChapterProgressItemDTO implements Serializable {
+
+        private Long chapterId;
+        private String chapterTitle;
+        private Integer orderIndex;
+        private Integer totalExercises;
+        private Integer completedExercises;
+        private Double progressPercentage;
+        private Double averageScore;
+        private Boolean isCompleted;
+
+        public ChapterProgressItemDTO() {}
+
+        public Long getChapterId() {
+            return chapterId;
+        }
+
+        public void setChapterId(Long chapterId) {
+            this.chapterId = chapterId;
+        }
+
+        public String getChapterTitle() {
+            return chapterTitle;
+        }
+
+        public void setChapterTitle(String chapterTitle) {
+            this.chapterTitle = chapterTitle;
+        }
+
+        public Integer getOrderIndex() {
+            return orderIndex;
+        }
+
+        public void setOrderIndex(Integer orderIndex) {
+            this.orderIndex = orderIndex;
+        }
+
+        public Integer getTotalExercises() {
+            return totalExercises;
+        }
+
+        public void setTotalExercises(Integer totalExercises) {
+            this.totalExercises = totalExercises;
+        }
+
+        public Integer getCompletedExercises() {
+            return completedExercises;
+        }
+
+        public void setCompletedExercises(Integer completedExercises) {
+            this.completedExercises = completedExercises;
+        }
+
+        public Double getProgressPercentage() {
+            return progressPercentage;
+        }
+
+        public void setProgressPercentage(Double progressPercentage) {
+            this.progressPercentage = progressPercentage;
+        }
+
+        public Double getAverageScore() {
+            return averageScore;
+        }
+
+        public void setAverageScore(Double averageScore) {
+            this.averageScore = averageScore;
+        }
+
+        public Boolean getIsCompleted() {
+            return isCompleted;
+        }
+
+        public void setIsCompleted(Boolean isCompleted) {
+            this.isCompleted = isCompleted;
+        }
+
+        @Override
+        public String toString() {
+            return (
+                "ChapterProgressItemDTO{" +
+                "chapterId=" +
+                chapterId +
+                ", chapterTitle='" +
+                chapterTitle +
+                '\'' +
+                ", orderIndex=" +
+                orderIndex +
+                ", completedExercises=" +
+                completedExercises +
+                "/" +
+                totalExercises +
+                ", progressPercentage=" +
+                progressPercentage +
+                ", averageScore=" +
+                averageScore +
+                ", isCompleted=" +
+                isCompleted +
+                '}'
+            );
+        }
     }
 }

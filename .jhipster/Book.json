@@ -1,8 +1,8 @@
 {
   "annotations": {
-    "changelogDate": "20251021152342"
+    "changelogDate": "20251122061521"
   },
-  "applications": ["Langleague"],
+  "applications": "*",
   "dto": "mapstruct",
   "fields": [
     {
@@ -13,9 +13,8 @@
     },
     {
       "fieldName": "level",
-      "fieldType": "String",
-      "fieldValidateRules": ["maxlength"],
-      "fieldValidateRulesMaxlength": "50"
+      "fieldType": "Level",
+      "fieldValues": "BEGINNER,INTERMEDIATE,ADVANCED"
     },
     {
       "fieldName": "description",
@@ -34,6 +33,18 @@
     {
       "otherEntityName": "chapter",
       "relationshipName": "chapter",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "bookReview",
+      "relationshipName": "bookReview",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "bookProgress",
+      "relationshipName": "bookProgress",
       "relationshipSide": "left",
       "relationshipType": "one-to-many"
     }

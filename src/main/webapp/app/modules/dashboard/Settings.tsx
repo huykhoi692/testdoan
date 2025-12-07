@@ -1,25 +1,117 @@
-import React, { useState } from 'react';
-import { Form, Input, Button, Select, Card, Typography, Divider, message, Switch } from 'antd';
-import { UserOutlined, MailOutlined, PhoneOutlined, LockOutlined, EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
+import React, { useState, useEffect } from 'react';
+import { Form, Input, Button, Select, Card, Typography, Divider, message, Switch, Radio, Spin } from 'antd';
+import { UserOutlined, MailOutlined, BulbOutlined, LockOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
+import { setTheme, updateSystemTheme } from 'app/shared/reducers/theme.reducer';
+import { setLocale } from 'app/shared/reducers/locale.reducer';
+import axios from 'axios';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
 
 const Settings: React.FC = () => {
+  const { t } = useTranslation('common');
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [fetchLoading, setFetchLoading] = useState(true);
   const [enableNotifications, setEnableNotifications] = useState(true);
   const [dailyNotifications, setDailyNotifications] = useState(true);
+  const [appUserData, setAppUserData] = useState<any>(null);
+  const dispatch = useAppDispatch();
+  const currentTheme = useAppSelector(state => state.theme.mode);
+  const currentLocale = useAppSelector(state => state.locale.currentLocale);
 
-  const onFinish = (values: any) => {
+  // Listen to system theme changes for auto mode
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = () => {
+      dispatch(updateSystemTheme());
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, [dispatch]);
+
+  // Fetch current user data
+  useEffect(() => {
+    const fetchUserData = async () => {
+      setFetchLoading(true);
+      try {
+        const userResponse = await axios.get('/api/account');
+        const userResult = userResponse.data;
+
+        try {
+          const appUserResponse = await axios.get('/api/app-users/me');
+          const appUserResult = appUserResponse.data;
+          setAppUserData(appUserResult);
+        } catch (appUserError) {
+          console.log('AppUser not found, using default values');
+        }
+
+        // Set form values
+        form.setFieldsValue({
+          username: userResult.firstName + ' ' + userResult.lastName,
+          email: userResult.email,
+          language: currentLocale || userResult.langKey || 'vi',
+        });
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        message.error('Không thể tải thông tin người dùng');
+      } finally {
+        setFetchLoading(false);
+      }
+    };
+    fetchUserData();
+  }, [form]);
+
+  const onFinish = async (values: any) => {
     setLoading(true);
-    console.log('Form values:', values);
+    try {
+      // Split username into first and last name
+      const nameParts = values.username.split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
 
-    setTimeout(() => {
+      // Update locale in Redux store
+      if (values.language && values.language !== currentLocale) {
+        dispatch(setLocale(values.language));
+      }
+
+      // Update user account info
+      const userUpdate = {
+        firstName,
+        lastName,
+        email: values.email,
+        langKey: values.language,
+      };
+
+      await axios.post('/api/account', userUpdate);
+
+      // Update app user profile if exists
+      if (appUserData?.id) {
+        await axios.put(`/api/app-users/${appUserData.id}`, {
+          id: appUserData.id,
+          displayName: values.username,
+        });
+      }
+
+      message.success(currentLocale === 'vi' ? 'Cập nhật thông tin thành công!' : 'Settings updated successfully!');
+    } catch (error) {
+      console.error('Error updating user:', error);
+      message.error(currentLocale === 'vi' ? 'Không thể cập nhật thông tin' : 'Failed to update settings');
+    } finally {
       setLoading(false);
-      message.success('Settings saved successfully!');
-    }, 1000);
+    }
   };
+
+  if (fetchLoading) {
+    return (
+      <div style={{ padding: '32px', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   return (
     <div style={{ padding: '32px' }}>
@@ -32,133 +124,122 @@ const Settings: React.FC = () => {
         }}
       >
         <Title level={3} style={{ color: '#667eea', marginBottom: 32 }}>
-          Account Information
+          {t('settings.title')}
         </Title>
 
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={onFinish}
-          initialValues={{
-            username: 'Dung Hang',
-            email: 'dunghang@gmail.com',
-            phone: '0123456789',
-            language: 'en',
-          }}
-        >
+        <Form form={form} layout="vertical" onFinish={onFinish}>
           <Form.Item
-            label={<Text style={{ fontSize: 14, fontWeight: 500 }}>Username</Text>}
+            label={<Text style={{ fontSize: 14, fontWeight: 500 }}>{t('settings.username')}</Text>}
             name="username"
-            rules={[{ required: true, message: 'Please enter your username' }]}
+            rules={[{ required: true, message: t('settings.updateError') }]}
           >
             <Input
               prefix={<UserOutlined style={{ color: '#999' }} />}
               size="large"
-              placeholder="Enter username"
+              placeholder={t('settings.username')}
               style={{ borderRadius: 8 }}
             />
           </Form.Item>
 
           <Form.Item
-            label={<Text style={{ fontSize: 14, fontWeight: 500 }}>Email</Text>}
+            label={
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Text style={{ fontSize: 14, fontWeight: 500 }}>Email</Text>
+                <LockOutlined style={{ fontSize: 12, color: '#999' }} />
+                <Text style={{ fontSize: 12, color: '#999' }}>({t('settings.loadError')})</Text>
+              </div>
+            }
             name="email"
-            rules={[
-              { required: true, message: 'Please enter your email' },
-              { type: 'email', message: 'Please enter a valid email' },
-            ]}
-          >
-            <Input prefix={<MailOutlined style={{ color: '#999' }} />} size="large" placeholder="Enter email" style={{ borderRadius: 8 }} />
-          </Form.Item>
-
-          <Form.Item
-            label={<Text style={{ fontSize: 14, fontWeight: 500 }}>Phone number</Text>}
-            name="phone"
-            rules={[{ required: true, message: 'Please enter your phone number' }]}
           >
             <Input
-              prefix={<PhoneOutlined style={{ color: '#999' }} />}
+              prefix={<MailOutlined style={{ color: '#999' }} />}
               size="large"
-              placeholder="Enter phone number"
-              style={{ borderRadius: 8 }}
+              disabled
+              style={{
+                borderRadius: 8,
+                backgroundColor: '#f5f5f5',
+                cursor: 'not-allowed',
+                color: '#999',
+              }}
             />
           </Form.Item>
 
-          <Divider />
-
-          <Title level={4} style={{ fontSize: 16, marginBottom: 24 }}>
-            Change password
-          </Title>
-
-          <Form.Item label={<Text style={{ fontSize: 14, fontWeight: 500 }}>Current password</Text>} name="currentPassword">
-            <Input.Password
-              prefix={<LockOutlined style={{ color: '#999' }} />}
+          <Form.Item label={<Text style={{ fontSize: 14, fontWeight: 500 }}>{t('settings.interfaceLanguage')}</Text>} name="language">
+            <Select
               size="large"
-              placeholder="Enter current password"
-              iconRender={visible => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
               style={{ borderRadius: 8 }}
-            />
-          </Form.Item>
-
-          <Form.Item
-            label={<Text style={{ fontSize: 14, fontWeight: 500 }}>New password</Text>}
-            name="newPassword"
-            rules={[
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  if (!value || value.length >= 6) {
-                    return Promise.resolve();
-                  }
-                  return Promise.reject(new Error('Password must be at least 6 characters'));
-                },
-              }),
-            ]}
-          >
-            <Input.Password
-              prefix={<LockOutlined style={{ color: '#999' }} />}
-              size="large"
-              placeholder="Enter new password"
-              iconRender={visible => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-              style={{ borderRadius: 8 }}
-            />
-          </Form.Item>
-
-          <Form.Item
-            label={<Text style={{ fontSize: 14, fontWeight: 500 }}>Re-enter new password</Text>}
-            name="confirmPassword"
-            dependencies={['newPassword']}
-            rules={[
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  if (!value || getFieldValue('newPassword') === value) {
-                    return Promise.resolve();
-                  }
-                  return Promise.reject(new Error('Passwords do not match'));
-                },
-              }),
-            ]}
-          >
-            <Input.Password
-              prefix={<LockOutlined style={{ color: '#999' }} />}
-              size="large"
-              placeholder="Re-enter new password"
-              iconRender={visible => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-              style={{ borderRadius: 8 }}
-            />
-          </Form.Item>
-
-          <Form.Item label={<Text style={{ fontSize: 14, fontWeight: 500 }}>Interface language</Text>} name="language">
-            <Select size="large" style={{ borderRadius: 8 }}>
-              <Option value="en">English (UK)</Option>
-              <Option value="vn">Tiếng Việt</Option>
-              <Option value="es">Español</Option>
-              <Option value="fr">Français</Option>
+              onChange={value => {
+                dispatch(setLocale(value));
+                form.setFieldsValue({ language: value });
+              }}
+            >
+              <Option value="en">English</Option>
+              <Option value="vi">Tiếng Việt</Option>
             </Select>
           </Form.Item>
 
           <Divider />
 
           <Title level={4} style={{ fontSize: 16, marginBottom: 24 }}>
-            Thông báo
+            <BulbOutlined style={{ marginRight: 8, color: '#667eea' }} />
+            {t('settings.theme')}
+          </Title>
+
+          <div style={{ marginBottom: 24 }}>
+            <Radio.Group value={currentTheme} onChange={e => dispatch(setTheme(e.target.value))} style={{ width: '100%' }}>
+              <Radio.Button
+                value="light"
+                style={{
+                  width: '33%',
+                  textAlign: 'center',
+                  height: 44,
+                  lineHeight: '44px',
+                  borderRadius: '8px 0 0 8px',
+                }}
+              >
+                ☀️ {t('settings.themeLight')}
+              </Radio.Button>
+              <Radio.Button
+                value="dark"
+                style={{
+                  width: '34%',
+                  textAlign: 'center',
+                  height: 44,
+                  lineHeight: '44px',
+                }}
+              >
+                🌙 {t('settings.themeDark')}
+              </Radio.Button>
+              <Radio.Button
+                value="auto"
+                style={{
+                  width: '33%',
+                  textAlign: 'center',
+                  height: 44,
+                  lineHeight: '44px',
+                  borderRadius: '0 8px 8px 0',
+                }}
+              >
+                💻 {t('settings.themeAuto')}
+              </Radio.Button>
+            </Radio.Group>
+            <Text
+              style={{
+                display: 'block',
+                marginTop: 12,
+                fontSize: 12,
+                color: '#999',
+                textAlign: 'center',
+              }}
+            >
+              {currentLocale === 'vi' ? 'Chế độ tự động sẽ theo cài đặt hệ thống của bạn' : 'Auto mode follows your system preference'}
+            </Text>
+          </div>
+
+          <Divider />
+
+          <Title level={4} style={{ fontSize: 16, marginBottom: 24 }}>
+            {t('settings.notifications')}
           </Title>
 
           <div style={{ marginBottom: 24 }}>
@@ -170,7 +251,7 @@ const Settings: React.FC = () => {
                 padding: '12px 0',
               }}
             >
-              <Text style={{ fontSize: 14, fontWeight: 500 }}>Bật thông báo</Text>
+              <Text style={{ fontSize: 14, fontWeight: 500 }}>{t('settings.enableNotifications')}</Text>
               <Switch
                 checked={enableNotifications}
                 onChange={setEnableNotifications}
@@ -188,7 +269,7 @@ const Settings: React.FC = () => {
                 padding: '12px 0',
               }}
             >
-              <Text style={{ fontSize: 14, fontWeight: 500 }}>Thông báo hàng ngày</Text>
+              <Text style={{ fontSize: 14, fontWeight: 500 }}>{t('settings.dailyNotifications')}</Text>
               <Switch
                 checked={dailyNotifications}
                 onChange={setDailyNotifications}
@@ -214,7 +295,7 @@ const Settings: React.FC = () => {
                 fontWeight: 500,
               }}
             >
-              Save
+              {t('settings.save')}
             </Button>
           </Form.Item>
         </Form>

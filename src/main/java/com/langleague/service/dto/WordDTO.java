@@ -1,10 +1,16 @@
 package com.langleague.service.dto;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.Lob;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * A DTO for the {@link com.langleague.domain.Word} entity.
+ */
+@Schema(description = "Vocabulary Definitions")
+@SuppressWarnings("common-java:DuplicatedBlocks")
 public class WordDTO implements Serializable {
 
     private Long id;
@@ -13,6 +19,7 @@ public class WordDTO implements Serializable {
     @Size(max = 255)
     private String text;
 
+    @Lob
     private String meaning;
 
     @Size(max = 255)
@@ -23,6 +30,8 @@ public class WordDTO implements Serializable {
 
     @Size(max = 512)
     private String imageUrl;
+
+    private ChapterDTO chapter;
 
     public Long getId() {
         return id;
@@ -72,41 +81,46 @@ public class WordDTO implements Serializable {
         this.imageUrl = imageUrl;
     }
 
+    public ChapterDTO getChapter() {
+        return chapter;
+    }
+
+    public void setChapter(ChapterDTO chapter) {
+        this.chapter = chapter;
+    }
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof WordDTO)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof WordDTO)) {
+            return false;
+        }
+
         WordDTO wordDTO = (WordDTO) o;
-        return Objects.equals(id, wordDTO.id);
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, wordDTO.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(this.id);
     }
 
+    // prettier-ignore
     @Override
     public String toString() {
-        return (
-            "WordDTO{" +
-            "id=" +
-            id +
-            ", text='" +
-            text +
-            '\'' +
-            ", meaning='" +
-            meaning +
-            '\'' +
-            ", pronunciation='" +
-            pronunciation +
-            '\'' +
-            ", partOfSpeech='" +
-            partOfSpeech +
-            '\'' +
-            ", imageUrl='" +
-            imageUrl +
-            '\'' +
-            '}'
-        );
+        return "WordDTO{" +
+            "id=" + getId() +
+            ", text='" + getText() + "'" +
+            ", meaning='" + getMeaning() + "'" +
+            ", pronunciation='" + getPronunciation() + "'" +
+            ", partOfSpeech='" + getPartOfSpeech() + "'" +
+            ", imageUrl='" + getImageUrl() + "'" +
+            ", chapter=" + getChapter() +
+            "}";
     }
 }

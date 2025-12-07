@@ -33,7 +33,7 @@ const ForgotPassword = () => {
         <div
           style={{
             flex: windowWidth <= 768 ? 'none' : '0 0 50%',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            background: 'linear-gradient(135deg, #e41d8aff 0%, #f1c602ff 100%)',
             display: windowWidth <= 480 ? 'none' : 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -44,7 +44,7 @@ const ForgotPassword = () => {
         >
           <div style={{ maxWidth: '480px', width: '100%' }}>
             <img
-              src="content/images/Langleague.jpg"
+              src="https://images.unsplash.com/photo-1596496181848-3091d4878b24?w=600"
               alt="Check email"
               style={{
                 width: '100%',
@@ -121,7 +121,7 @@ const ForgotPassword = () => {
       <div
         style={{
           flex: windowWidth <= 768 ? 'none' : '0 0 50%',
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          background: 'linear-gradient(135deg, #e41d8aff 0%, #f1c602ff 100%)',
           display: windowWidth <= 480 ? 'none' : 'flex',
           alignItems: 'center',
           justifyContent: 'center',

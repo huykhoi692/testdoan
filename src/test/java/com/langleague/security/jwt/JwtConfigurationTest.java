@@ -1,15 +1,14 @@
 package com.langleague.security.jwt;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.langleague.security.JwtTestUtility;
+import java.util.Date;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-
-import java.util.Date;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Integration tests for JWT token generation and validation.
@@ -55,10 +54,10 @@ class JwtConfigurationTest {
         assertThat(rememberMeValidityInSeconds).isGreaterThan(tokenValidityInSeconds);
 
         System.out.println("✓ JWT Expiration Settings:");
-        System.out.println("  - Standard token: " + tokenValidityInSeconds + " seconds (" +
-            (tokenValidityInSeconds / 3600) + " hours)");
-        System.out.println("  - Remember-me token: " + rememberMeValidityInSeconds + " seconds (" +
-            (rememberMeValidityInSeconds / 86400) + " days)");
+        System.out.println("  - Standard token: " + tokenValidityInSeconds + " seconds (" + (tokenValidityInSeconds / 3600) + " hours)");
+        System.out.println(
+            "  - Remember-me token: " + rememberMeValidityInSeconds + " seconds (" + (rememberMeValidityInSeconds / 86400) + " days)"
+        );
     }
 
     @Test
@@ -120,7 +119,7 @@ class JwtConfigurationTest {
 
     @Test
     void testTokenWithAuthorities() {
-        String[] authorities = {"ROLE_USER", "ROLE_ADMIN"};
+        String[] authorities = { "ROLE_USER", "ROLE_ADMIN" };
         String token = jwtTestUtility.generateTestToken("adminuser", authorities);
 
         assertThat(token).isNotNull();
@@ -165,4 +164,3 @@ class JwtConfigurationTest {
         System.out.println("✓ Token validity periods are within recommended ranges");
     }
 }
-

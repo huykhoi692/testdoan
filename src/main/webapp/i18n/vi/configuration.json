@@ -1,7 +1,7 @@
 {
   "configuration": {
     "title": "Cấu hình",
-    "filter": "Lọc (tiền tố)",
+    "filter": "Lọc (theo tiền tố)",
     "table": {
       "prefix": "Tiền tố",
       "properties": "Thuộc tính"

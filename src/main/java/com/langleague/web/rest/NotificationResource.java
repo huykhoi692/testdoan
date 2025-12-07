@@ -4,6 +4,7 @@ import com.langleague.security.AuthoritiesConstants;
 import com.langleague.service.NotificationService;
 import com.langleague.service.dto.NotificationDTO;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.slf4j.Logger;
@@ -90,7 +91,8 @@ public class NotificationResource {
      */
     @PreAuthorize("hasAuthority('" + AuthoritiesConstants.ADMIN + "')")
     @PostMapping
-    public ResponseEntity<NotificationDTO> createNotification(@RequestBody NotificationDTO notificationDTO) throws URISyntaxException {
+    public ResponseEntity<NotificationDTO> createNotification(@Valid @RequestBody NotificationDTO notificationDTO)
+        throws URISyntaxException {
         LOG.debug("REST request to save Notification : {}", notificationDTO);
         if (notificationDTO.getId() != null) {
             return ResponseEntity.badRequest().build();
@@ -134,6 +136,7 @@ public class NotificationResource {
      * @param type    the notification type.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)}.
      */
+    @PreAuthorize("hasAuthority('" + AuthoritiesConstants.ADMIN + "')")
     @PostMapping("/broadcast")
     public ResponseEntity<Void> broadcastNotification(
         @RequestParam String title,

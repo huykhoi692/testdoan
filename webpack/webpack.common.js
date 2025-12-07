@@ -34,53 +34,63 @@ const getTsLoaderRule = () => {
 
 module.exports = async options => {
   const development = options.env === 'development';
-  const languagesHash = await hashElement(path.resolve(__dirname, '../src/main/webapp/i18n'), {
-    algo: 'md5',
-    encoding: 'hex',
-    files: { include: ['*.json'] },
-  });
+  const fs = require('fs');
+  const i18nPath = path.resolve(__dirname, '../src/main/webapp/i18n');
+
+  // Check if i18n directory exists before hashing
+  let languagesHash = '';
+  if (fs.existsSync(i18nPath)) {
+    languagesHash = await hashElement(i18nPath, {
+      algo: 'md5',
+      encoding: 'hex',
+      files: { include: ['*.json'] },
+    });
+  }
 
   // Check if i18n files exist
-  const i18nPath = path.resolve(__dirname, '../src/main/webapp/i18n');
   const languages = ['en', 'vi'];
   const i18nPlugins = [];
 
-  languages.forEach(lang => {
-    const files = glob.sync(path.join(i18nPath, lang, '*.json'));
-    if (files.length > 0) {
-      i18nPlugins.push(
-        new MergeJsonWebpackPlugin({
-          output: {
-            groupBy: [
-              {
-                pattern: `./src/main/webapp/i18n/${lang}/*.json`,
-                fileName: `./i18n/${lang}.json`,
-              },
-            ],
-          },
-        }),
-      );
-    }
-  });
+  if (fs.existsSync(i18nPath)) {
+    languages.forEach(lang => {
+      const files = glob.sync(path.join(i18nPath, lang, '*.json'));
+      if (files.length > 0) {
+        i18nPlugins.push(
+          new MergeJsonWebpackPlugin({
+            output: {
+              groupBy: [
+                {
+                  pattern: `./src/main/webapp/i18n/${lang}/*.json`,
+                  fileName: `./i18n/${lang}.json`,
+                },
+              ],
+            },
+          }),
+        );
+      }
+    });
+  }
 
   return merge(
     {
-      cache: {
-        // 1. Set cache type to filesystem
-        type: 'filesystem',
-        cacheDirectory: path.resolve(__dirname, '../target/webpack'),
-        buildDependencies: {
-          // 2. Add your config as buildDependency to get cache invalidation on config change
-          config: [
-            __filename,
-            path.resolve(__dirname, `webpack.${development ? 'dev' : 'prod'}.js`),
-            path.resolve(__dirname, 'environment.js'),
-            path.resolve(__dirname, 'utils.js'),
-            path.resolve(__dirname, '../postcss.config.js'),
-            path.resolve(__dirname, '../tsconfig.json'),
-          ],
-        },
-      },
+      cache: process.env.WEBPACK_NO_CACHE
+        ? false
+        : {
+            // 1. Set cache type to filesystem
+            type: 'filesystem',
+            cacheDirectory: path.resolve(__dirname, '../target/webpack'),
+            buildDependencies: {
+              // 2. Add your config as buildDependency to get cache invalidation on config change
+              config: [
+                __filename,
+                path.resolve(__dirname, `webpack.${development ? 'dev' : 'prod'}.js`),
+                path.resolve(__dirname, 'environment.js'),
+                path.resolve(__dirname, 'utils.js'),
+                path.resolve(__dirname, '../postcss.config.js'),
+                path.resolve(__dirname, '../tsconfig.json'),
+              ],
+            },
+          },
       resolve: {
         extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
         modules: ['node_modules'],
@@ -96,6 +106,20 @@ module.exports = async options => {
             use: getTsLoaderRule(options.env),
             include: [utils.root('./src/main/webapp/app')],
             exclude: [utils.root('node_modules')],
+          },
+          {
+            test: /\.(png|jpe?g|gif|svg|webp)$/i,
+            type: 'asset/resource',
+            generator: {
+              filename: 'content/images/[name].[hash:8][ext]',
+            },
+          },
+          {
+            test: /\.(woff|woff2|eot|ttf|otf)$/i,
+            type: 'asset/resource',
+            generator: {
+              filename: 'content/fonts/[name].[hash:8][ext]',
+            },
           },
           /*
        ,
@@ -143,6 +167,7 @@ module.exports = async options => {
             },
             { from: './src/main/webapp/swagger-ui/', to: 'swagger-ui/' },
             { from: './src/main/webapp/content/', to: 'content/' },
+            { from: './src/main/webapp/i18n/', to: 'i18n/' },
             { from: './src/main/webapp/favicon.ico', to: 'favicon.ico' },
             { from: './src/main/webapp/manifest.webapp', to: 'manifest.webapp' },
             // jhipster-needle-add-assets-to-webpack - JHipster will add/remove third-party resources in this array

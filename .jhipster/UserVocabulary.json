@@ -1,8 +1,9 @@
 {
   "annotations": {
-    "changelogDate": "20251021152359"
+    "changelogDate": "20251122061525"
   },
-  "applications": ["Langleague"],
+  "applications": "*",
+  "documentation": "User vocabulary progress (Flashcards)",
   "dto": "mapstruct",
   "fields": [
     {
@@ -16,6 +17,10 @@
     {
       "fieldName": "lastReviewed",
       "fieldType": "Instant"
+    },
+    {
+      "fieldName": "reviewCount",
+      "fieldType": "Integer"
     }
   ],
   "name": "UserVocabulary",

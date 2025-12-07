@@ -2,8 +2,10 @@ package com.langleague.web.rest;
 
 import com.langleague.repository.UserGrammarRepository;
 import com.langleague.service.UserGrammarService;
+import com.langleague.service.dto.GrammarStatisticsDTO;
 import com.langleague.service.dto.UserGrammarDTO;
 import com.langleague.web.rest.errors.BadRequestAlertException;
+import jakarta.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -53,7 +55,7 @@ public class UserGrammarResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public ResponseEntity<UserGrammarDTO> createUserGrammar(@RequestBody UserGrammarDTO userGrammarDTO) throws URISyntaxException {
+    public ResponseEntity<UserGrammarDTO> createUserGrammar(@Valid @RequestBody UserGrammarDTO userGrammarDTO) throws URISyntaxException {
         LOG.debug("REST request to save UserGrammar : {}", userGrammarDTO);
         if (userGrammarDTO.getId() != null) {
             throw new BadRequestAlertException("A new userGrammar cannot already have an ID", ENTITY_NAME, "idexists");
@@ -286,9 +288,9 @@ public class UserGrammarResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the statistics in body.
      */
     @GetMapping("/statistics")
-    public ResponseEntity<UserGrammarService.GrammarStatisticsDTO> getStatistics() {
+    public ResponseEntity<GrammarStatisticsDTO> getStatistics() {
         LOG.debug("REST request to get grammar statistics");
-        UserGrammarService.GrammarStatisticsDTO stats = userGrammarService.getStatistics();
+        GrammarStatisticsDTO stats = userGrammarService.getStatistics();
         return ResponseEntity.ok().body(stats);
     }
 }

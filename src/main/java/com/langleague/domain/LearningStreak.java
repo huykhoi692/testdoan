@@ -33,14 +33,26 @@ public class LearningStreak implements Serializable {
     @Column(name = "last_study_date")
     private Instant lastStudyDate;
 
-    @Size(max = 256)
-    @Column(name = "icon_url", length = 256)
-    private String iconUrl;
+    // Note: iconUrl removed - use StreakIconRepository.findCurrentIconForStreak() for dynamic query
+    // This avoids data duplication and ensures icons are always up-to-date
+
+    @Version
+    @Column(name = "version")
+    private Long version;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(
         value = {
-            "comments", "exerciseResults", "userProgresses", "userVocabularies", "userAchievements", "learningStreaks", "studySessions",
+            "internalUser",
+            "userVocabularies",
+            "userGrammars",
+            "bookReviews",
+            "comments",
+            "exerciseResults",
+            "chapterProgresses",
+            "userAchievements",
+            "learningStreaks",
+            "studySessions",
         },
         allowSetters = true
     )
@@ -100,17 +112,12 @@ public class LearningStreak implements Serializable {
         this.lastStudyDate = lastStudyDate;
     }
 
-    public String getIconUrl() {
-        return this.iconUrl;
+    public Long getVersion() {
+        return this.version;
     }
 
-    public LearningStreak iconUrl(String iconUrl) {
-        this.setIconUrl(iconUrl);
-        return this;
-    }
-
-    public void setIconUrl(String iconUrl) {
-        this.iconUrl = iconUrl;
+    public void setVersion(Long version) {
+        this.version = version;
     }
 
     public AppUser getAppUser() {
@@ -153,7 +160,6 @@ public class LearningStreak implements Serializable {
             ", currentStreak=" + getCurrentStreak() +
             ", longestStreak=" + getLongestStreak() +
             ", lastStudyDate='" + getLastStudyDate() + "'" +
-            ", iconUrl='" + getIconUrl() + "'" +
             "}";
     }
 }

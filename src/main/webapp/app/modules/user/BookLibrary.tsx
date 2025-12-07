@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Row, Col, Typography, Input, Select, Spin, Tag, Space, Empty } from 'antd';
-import { BookOutlined, SearchOutlined, FileTextOutlined } from '@ant-design/icons';
+import { BookOutlined, SearchOutlined, ClockCircleOutlined, FileTextOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from 'app/config/store';
-import { searchBooks, getAllBooks } from 'app/shared/services/book.service';
-import { IBook } from 'app/shared/model/book.model';
-import DashboardLayout from 'app/shared/layout/dashboard-layout';
+import { getActiveBooks, searchBooks, getBooksByLevel } from 'app/shared/services/book.service';
+import { IBook } from 'app/shared/model/models';
+import { t } from 'i18next';
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -14,50 +14,84 @@ const BookLibrary: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [books, setBooks] = useState<IBook[]>([]);
+  const [filteredBooks, setFilteredBooks] = useState<IBook[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [selectedLevel, setSelectedLevel] = useState<string>('all');
 
-  const fetchAndSetBooks = useCallback(
-    async (query: string, level: string) => {
-      setLoading(true);
-      try {
-        let result;
-        if (query) {
-          result = await dispatch(searchBooks(query)).unwrap();
-        } else {
-          result = await dispatch(getAllBooks()).unwrap();
-        }
-
-        let booksArray = Array.isArray(result) ? result : [];
-
-        if (level !== 'all') {
-          booksArray = booksArray.filter(book => book.level === level);
-        }
-
-        setBooks(booksArray);
-      } catch (error) {
-        console.error('Error fetching books:', error);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [dispatch],
-  );
-
-  const debouncedSearch = useCallback(
-    (query: string, level: string) => {
-      const timeoutId = setTimeout(() => {
-        fetchAndSetBooks(query, level);
-      }, 300);
-      return () => clearTimeout(timeoutId);
-    },
-    [fetchAndSetBooks],
-  );
-
+  // Fetch books
   useEffect(() => {
-    return debouncedSearch(searchText, selectedLevel);
-  }, [searchText, selectedLevel, debouncedSearch]);
+    fetchBooks();
+  }, []);
+
+  const fetchBooks = async () => {
+    setLoading(true);
+    try {
+      // Use getActiveBooks instead of getBooks
+      const result = await dispatch(getActiveBooks({ page: 0, size: 100 })).unwrap();
+      console.log('Active books API result:', result);
+      const booksArray = Array.isArray(result) ? result : result.content ? result.content : [];
+      setBooks(booksArray);
+      setFilteredBooks(booksArray);
+    } catch (error) {
+      console.error('Error fetching books:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Filter/Search books with debounce
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      handleFilterBooks();
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchText, selectedLevel]);
+
+  const handleFilterBooks = async () => {
+    setLoading(true);
+    try {
+      let result: any;
+
+      // If searching, use search API
+      if (searchText && searchText.trim()) {
+        result = await dispatch(searchBooks({ keyword: searchText, page: 0, size: 100 })).unwrap();
+      }
+      // If filtering by level, use level API
+      else if (selectedLevel !== 'all') {
+        result = await dispatch(getBooksByLevel(selectedLevel)).unwrap();
+      }
+      // Otherwise get active books
+      else {
+        result = await dispatch(getActiveBooks({ page: 0, size: 100 })).unwrap();
+      }
+
+      const booksArray = Array.isArray(result) ? result : result.content ? result.content : [];
+      setFilteredBooks(booksArray);
+    } catch (error) {
+      console.error('Error filtering books:', error);
+      // Fallback to client-side filtering if API fails
+      let filtered = books;
+
+      if (searchText) {
+        filtered = filtered.filter(
+          book =>
+            book.title.toLowerCase().includes(searchText.toLowerCase()) ||
+            book.author?.toLowerCase().includes(searchText.toLowerCase()) ||
+            book.description?.toLowerCase().includes(searchText.toLowerCase()),
+        );
+      }
+
+      if (selectedLevel !== 'all') {
+        filtered = filtered.filter(book => book.level === selectedLevel);
+      }
+
+      setFilteredBooks(filtered);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getLevelColor = (level?: string) => {
     const colors: Record<string, string> = {
@@ -82,122 +116,127 @@ const BookLibrary: React.FC = () => {
   };
 
   return (
-    <DashboardLayout>
-      <div style={{ padding: '40px 24px', maxWidth: 1400, margin: '0 auto' }}>
-        {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <Title level={2}>
-            <BookOutlined style={{ marginRight: 12 }} />
-            Thư Viện Sách Hàn Quốc
-          </Title>
-          <Paragraph type="secondary" style={{ fontSize: 16 }}>
-            Khám phá và học tiếng Hàn với hàng trăm cuốn sách Hàn Quốc được AI phân tích chi tiết
-          </Paragraph>
-        </div>
+    <div style={{ padding: '40px 24px', maxWidth: 1400, margin: '0 auto' }}>
+      {/* Header */}
+      <div style={{ textAlign: 'center', marginBottom: 40 }}>
+        <Title level={2}>
+          <BookOutlined style={{ marginRight: 12 }} />
+          {t('books.title')}
+        </Title>
+        <Paragraph type="secondary" style={{ fontSize: 16 }}>
+          Khám phá và học tiếng Hàn với hàng trăm cuốn sách Hàn Quốc được AI phân tích chi tiết
+        </Paragraph>
+      </div>
 
-        {/* Filters */}
-        <Card style={{ marginBottom: 24, borderRadius: 12 }}>
-          <Row gutter={16}>
-            <Col xs={24} sm={24} md={16}>
-              <Input
-                size="large"
-                placeholder="Tìm kiếm theo tên sách, tác giả..."
-                prefix={<SearchOutlined />}
-                value={searchText}
-                onChange={e => setSearchText(e.target.value)}
-                allowClear
-                style={{ borderRadius: 8 }}
-              />
-            </Col>
-            <Col xs={24} sm={12} md={8}>
-              <Select
-                size="large"
-                placeholder="Cấp độ"
-                value={selectedLevel}
-                onChange={setSelectedLevel}
-                style={{ width: '100%', borderRadius: 8 }}
-              >
-                <Option value="all">Tất cả cấp độ</Option>
-                <Option value="BEGINNER">Sơ cấp</Option>
-                <Option value="ELEMENTARY">Cơ bản</Option>
-                <Option value="INTERMEDIATE">Trung cấp</Option>
-                <Option value="UPPER_INTERMEDIATE">Trung cao cấp</Option>
-                <Option value="ADVANCED">Cao cấp</Option>
-              </Select>
-            </Col>
-          </Row>
-        </Card>
+      {/* Filters */}
+      <Card variant="borderless" style={{ marginBottom: 24, borderRadius: 12 }}>
+        <Row gutter={16}>
+          <Col xs={24} sm={24} md={16}>
+            <Input
+              size="large"
+              placeholder={t('books.search')}
+              prefix={<SearchOutlined />}
+              value={searchText}
+              onChange={e => setSearchText(e.target.value)}
+              allowClear
+              style={{ borderRadius: 8 }}
+            />
+          </Col>
+          <Col xs={24} sm={12} md={8}>
+            <Select
+              size="large"
+              placeholder={t('books.level')}
+              value={selectedLevel}
+              onChange={setSelectedLevel}
+              style={{ width: '100%', borderRadius: 8 }}
+            >
+              <Option value="all">{t('books.allBooks')}</Option>
+              <Option value="BEGINNER">{t('books.beginner')}</Option>
+              <Option value="ELEMENTARY">{t('books.beginner')}</Option>
+              <Option value="INTERMEDIATE">{t('books.intermediate')}</Option>
+              <Option value="UPPER_INTERMEDIATE">{t('books.intermediate')}</Option>
+              <Option value="ADVANCED">{t('books.advanced')}</Option>
+            </Select>
+          </Col>
+        </Row>
+      </Card>
 
-        {/* Book Grid */}
-        <Spin spinning={loading}>
-          {books.length === 0 ? (
-            <Empty description="Không tìm thấy sách nào" style={{ marginTop: 60 }} />
-          ) : (
-            <Row gutter={[24, 24]}>
-              {books.map(book => (
-                <Col xs={24} sm={12} md={8} lg={6} key={book.id}>
-                  <Card
-                    hoverable
-                    cover={
-                      <div
-                        style={{
-                          height: 280,
-                          backgroundColor: '#f5f5f5',
-                          backgroundImage: book.thumbnailUrl ? `url(${book.thumbnailUrl})` : 'none',
-                          backgroundSize: 'cover',
-                          backgroundPosition: 'center',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          borderRadius: '12px 12px 0 0',
-                        }}
-                      >
-                        {!book.thumbnailUrl && <BookOutlined style={{ fontSize: 80, color: '#d9d9d9' }} />}
+      {/* Book Grid */}
+      <Spin spinning={loading}>
+        {filteredBooks.length === 0 ? (
+          <Empty description={t('common.noData')} style={{ marginTop: 60 }} />
+        ) : (
+          <Row gutter={[24, 24]}>
+            {filteredBooks.map(book => (
+              <Col xs={24} sm={12} md={8} lg={6} key={book.id}>
+                <Card
+                  hoverable
+                  cover={
+                    <div
+                      style={{
+                        height: 280,
+                        backgroundColor: '#f5f5f5',
+                        backgroundImage: book.thumbnail ? `url(${book.thumbnail})` : 'none',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: '12px 12px 0 0',
+                      }}
+                    >
+                      {!book.thumbnail && <BookOutlined style={{ fontSize: 80, color: '#d9d9d9' }} />}
+                    </div>
+                  }
+                  style={{ borderRadius: 12, overflow: 'hidden' }}
+                  onClick={() => navigate(`/dashboard/books/${book.id}`)}
+                >
+                  <Card.Meta
+                    title={
+                      <div style={{ marginBottom: 8 }}>
+                        <Text strong ellipsis style={{ fontSize: 16 }}>
+                          {book.title}
+                        </Text>
                       </div>
                     }
-                    style={{ borderRadius: 12, overflow: 'hidden' }}
-                    onClick={() => navigate(`/dashboard/books/${book.id}`)}
-                  >
-                    <Card.Meta
-                      title={
-                        <div style={{ marginBottom: 8 }}>
-                          <Text strong ellipsis style={{ fontSize: 16 }}>
-                            {book.title}
-                          </Text>
-                        </div>
-                      }
-                      description={
-                        <Space direction="vertical" size={8} style={{ width: '100%' }}>
-                          <Text type="secondary" ellipsis style={{ fontSize: 13 }}>
-                            Cấp độ: {getLevelText(book.level)}
-                          </Text>
+                    description={
+                      <Space direction="vertical" size={8} style={{ width: '100%' }}>
+                        <Text type="secondary" ellipsis style={{ fontSize: 13 }}>
+                          {book.author || t('books.author')}
+                        </Text>
 
-                          {book.level && (
-                            <Tag color={getLevelColor(book.level)} style={{ marginTop: 4 }}>
-                              {getLevelText(book.level)}
-                            </Tag>
-                          )}
+                        {book.level && (
+                          <Tag color={getLevelColor(book.level)} style={{ marginTop: 4 }}>
+                            {getLevelText(book.level)}
+                          </Tag>
+                        )}
 
-                          <Space split="|" size={4} style={{ fontSize: 12, color: '#999' }}>
+                        <Space split="|" size={4} style={{ fontSize: 12, color: '#999' }}>
+                          {book.totalChapters && (
                             <span>
-                              <FileTextOutlined /> {book.level || 'Không rõ cấp độ'}
+                              <FileTextOutlined /> {book.totalChapters} {t('books.chapters').toLowerCase()}
                             </span>
-                          </Space>
-
-                          <Paragraph ellipsis={{ rows: 2 }} type="secondary" style={{ fontSize: 12, marginTop: 8, marginBottom: 0 }}>
-                            {book.description || 'Không có mô tả'}
-                          </Paragraph>
+                          )}
+                          {book.totalPages && (
+                            <span>
+                              <ClockCircleOutlined /> {book.totalPages} {t('common.pages') || 'trang'}
+                            </span>
+                          )}
                         </Space>
-                      }
-                    />
-                  </Card>
-                </Col>
-              ))}
-            </Row>
-          )}
-        </Spin>
-      </div>
-    </DashboardLayout>
+
+                        <Paragraph ellipsis={{ rows: 2 }} type="secondary" style={{ fontSize: 12, marginTop: 8, marginBottom: 0 }}>
+                          {book.description || t('books.description')}
+                        </Paragraph>
+                      </Space>
+                    }
+                  />
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        )}
+      </Spin>
+    </div>
   );
 };
 

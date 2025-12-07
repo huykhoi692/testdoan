@@ -18,9 +18,6 @@
             <column name="last_study_date" type="${datetimeType}">
                 <constraints nullable="true"/>
             </column>
-            <column name="icon_url" type="varchar(256)">
-                <constraints nullable="true"/>
-            </column>
             <column name="version" type="bigint">
                 <constraints nullable="true"/>
             </column>
@@ -31,8 +28,18 @@
     </changeSet>
 
     <changeSet id="20251125000023-2" author="system">
-        <addForeignKeyConstraint baseColumnNames="app_user_id" baseTableName="learning_streak" 
+        <addForeignKeyConstraint baseColumnNames="app_user_id" baseTableName="learning_streak"
             constraintName="fk_learning_streak_app_user_id" referencedColumnNames="id" referencedTableName="app_user"/>
+    </changeSet>
+
+    <!-- Add index -->
+    <changeSet id="20251125000023-3" author="system">
+        <preConditions onFail="MARK_RAN">
+            <not><indexExists indexName="idx_learning_streak_app_user_id"/></not>
+        </preConditions>
+        <createIndex indexName="idx_learning_streak_app_user_id" tableName="learning_streak">
+            <column name="app_user_id"/>
+        </createIndex>
     </changeSet>
 
 </databaseChangeLog>

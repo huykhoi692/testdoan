@@ -3,9 +3,11 @@ package com.langleague.service;
 import com.langleague.domain.ChapterProgress;
 import com.langleague.repository.ChapterProgressRepository;
 import com.langleague.service.dto.ChapterProgressDTO;
+import com.langleague.service.dto.MyChapterDTO;
 import com.langleague.service.mapper.ChapterProgressMapper;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -203,5 +205,66 @@ public class ChapterProgressService {
 
         double totalPercent = progresses.stream().mapToInt(p -> p.getPercent() != null ? p.getPercent() : 0).sum();
         return totalPercent / progresses.size();
+    }
+
+    /**
+     * Get all chapters that the user has saved and is learning.
+     * Returns chapters ordered by last accessed time (most recent first).
+     *
+     * @param userLogin the user login
+     * @return list of chapters with progress information
+     */
+    @Transactional(readOnly = true)
+    public List<MyChapterDTO> getMyChapters(String userLogin) {
+        LOG.debug("Request to get my chapters for user {}", userLogin);
+        return chapterProgressRepository
+            .findByAppUser_InternalUser_Login(userLogin)
+            .stream()
+            .map(progress ->
+                new MyChapterDTO(
+                    progress.getChapter().getId(),
+                    progress.getChapter().getTitle(),
+                    progress.getChapter().getOrderIndex(),
+                    progress.getChapter().getBook().getId(),
+                    progress.getChapter().getBook().getTitle(),
+                    progress.getChapter().getBook().getThumbnail(),
+                    progress.getChapter().getBook().getLevel() != null ? progress.getChapter().getBook().getLevel().name() : null,
+                    progress.getPercent() != null ? progress.getPercent() : 0,
+                    progress.getCompleted() != null ? progress.getCompleted() : false,
+                    progress.getLastAccessed()
+                )
+            )
+            .sorted((a, b) -> {
+                // Sort by last accessed, most recent first
+                if (a.getLastAccessed() == null && b.getLastAccessed() == null) return 0;
+                if (a.getLastAccessed() == null) return 1;
+                if (b.getLastAccessed() == null) return -1;
+                return b.getLastAccessed().compareTo(a.getLastAccessed());
+            })
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Get chapters that the user is currently learning (not completed).
+     *
+     * @param userLogin the user login
+     * @return list of in-progress chapters
+     */
+    @Transactional(readOnly = true)
+    public List<MyChapterDTO> getMyInProgressChapters(String userLogin) {
+        LOG.debug("Request to get in-progress chapters for user {}", userLogin);
+        return getMyChapters(userLogin).stream().filter(chapter -> !chapter.getCompleted()).collect(Collectors.toList());
+    }
+
+    /**
+     * Get chapters that the user has completed.
+     *
+     * @param userLogin the user login
+     * @return list of completed chapters
+     */
+    @Transactional(readOnly = true)
+    public List<MyChapterDTO> getMyCompletedChapters(String userLogin) {
+        LOG.debug("Request to get completed chapters for user {}", userLogin);
+        return getMyChapters(userLogin).stream().filter(MyChapterDTO::getCompleted).collect(Collectors.toList());
     }
 }

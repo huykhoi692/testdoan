@@ -153,8 +153,8 @@ class ExerciseResultServiceTest {
 
         // Then
         assertThat(result).isPresent();
-        assertThat(result.get().getId()).isEqualTo(1L);
-        assertThat(result.get().getScore()).isEqualTo(85);
+        assertThat(result.orElseThrow().getId()).isEqualTo(1L);
+        assertThat(result.orElseThrow().getScore()).isEqualTo(85);
         verify(exerciseResultRepository, times(1)).findById(1L);
     }
 

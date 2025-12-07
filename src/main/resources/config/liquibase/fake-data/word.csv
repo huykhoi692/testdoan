@@ -1,11 +1,12 @@
-id;text;meaning;pronunciation;part_of_speech;image_url
-1;plus broken;../fake-data/blob/hipster.txt;yippee;leap;mmm yet equally
-2;correctly;../fake-data/blob/hipster.txt;following plus near;blissfully fraudster;valiantly why
-3;aboard;../fake-data/blob/hipster.txt;scrap;who;inasmuch
-4;tough ugh;../fake-data/blob/hipster.txt;inside slowly;eventually once;peaceful soon inasmuch
-5;er;../fake-data/blob/hipster.txt;jut gee;disposer self-assured;nor instead
-6;the daintily utilization;../fake-data/blob/hipster.txt;wash;phew how amidst;failing
-7;guard;../fake-data/blob/hipster.txt;wrongly mmm;vet twine;ramp
-8;via qua;../fake-data/blob/hipster.txt;tromp;whose book usually;ack graft
-9;busily hm meander;../fake-data/blob/hipster.txt;broadside inquisitively but;fax circa as;drug
-10;through that regulate;../fake-data/blob/hipster.txt;eek irritably smart;fellow greedily;assail if ape
+id;text;meaning;pronunciation;part_of_speech;image_url;chapter_id
+1;안녕하세요;Hello (formal);an-nyeong-ha-se-yo;GREETING;;3
+2;감사합니다;Thank you;gam-sa-ham-ni-da;EXPRESSION;;3
+3;하나;One;ha-na;NUMBER;;4
+4;둘;Two;dul;NUMBER;;4
+5;책;Book;chaek;NOUN;;5
+6;학교;School;hak-gyo;NOUN;;5
+7;먹다;To eat;meok-da;VERB;;6
+8;가다;To go;ga-da;VERB;;7
+9;예쁘다;Pretty;ye-ppeu-da;ADJECTIVE;;5
+10;사랑;Love;sa-rang;NOUN;;5
+

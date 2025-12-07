@@ -19,13 +19,10 @@ public class SpeakingExerciseDTO implements Serializable {
     @Size(max = 512)
     private String sampleAudio;
 
-    @Size(max = 255)
-    private String targetPhrase;
+    @NotNull
+    private Integer maxScore;
 
-    @Size(max = 255)
-    private String evaluationMethod;
-
-    private LessonSkillDTO lessonSkill;
+    private ChapterDTO chapter;
 
     public Long getId() {
         return id;
@@ -51,28 +48,20 @@ public class SpeakingExerciseDTO implements Serializable {
         this.sampleAudio = sampleAudio;
     }
 
-    public String getTargetPhrase() {
-        return targetPhrase;
+    public Integer getMaxScore() {
+        return maxScore;
     }
 
-    public void setTargetPhrase(String targetPhrase) {
-        this.targetPhrase = targetPhrase;
+    public void setMaxScore(Integer maxScore) {
+        this.maxScore = maxScore;
     }
 
-    public String getEvaluationMethod() {
-        return evaluationMethod;
+    public ChapterDTO getChapter() {
+        return chapter;
     }
 
-    public void setEvaluationMethod(String evaluationMethod) {
-        this.evaluationMethod = evaluationMethod;
-    }
-
-    public LessonSkillDTO getLessonSkill() {
-        return lessonSkill;
-    }
-
-    public void setLessonSkill(LessonSkillDTO lessonSkill) {
-        this.lessonSkill = lessonSkill;
+    public void setChapter(ChapterDTO chapter) {
+        this.chapter = chapter;
     }
 
     @Override
@@ -103,9 +92,8 @@ public class SpeakingExerciseDTO implements Serializable {
             "id=" + getId() +
             ", prompt='" + getPrompt() + "'" +
             ", sampleAudio='" + getSampleAudio() + "'" +
-            ", targetPhrase='" + getTargetPhrase() + "'" +
-            ", evaluationMethod='" + getEvaluationMethod() + "'" +
-            ", lessonSkill=" + getLessonSkill() +
+            ", maxScore=" + getMaxScore() +
+            ", chapter=" + getChapter() +
             "}";
     }
 }

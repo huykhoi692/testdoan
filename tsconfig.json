@@ -20,7 +20,10 @@
     },
     "importHelpers": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true
   },
   "include": ["src/main/webapp/app"],
   "exclude": ["node_modules", "**/*.spec.ts", "**/*.spec.tsx"]

@@ -9,13 +9,16 @@
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="name" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="icon_url" type="varchar(512)">
+            <column name="level" type="varchar(50)">
                 <constraints nullable="true"/>
             </column>
-            <column name="required_streak" type="integer">
+            <column name="min_days" type="integer">
+                <constraints nullable="true"/>
+            </column>
+            <column name="icon_path" type="varchar(256)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="description" type="varchar(255)">
                 <constraints nullable="true"/>
             </column>
         </createTable>

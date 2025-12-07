@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.langleague.security.CaptchaService;
 import com.langleague.security.DomainUserDetailsService.UserWithId;
 import com.langleague.web.rest.vm.LoginVM;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.security.Principal;
 import java.time.Instant;
@@ -32,7 +33,10 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * Controller to authenticate users.
+ * Use case 1: Login
+ * Use case 2: Logout (client-side JWT removal)
  */
+@Tag(name = "Authentication", description = "User authentication and JWT token management")
 @RestController
 @RequestMapping("/api")
 public class AuthenticateController {
@@ -49,6 +53,9 @@ public class AuthenticateController {
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final CaptchaService captchaService;
+
+    @Value("${spring.profiles.active:}")
+    private String activeProfile;
 
     //    @Value("${jhipster.security.authentication.jwt.token-validity-in-seconds:0}")
     //    private long tokenValidityInSeconds;
@@ -74,11 +81,18 @@ public class AuthenticateController {
      */
     @PostMapping("/authenticate")
     public ResponseEntity<JWTToken> authorize(@Valid @RequestBody LoginVM loginVM) {
-        // ---  Verify captcha first ---
-        boolean captchaValid = captchaService.verifyCaptcha(loginVM.getCaptchaId(), loginVM.getCaptchaValue());
-        if (!captchaValid) {
-            LOG.warn("Captcha verification failed for captchaId={}", loginVM.getCaptchaId());
-            return ResponseEntity.badRequest().build(); // trả 400 nếu captcha không hợp lệ
+        // --- Skip captcha verification in dev/test environment ---
+        boolean skipCaptcha = activeProfile != null && (activeProfile.contains("dev") || activeProfile.contains("test"));
+
+        if (!skipCaptcha) {
+            // --- Verify captcha first ---
+            boolean captchaValid = captchaService.verifyCaptcha(loginVM.getCaptchaId(), loginVM.getCaptchaValue());
+            if (!captchaValid) {
+                LOG.warn("Captcha verification failed for captchaId={}", loginVM.getCaptchaId());
+                return ResponseEntity.badRequest().build(); // trả 400 nếu captcha không hợp lệ
+            }
+        } else {
+            LOG.debug("Captcha verification skipped for {} environment", activeProfile);
         }
 
         // --- Authenticate user credentials ---
@@ -89,7 +103,11 @@ public class AuthenticateController {
         // --- Set JWT token in Authorization header ---
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = this.createToken(authentication, loginVM.isRememberMe());
+
+        // Handle null rememberMe - default to false
+        boolean rememberMe = loginVM.isRememberMe() != null && loginVM.isRememberMe();
+        String jwt = this.createToken(authentication, rememberMe);
+
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setBearerAuth(jwt);
         return new ResponseEntity<>(new JWTToken(jwt), httpHeaders, HttpStatus.OK);

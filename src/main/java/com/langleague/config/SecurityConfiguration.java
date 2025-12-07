@@ -4,6 +4,9 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 import com.langleague.security.*;
 import com.langleague.security.OAuth2AuthenticationSuccessHandler;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.stream.Collectors;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,10 +14,13 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
 import org.springframework.security.config.http.SessionCreationPolicy;
+//import org.springframework.security.jwt.Jwt;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
 import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
@@ -40,13 +46,28 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, MvcRequestMatcher.Builder mvc) throws Exception {
+        // Configure JWT -> GrantedAuthorities converter so that our custom "auth" claim (space separated roles)
+        // is converted into GrantedAuthority values understood by hasRole/hasAuthority checks.
+        JwtAuthenticationConverter jwtAuthConverter = new JwtAuthenticationConverter();
+        JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        grantedAuthoritiesConverter.setAuthorityPrefix(""); // our tokens already have ROLE_ prefix
+        // Use custom converter that reads the `auth` claim if present
+        jwtAuthConverter.setJwtGrantedAuthoritiesConverter(jwt -> {
+            Object authClaim = jwt.getClaim(SecurityUtils.AUTHORITIES_CLAIM);
+            if (authClaim instanceof String str && !str.isBlank()) {
+                return Arrays.stream(str.split(" ")).map(SimpleGrantedAuthority::new).collect(Collectors.toSet());
+            }
+            // fallback to default behaviour (scope/roles mapping)
+            return grantedAuthoritiesConverter.convert(jwt);
+        });
+        // Register converter with resource server
+        http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthConverter)));
+
         http
             // Enable CORS
             .cors(withDefaults())
             // Disable CSRF (API + JWT không cần CSRF)
             .csrf(csrf -> csrf.disable())
-            // JWT filter (optional, validation is done by oauth2ResourceServer)
-            .addFilterBefore(new JWTFilter(), BasicAuthenticationFilter.class)
             // Security headers
             .headers(headers ->
                 headers
@@ -57,7 +78,9 @@ public class SecurityConfiguration {
             // URL authorization
             .authorizeHttpRequests(authz ->
                 authz
-                    // Static resources
+                    // ============================================================
+                    // STATIC RESOURCES - Public
+                    // ============================================================
                     .requestMatchers(
                         mvc.pattern("/index.html"),
                         mvc.pattern("/*.js"),
@@ -73,12 +96,16 @@ public class SecurityConfiguration {
                     .permitAll()
                     .requestMatchers(mvc.pattern("/swagger-ui/**"), mvc.pattern("/v3/api-docs/**"))
                     .permitAll()
-                    // Management endpoints - health check public
+                    // ============================================================
+                    // MANAGEMENT ENDPOINTS - Health check public
+                    // ============================================================
                     .requestMatchers(mvc.pattern("/management/health/**"))
                     .permitAll()
                     .requestMatchers(mvc.pattern("/management/info"))
                     .permitAll()
-                    // Public APIs
+                    // ============================================================
+                    // PUBLIC AUTHENTICATION APIS
+                    // ============================================================
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/authenticate"))
                     .permitAll()
                     .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/authenticate"))
@@ -100,45 +127,216 @@ public class SecurityConfiguration {
                     .requestMatchers(mvc.pattern("/api/oauth2/**"))
                     .permitAll()
                     // ============================================================
-                    // ROLE-BASED AUTHORIZATION
-                    // ADMIN: Full access to everything
-                    // STAFF: Manage all resources except users
-                    // USER: Read-only access
+                    // ADMIN-ONLY APIS
+                    // User Management, Authorities, System Reports
                     // ============================================================
-
-                    // User Management - ADMIN ONLY
                     .requestMatchers(mvc.pattern("/api/admin/**"))
-                    .hasRole("ADMIN")
-                    .requestMatchers(mvc.pattern("/api/users"))
-                    .hasRole("ADMIN")
-                    .requestMatchers(mvc.pattern("/api/users/**"))
-                    .hasRole("ADMIN")
-                    .requestMatchers(mvc.pattern("/api/authorities"))
-                    .hasRole("ADMIN")
+                    .hasAuthority("ROLE_ADMIN")
                     .requestMatchers(mvc.pattern("/api/authorities/**"))
-                    .hasRole("ADMIN")
-                    // Account Management - Users can manage their own account
+                    .hasAuthority("ROLE_ADMIN")
+                    // System-wide reports and statistics
+                    .requestMatchers(mvc.pattern("/api/learning-reports/system-stats"))
+                    .hasAuthority("ROLE_ADMIN")
+                    .requestMatchers(mvc.pattern("/api/learning-reports/user-activity"))
+                    .hasAuthority("ROLE_ADMIN")
+                    .requestMatchers(mvc.pattern("/api/learning-reports/popular-content"))
+                    .hasAuthority("ROLE_ADMIN")
+                    // ============================================================
+                    // ACCOUNT MANAGEMENT - Authenticated users manage their own account
+                    // ============================================================
                     .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/account"))
                     .authenticated()
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/account"))
                     .authenticated()
                     .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/account"))
                     .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/account/**"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/account/**"))
+                    .authenticated()
                     .requestMatchers(mvc.pattern("/api/account/change-password"))
                     .authenticated()
-                    // Write Operations (POST, PUT, DELETE, PATCH) - ADMIN & STAFF only
-                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/**"))
-                    .hasAnyRole("ADMIN", "STAFF")
-                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/**"))
-                    .hasAnyRole("ADMIN", "STAFF")
-                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/**"))
-                    .hasAnyRole("ADMIN", "STAFF")
-                    .requestMatchers(mvc.pattern(HttpMethod.PATCH, "/api/**"))
-                    .hasAnyRole("ADMIN", "STAFF")
-                    // Read Operations (GET) - All authenticated users (ADMIN, STAFF, USER)
+                    // ============================================================
+                    // USER PERSONAL DATA - Authenticated users manage their own data
+                    // ============================================================
+                    // User's personal learning data (can create/update their own)
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/study-sessions"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/study-sessions/**"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/exercise-results"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/user-vocabularies"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/user-vocabularies/**"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/user-vocabularies/**"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/user-grammars"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/user-grammars/**"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/user-grammars/**"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/book-progress"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/book-progress/**"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/chapter-progress"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/chapter-progress/**"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/learning-streaks"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/learning-streaks/**"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/user-achievements"))
+                    .authenticated()
+                    // User can manage their own comments, reviews, favorites
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/comments"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/comments/**"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/comments/**"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/book-reviews"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/book-reviews/**"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/book-reviews/**"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/favorites"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/favorites/**"))
+                    .authenticated()
+                    // User personal reports
+                    .requestMatchers(mvc.pattern("/api/learning-reports/my-progress"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern("/api/learning-reports/export"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern("/api/learning-reports/history"))
+                    .authenticated()
+                    // Notification management
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/notifications/**"))
+                    .authenticated()
+                    // ============================================================
+                    // CONTENT MANAGEMENT - ADMIN & STAFF
+                    // Books, Chapters, Exercises, Words, Grammar, etc.
+                    // ============================================================
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/books"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/books/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/books/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.PATCH, "/api/books/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/chapters"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/chapters/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/chapters/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.PATCH, "/api/chapters/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/words"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/words/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/words/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.PATCH, "/api/words/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/word-examples"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/word-examples/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/word-examples/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/grammars"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/grammars/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/grammars/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/grammar-examples"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/grammar-examples/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/grammar-examples/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    // Exercise Management
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/listening-exercises"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/listening-exercises/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/listening-exercises/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/listening-options"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/listening-options/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/listening-options/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/reading-exercises"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/reading-exercises/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/reading-exercises/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/reading-options"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/reading-options/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/reading-options/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/writing-exercises"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/writing-exercises/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/writing-exercises/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/speaking-exercises"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/speaking-exercises/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/speaking-exercises/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    // Achievement & Streak Management
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/achievements"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/achievements/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/achievements/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/streak-icons"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/streak-icons/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/streak-icons/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/streak-milestones"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/streak-milestones/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/streak-milestones/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    // Notification creation (broadcast) - Admin only
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/notifications"))
+                    .hasAuthority("ROLE_ADMIN")
+                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/notifications/**"))
+                    .hasAuthority("ROLE_ADMIN")
+                    // Bulk operations - Admin & Staff
+                    .requestMatchers(mvc.pattern("/api/bulk-operations/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    // ============================================================
+                    // READ OPERATIONS - All authenticated users
+                    // ============================================================
                     .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/**"))
                     .authenticated()
-                    // Default - require authentication
+                    // ============================================================
+                    // DEFAULT - Require authentication
+                    // ============================================================
                     .anyRequest()
                     .authenticated()
             )
@@ -155,9 +353,7 @@ public class SecurityConfiguration {
                 oauth2
                     .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                     .successHandler(oAuth2AuthenticationSuccessHandler)
-            )
-            // JWT Resource Server - jwtDecoder bean is provided by SecurityJwtConfiguration
-            .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()));
+            ); // (Configured earlier with a custom JwtAuthenticationConverter) // JWT Resource Server - jwtDecoder bean is provided by SecurityJwtConfiguration
 
         return http.build();
     }

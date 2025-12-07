@@ -1,14 +1,21 @@
-import React from 'react';
+import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { Form, Input, Button, Typography, Space, Divider } from 'antd';
+import { Form, Input, Button, Typography, Space, Divider, message } from 'antd';
 import { FacebookOutlined, GoogleOutlined, InstagramOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useAppDispatch } from 'app/config/store';
+import { register } from 'app/shared/services/account.service';
 
 const { Title, Text } = Typography;
 
 const RegisterPage = () => {
+  const { t } = useTranslation('register');
   const [form] = Form.useForm();
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -16,8 +23,34 @@ const RegisterPage = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const onFinish = (values: any) => {
-    console.log('Register attempt:', values);
+  const onFinish = async (values: any) => {
+    setLoading(true);
+    try {
+      // Call register API
+      await dispatch(
+        register({
+          login: values.email,
+          email: values.email,
+          password: values.password,
+          firstName: values.name.split(' ')[0] || values.name,
+          lastName: values.name.split(' ').slice(1).join(' ') || '',
+          langKey: 'vi',
+        }),
+      ).unwrap();
+
+      message.success(t('register.success'));
+
+      // Redirect to login after 2 seconds
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
+    } catch (error: any) {
+      console.error('Registration error:', error);
+      const errorMsg = error?.message || 'Registration failed. Please try again.';
+      message.error(errorMsg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -32,7 +65,7 @@ const RegisterPage = () => {
       <div
         style={{
           flex: windowWidth <= 768 ? 'none' : '0 0 50%',
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          background: 'linear-gradient(135deg, #e41d8aff 0%, #f1c602ff 100%)',
           display: windowWidth <= 480 ? 'none' : 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -43,7 +76,7 @@ const RegisterPage = () => {
       >
         <div style={{ maxWidth: '480px', width: '100%' }}>
           <img
-            src="content/images/Langleague.jpg"
+            src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=600"
             alt="Students signing up"
             style={{
               width: '100%',
@@ -63,7 +96,7 @@ const RegisterPage = () => {
               textAlign: windowWidth <= 768 ? 'center' : 'left',
             }}
           >
-            Join us and start your learning journey today
+            {t('register.welcomeMessage')}
           </Title>
         </div>
       </div>
@@ -80,64 +113,64 @@ const RegisterPage = () => {
       >
         <div style={{ marginBottom: windowWidth <= 768 ? 32 : 48 }}>
           <Title level={2} style={{ marginBottom: 8, fontSize: windowWidth <= 768 ? '24px' : '32px', fontWeight: 600 }}>
-            Sign Up
+            {t('register.title')}
           </Title>
           <Text style={{ fontSize: '15px', color: '#6c757d' }}>
-            Already have an account?{' '}
+            {t('register.haveAccount')}{' '}
             <Link to="/login" style={{ color: '#1890ff', fontWeight: 500 }}>
-              Log in
+              {t('register.logIn')}
             </Link>
           </Text>
         </div>
 
         <Form form={form} onFinish={onFinish} layout="vertical">
           <Form.Item
-            label={<span style={{ fontSize: '14px', fontWeight: 500 }}>Full Name</span>}
+            label={<span style={{ fontSize: '14px', fontWeight: 500 }}>{t('register.name')}</span>}
             name="name"
-            rules={[{ required: true, message: 'Please input your full name!' }]}
+            rules={[{ required: true, message: t('register.validation.nameRequired') }]}
           >
-            <Input placeholder="Full Name" size="large" style={{ height: '48px', fontSize: '15px' }} />
+            <Input placeholder={t('register.name')} size="large" style={{ height: '48px', fontSize: '15px' }} />
           </Form.Item>
 
           <Form.Item
-            label={<span style={{ fontSize: '14px', fontWeight: 500 }}>Email</span>}
+            label={<span style={{ fontSize: '14px', fontWeight: 500 }}>{t('register.email')}</span>}
             name="email"
             rules={[
-              { required: true, message: 'Please input your email!' },
-              { type: 'email', message: 'Please enter a valid email!' },
+              { required: true, message: t('register.validation.emailRequired') },
+              { type: 'email', message: t('register.validation.emailInvalid') },
             ]}
           >
-            <Input placeholder="Email address" size="large" style={{ height: '48px', fontSize: '15px' }} />
+            <Input placeholder={t('register.email')} size="large" style={{ height: '48px', fontSize: '15px' }} />
           </Form.Item>
 
           <Form.Item
-            label={<span style={{ fontSize: '14px', fontWeight: 500 }}>Password</span>}
+            label={<span style={{ fontSize: '14px', fontWeight: 500 }}>{t('register.password')}</span>}
             name="password"
             rules={[
-              { required: true, message: 'Please input your password!' },
-              { min: 6, message: 'Password must be at least 6 characters!' },
+              { required: true, message: t('register.validation.passwordRequired') },
+              { min: 8, message: t('register.validation.passwordMin') },
             ]}
           >
             <Input.Password placeholder="Password" size="large" style={{ height: '48px', fontSize: '15px' }} />
           </Form.Item>
 
           <Form.Item
-            label={<span style={{ fontSize: '14px', fontWeight: 500 }}>Confirm Password</span>}
+            label={<span style={{ fontSize: '14px', fontWeight: 500 }}>{t('register.confirmPassword')}</span>}
             name="confirmPassword"
             dependencies={['password']}
             rules={[
-              { required: true, message: 'Please confirm your password!' },
+              { required: true, message: t('register.validation.confirmRequired') },
               ({ getFieldValue }) => ({
                 validator(_, value) {
                   if (!value || getFieldValue('password') === value) {
                     return Promise.resolve();
                   }
-                  return Promise.reject(new Error('Passwords do not match!'));
+                  return Promise.reject(new Error(t('register.validation.passwordMatch')));
                 },
               }),
             ]}
           >
-            <Input.Password placeholder="Confirm Password" size="large" style={{ height: '48px', fontSize: '15px' }} />
+            <Input.Password placeholder={t('register.confirmPassword')} size="large" style={{ height: '48px', fontSize: '15px' }} />
           </Form.Item>
 
           <Form.Item style={{ marginBottom: '24px' }}>
@@ -146,6 +179,7 @@ const RegisterPage = () => {
               htmlType="submit"
               block
               size="large"
+              loading={loading}
               style={{
                 background: '#1890ff',
                 borderColor: '#1890ff',
@@ -155,12 +189,12 @@ const RegisterPage = () => {
                 borderRadius: '6px',
               }}
             >
-              Sign Up
+              {t('register.registerButton')}
             </Button>
           </Form.Item>
 
           <Divider plain style={{ margin: '24px 0', fontSize: '14px', color: '#9ca3af' }}>
-            Or continue with
+            {t('register.orContinueWith')}
           </Divider>
 
           <Space style={{ width: '100%', justifyContent: 'center' }} size={windowWidth <= 480 ? 'small' : 'middle'}>

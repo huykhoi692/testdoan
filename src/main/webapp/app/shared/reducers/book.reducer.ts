@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { IBook, getBooks, getBook, createBook, updateBook, deleteBook } from '../services/book.service';
+import { IBook } from '../model/models';
+import { getBooks, getBook, createBook, updateBook, deleteBook } from '../services/book.service';
 
 export interface BookState {
   loading: boolean;
@@ -40,8 +41,8 @@ export const BookSlice = createSlice({
       })
       .addCase(getBooks.fulfilled, (state, action) => {
         state.loading = false;
-        state.entities = action.payload.content || action.payload;
-        state.totalItems = action.payload.totalElements || action.payload.length;
+        state.entities = action.payload;
+        state.totalItems = action.payload.length;
       })
       .addCase(getBooks.rejected, (state, action) => {
         state.loading = false;

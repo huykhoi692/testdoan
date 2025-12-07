@@ -28,10 +28,21 @@
     </changeSet>
 
     <changeSet id="20251125000018-2" author="system">
-        <addForeignKeyConstraint baseColumnNames="app_user_id" baseTableName="chapter_progress" 
+        <addForeignKeyConstraint baseColumnNames="app_user_id" baseTableName="chapter_progress"
             constraintName="fk_chapter_progress_app_user_id" referencedColumnNames="id" referencedTableName="app_user"/>
-        <addForeignKeyConstraint baseColumnNames="chapter_id" baseTableName="chapter_progress" 
+        <addForeignKeyConstraint baseColumnNames="chapter_id" baseTableName="chapter_progress"
             constraintName="fk_chapter_progress_chapter_id" referencedColumnNames="id" referencedTableName="chapter"/>
+    </changeSet>
+
+    <!-- Add index -->
+    <changeSet id="20251125000018-3" author="system">
+        <preConditions onFail="MARK_RAN">
+            <not><indexExists indexName="idx_chapter_progress_user_chapter"/></not>
+        </preConditions>
+        <createIndex indexName="idx_chapter_progress_user_chapter" tableName="chapter_progress">
+            <column name="app_user_id"/>
+            <column name="chapter_id"/>
+        </createIndex>
     </changeSet>
 
 </databaseChangeLog>

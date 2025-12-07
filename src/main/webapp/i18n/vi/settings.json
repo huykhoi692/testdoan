@@ -1,21 +1,32 @@
 {
   "settings": {
-    "title": "Cài đặt người dùng cho [<b>{{username}}</b>]",
+    "title": "Cài đặt người dùng cho [<strong>{{username}}</strong>]",
     "form": {
       "firstname": "Tên",
       "firstname.placeholder": "Tên của bạn",
       "lastname": "Họ",
       "lastname.placeholder": "Họ của bạn",
-      "email": "Email",
-      "email.placeholder": "Email của bạn",
+      "language": "Ngôn ngữ",
       "button": "Lưu"
     },
     "messages": {
       "error": {
-        "fail": "Đã xảy ra lỗi khi lưu cài đặt. Vui lòng thử lại.",
-        "emailexists": "Email đã được sử dụng!"
+        "fail": "<strong>Đã xảy ra lỗi!</strong> Không thể lưu cài đặt.",
+        "emailexists": "<strong>Email đã được sử dụng!</strong> Vui lòng chọn email khác."
       },
-      "success": "Cài đặt đã được lưu!"
+      "success": "<strong>Đã lưu cài đặt!</strong>",
+      "validate": {
+        "firstname": {
+          "required": "Tên là bắt buộc.",
+          "minlength": "Tên phải có ít nhất 1 ký tự",
+          "maxlength": "Tên không được dài quá 50 ký tự"
+        },
+        "lastname": {
+          "required": "Họ là bắt buộc.",
+          "minlength": "Họ phải có ít nhất 1 ký tự",
+          "maxlength": "Họ không được dài quá 50 ký tự"
+        }
+      }
     }
   }
 }

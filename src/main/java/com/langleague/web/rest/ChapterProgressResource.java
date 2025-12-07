@@ -3,6 +3,7 @@ package com.langleague.web.rest;
 import com.langleague.repository.ChapterProgressRepository;
 import com.langleague.service.ChapterProgressService;
 import com.langleague.service.dto.ChapterProgressDTO;
+import com.langleague.service.dto.MyChapterDTO;
 import com.langleague.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -250,5 +251,50 @@ public class ChapterProgressResource {
 
         Double completion = chapterProgressService.getBookCompletionPercentage(bookId, userLogin);
         return ResponseEntity.ok().body(completion);
+    }
+
+    /**
+     * {@code GET  /chapter-progresses/my-chapters} : Get all chapters that the user has saved and is learning.
+     *
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of chapters with progress in body.
+     */
+    @GetMapping("/my-chapters")
+    public ResponseEntity<List<MyChapterDTO>> getMyChapters() {
+        LOG.debug("REST request to get my chapters");
+        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin()
+            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
+
+        List<MyChapterDTO> chapters = chapterProgressService.getMyChapters(userLogin);
+        return ResponseEntity.ok().body(chapters);
+    }
+
+    /**
+     * {@code GET  /chapter-progresses/my-chapters/in-progress} : Get chapters that the user is currently learning.
+     *
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of in-progress chapters in body.
+     */
+    @GetMapping("/my-chapters/in-progress")
+    public ResponseEntity<List<MyChapterDTO>> getMyInProgressChapters() {
+        LOG.debug("REST request to get my in-progress chapters");
+        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin()
+            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
+
+        List<MyChapterDTO> chapters = chapterProgressService.getMyInProgressChapters(userLogin);
+        return ResponseEntity.ok().body(chapters);
+    }
+
+    /**
+     * {@code GET  /chapter-progresses/my-chapters/completed} : Get chapters that the user has completed.
+     *
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of completed chapters in body.
+     */
+    @GetMapping("/my-chapters/completed")
+    public ResponseEntity<List<MyChapterDTO>> getMyCompletedChapters() {
+        LOG.debug("REST request to get my completed chapters");
+        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin()
+            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
+
+        List<MyChapterDTO> chapters = chapterProgressService.getMyCompletedChapters(userLogin);
+        return ResponseEntity.ok().body(chapters);
     }
 }

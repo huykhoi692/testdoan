@@ -31,7 +31,7 @@ public class WordExample implements Serializable {
     private String translation;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "wordExamples", "userVocabularies", "lessonWords" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "wordExamples", "userVocabularies", "chapter" }, allowSetters = true)
     private Word word;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

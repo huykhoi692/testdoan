@@ -42,7 +42,6 @@ public class ChapterProgress implements Serializable {
             "comments",
             "exerciseResults",
             "chapterProgresses",
-            "bookProgresses",
             "userAchievements",
             "learningStreaks",
             "studySessions",

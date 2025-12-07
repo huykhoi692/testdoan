@@ -1,32 +1,35 @@
 {
   "annotations": {
-    "changelogDate": "20251021152354"
+    "changelogDate": "20251122061533"
   },
-  "applications": ["Langleague"],
+  "applications": "*",
   "dto": "mapstruct",
   "fields": [
     {
       "fieldName": "prompt",
-      "fieldType": "TextBlob"
-    },
-    {
-      "fieldName": "wordLimit",
-      "fieldType": "String",
-      "fieldValidateRules": ["maxlength"],
-      "fieldValidateRulesMaxlength": "255"
-    },
-    {
-      "fieldName": "maxLength",
-      "fieldType": "Integer"
+      "fieldType": "TextBlob",
+      "fieldValidateRules": ["required"]
     },
     {
       "fieldName": "sampleAnswer",
       "fieldType": "TextBlob"
+    },
+    {
+      "fieldName": "maxScore",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
     }
   ],
   "name": "WritingExercise",
   "pagination": "pagination",
-  "relationships": [],
+  "relationships": [
+    {
+      "otherEntityName": "exerciseResult",
+      "relationshipName": "exerciseResult",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    }
+  ],
   "searchEngine": "no",
   "service": "serviceClass"
 }

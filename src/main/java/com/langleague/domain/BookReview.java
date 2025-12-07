@@ -64,7 +64,7 @@ public class BookReview implements Serializable {
     private AppUser appUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "chapters", "bookReviews", "bookProgresses" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "chapters", "bookReviews" }, allowSetters = true)
     private Book book;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

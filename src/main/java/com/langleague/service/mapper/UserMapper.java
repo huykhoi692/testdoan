@@ -1,94 +1,29 @@
 package com.langleague.service.mapper;
 
-import com.langleague.domain.Authority;
 import com.langleague.domain.User;
-import com.langleague.service.dto.AdminUserDTO;
 import com.langleague.service.dto.UserDTO;
 import java.util.*;
-import java.util.stream.Collectors;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.springframework.stereotype.Service;
 
 /**
- * Mapper for the entity {@link User} and its DTO called {@link UserDTO}.
+ * Mapper for the entity {@link User} and its DTO {@link UserDTO}.
  *
- * Normal mappers are generated using MapStruct, this one is hand-coded as MapStruct
- * support is still in beta, and requires a manual step with an IDE.
+ * This mapper provides named mapping methods used by other MapStruct mappers
+ * for handling User entity references.
  */
 @Service
 public class UserMapper {
 
-    public List<UserDTO> usersToUserDTOs(List<User> users) {
-        return users.stream().filter(Objects::nonNull).map(this::userToUserDTO).toList();
-    }
-
-    public UserDTO userToUserDTO(User user) {
-        return new UserDTO(user);
-    }
-
-    public List<AdminUserDTO> usersToAdminUserDTOs(List<User> users) {
-        return users.stream().filter(Objects::nonNull).map(this::userToAdminUserDTO).toList();
-    }
-
-    public AdminUserDTO userToAdminUserDTO(User user) {
-        return new AdminUserDTO(user);
-    }
-
-    public List<User> userDTOsToUsers(List<AdminUserDTO> userDTOs) {
-        return userDTOs.stream().filter(Objects::nonNull).map(this::userDTOToUser).toList();
-    }
-
-    public User userDTOToUser(AdminUserDTO userDTO) {
-        if (userDTO == null) {
-            return null;
-        } else {
-            User user = new User();
-            user.setId(userDTO.getId());
-            user.setLogin(userDTO.getLogin());
-            user.setFirstName(userDTO.getFirstName());
-            user.setLastName(userDTO.getLastName());
-            user.setEmail(userDTO.getEmail());
-            user.setImageUrl(userDTO.getImageUrl());
-            user.setCreatedBy(userDTO.getCreatedBy());
-            user.setCreatedDate(userDTO.getCreatedDate());
-            user.setLastModifiedBy(userDTO.getLastModifiedBy());
-            user.setLastModifiedDate(userDTO.getLastModifiedDate());
-            user.setActivated(userDTO.isActivated());
-            user.setLangKey(userDTO.getLangKey());
-            Set<Authority> authorities = this.authoritiesFromStrings(userDTO.getAuthorities());
-            user.setAuthorities(authorities);
-            return user;
-        }
-    }
-
-    private Set<Authority> authoritiesFromStrings(Set<String> authoritiesAsString) {
-        Set<Authority> authorities = new HashSet<>();
-
-        if (authoritiesAsString != null) {
-            authorities = authoritiesAsString
-                .stream()
-                .map(string -> {
-                    Authority auth = new Authority();
-                    auth.setName(string);
-                    return auth;
-                })
-                .collect(Collectors.toSet());
-        }
-
-        return authorities;
-    }
-
-    public User userFromId(Long id) {
-        if (id == null) {
-            return null;
-        }
-        User user = new User();
-        user.setId(id);
-        return user;
-    }
-
+    /**
+     * Map User entity to UserDTO with only ID field.
+     * Used by MapStruct mappers with @Mapping(qualifiedByName = "id")
+     *
+     * @param user the User entity
+     * @return UserDTO with only ID populated
+     */
     @Named("id")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
@@ -101,6 +36,13 @@ public class UserMapper {
         return userDto;
     }
 
+    /**
+     * Map Set of User entities to Set of UserDTOs with only ID field.
+     * Used by MapStruct mappers with @Mapping(qualifiedByName = "idSet")
+     *
+     * @param users the Set of User entities
+     * @return Set of UserDTOs with only ID populated
+     */
     @Named("idSet")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
@@ -108,15 +50,20 @@ public class UserMapper {
         if (users == null) {
             return Collections.emptySet();
         }
-
         Set<UserDTO> userSet = new HashSet<>();
         for (User userEntity : users) {
             userSet.add(this.toDtoId(userEntity));
         }
-
         return userSet;
     }
 
+    /**
+     * Map User entity to UserDTO with ID and login fields.
+     * Used by MapStruct mappers with @Mapping(qualifiedByName = "login")
+     *
+     * @param user the User entity
+     * @return UserDTO with ID and login populated
+     */
     @Named("login")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
@@ -131,6 +78,13 @@ public class UserMapper {
         return userDto;
     }
 
+    /**
+     * Map Set of User entities to Set of UserDTOs with ID and login fields.
+     * Used by MapStruct mappers with @Mapping(qualifiedByName = "loginSet")
+     *
+     * @param users the Set of User entities
+     * @return Set of UserDTOs with ID and login populated
+     */
     @Named("loginSet")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
@@ -139,12 +93,25 @@ public class UserMapper {
         if (users == null) {
             return Collections.emptySet();
         }
-
         Set<UserDTO> userSet = new HashSet<>();
         for (User userEntity : users) {
             userSet.add(this.toDtoLogin(userEntity));
         }
-
         return userSet;
+    }
+
+    /**
+     * Create a User entity from ID only.
+     *
+     * @param id the User ID
+     * @return User entity with only ID set
+     */
+    public User userFromId(Long id) {
+        if (id == null) {
+            return null;
+        }
+        User user = new User();
+        user.setId(id);
+        return user;
     }
 }

@@ -1,15 +1,15 @@
 {
   "sessions": {
-    "title": "Phiên hoạt động",
+    "title": "Phiên hoạt động cho [<strong>{{username}}</strong>]",
     "table": {
       "ipaddress": "Địa chỉ IP",
-      "useragent": "User Agent",
+      "useragent": "Trình duyệt",
       "date": "Ngày",
-      "button": "Hủy bỏ"
+      "button": "Vô hiệu hóa"
     },
     "messages": {
-      "success": "Phiên hoạt động đã bị hủy bỏ!",
-      "error": "Đã xảy ra lỗi khi hủy bỏ phiên hoạt động. Vui lòng thử lại."
+      "success": "<strong>Đã vô hiệu hóa phiên!</strong>",
+      "error": "<strong>Đã xảy ra lỗi!</strong> Không thể vô hiệu hóa phiên."
     }
   }
 }

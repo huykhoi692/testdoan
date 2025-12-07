@@ -1,5 +1,7 @@
 package com.langleague.service.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
@@ -7,6 +9,7 @@ import java.util.Objects;
 /**
  * A DTO for the {@link com.langleague.domain.UserVocabulary} entity.
  */
+@Schema(description = "User vocabulary progress (Flashcards)")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class UserVocabularyDTO implements Serializable {
 
@@ -18,10 +21,11 @@ public class UserVocabularyDTO implements Serializable {
 
     private Instant lastReviewed;
 
+    private Integer reviewCount;
+
     private AppUserDTO appUser;
 
-    private LessonDTO lesson;
-
+    @NotNull(message = "Word is required")
     private WordDTO word;
 
     public Long getId() {
@@ -56,20 +60,20 @@ public class UserVocabularyDTO implements Serializable {
         this.lastReviewed = lastReviewed;
     }
 
+    public Integer getReviewCount() {
+        return reviewCount;
+    }
+
+    public void setReviewCount(Integer reviewCount) {
+        this.reviewCount = reviewCount;
+    }
+
     public AppUserDTO getAppUser() {
         return appUser;
     }
 
     public void setAppUser(AppUserDTO appUser) {
         this.appUser = appUser;
-    }
-
-    public LessonDTO getLesson() {
-        return lesson;
-    }
-
-    public void setLesson(LessonDTO lesson) {
-        this.lesson = lesson;
     }
 
     public WordDTO getWord() {
@@ -109,8 +113,8 @@ public class UserVocabularyDTO implements Serializable {
             ", remembered='" + getRemembered() + "'" +
             ", isMemorized='" + getIsMemorized() + "'" +
             ", lastReviewed='" + getLastReviewed() + "'" +
+            ", reviewCount=" + getReviewCount() +
             ", appUser=" + getAppUser() +
-            ", lesson=" + getLesson() +
             ", word=" + getWord() +
             "}";
     }

@@ -4,6 +4,7 @@ import com.langleague.repository.WordExampleRepository;
 import com.langleague.service.WordExampleService;
 import com.langleague.service.dto.WordExampleDTO;
 import com.langleague.web.rest.errors.BadRequestAlertException;
+import jakarta.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -53,7 +54,7 @@ public class WordExampleResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public ResponseEntity<WordExampleDTO> createWordExample(@RequestBody WordExampleDTO wordExampleDTO) throws URISyntaxException {
+    public ResponseEntity<WordExampleDTO> createWordExample(@Valid @RequestBody WordExampleDTO wordExampleDTO) throws URISyntaxException {
         LOG.debug("REST request to save WordExample : {}", wordExampleDTO);
         if (wordExampleDTO.getId() != null) {
             throw new BadRequestAlertException("A new wordExample cannot already have an ID", ENTITY_NAME, "idexists");

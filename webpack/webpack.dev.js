@@ -31,14 +31,22 @@ module.exports = async options =>
             'style-loader',
             {
               loader: 'css-loader',
-              options: { url: false },
+              options: {
+                sourceMap: true,
+              },
             },
             {
               loader: 'postcss-loader',
+              options: {
+                sourceMap: true,
+              },
             },
             {
               loader: 'sass-loader',
-              options: { implementation: sass },
+              options: {
+                implementation: sass,
+                sourceMap: true,
+              },
             },
           ],
         },

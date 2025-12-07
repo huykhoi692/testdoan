@@ -64,7 +64,7 @@ public class JwtTestUtility {
      * @return Generated JWT token string
      */
     public String generateTestToken(String username) {
-        return generateTestToken(username, new String[]{"ROLE_USER"});
+        return generateTestToken(username, new String[] { "ROLE_USER" });
     }
 
     /**
@@ -124,10 +124,7 @@ public class JwtTestUtility {
      */
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder()
-                .setSigningKey(secretKey)
-                .build()
-                .parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
 
             log.info("Token validation successful");
             return true;
@@ -144,11 +141,7 @@ public class JwtTestUtility {
      * @return Username from token subject
      */
     public String getUsernameFromToken(String token) {
-        Claims claims = Jwts.parserBuilder()
-            .setSigningKey(secretKey)
-            .build()
-            .parseClaimsJws(token)
-            .getBody();
+        Claims claims = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
 
         return claims.getSubject();
     }
@@ -160,11 +153,7 @@ public class JwtTestUtility {
      * @return Expiration date
      */
     public Date getExpirationDateFromToken(String token) {
-        Claims claims = Jwts.parserBuilder()
-            .setSigningKey(secretKey)
-            .build()
-            .parseClaimsJws(token)
-            .getBody();
+        Claims claims = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
 
         return claims.getExpiration();
     }
@@ -194,11 +183,7 @@ public class JwtTestUtility {
      * @return Claims object containing all token claims
      */
     public Claims getClaimsFromToken(String token) {
-        return Jwts.parserBuilder()
-            .setSigningKey(secretKey)
-            .build()
-            .parseClaimsJws(token)
-            .getBody();
+        return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
     }
 
     /**
@@ -212,7 +197,7 @@ public class JwtTestUtility {
         try {
             // Test 1: Generate valid token
             log.info("Test 1: Generating valid token...");
-            String token = generateTestToken("testuser", new String[]{"ROLE_USER", "ROLE_ADMIN"});
+            String token = generateTestToken("testuser", new String[] { "ROLE_USER", "ROLE_ADMIN" });
             log.info("Generated token: {}...", token.substring(0, Math.min(50, token.length())));
 
             // Test 2: Validate token
@@ -256,12 +241,15 @@ public class JwtTestUtility {
             // Test 6: Extract all claims
             log.info("Test 6: Extracting all claims...");
             Claims claims = getClaimsFromToken(token);
-            log.info("Test 6 PASSED: Claims extracted - Subject: {}, Issuer: {}, Expiry: {}",
-                claims.getSubject(), claims.getIssuer(), claims.getExpiration());
+            log.info(
+                "Test 6 PASSED: Claims extracted - Subject: {}, Issuer: {}, Expiry: {}",
+                claims.getSubject(),
+                claims.getIssuer(),
+                claims.getExpiration()
+            );
 
             log.info("=== JWT Comprehensive Test COMPLETED SUCCESSFULLY ===");
             return true;
-
         } catch (Exception e) {
             log.error("JWT Test FAILED with exception: ", e);
             return false;
@@ -287,4 +275,3 @@ public class JwtTestUtility {
         System.exit(success ? 0 : 1);
     }
 }
-

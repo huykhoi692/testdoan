@@ -13,8 +13,12 @@ public class ListeningExerciseDTO implements Serializable {
 
     private Long id;
 
+    @NotNull
     @Size(max = 512)
     private String audioPath;
+
+    @Size(max = 512)
+    private String imageUrl;
 
     @Lob
     private String transcript;
@@ -23,20 +27,12 @@ public class ListeningExerciseDTO implements Serializable {
     private String question;
 
     @Size(max = 255)
-    private String optionA;
+    private String correctAnswer;
 
-    @Size(max = 255)
-    private String optionB;
+    @NotNull
+    private Integer maxScore;
 
-    @Size(max = 255)
-    private String optionC;
-
-    @Size(max = 255)
-    private String correctOption;
-
-    private Integer chart;
-
-    private LessonSkillDTO lessonSkill;
+    private ChapterDTO chapter;
 
     public Long getId() {
         return id;
@@ -52,6 +48,14 @@ public class ListeningExerciseDTO implements Serializable {
 
     public void setAudioPath(String audioPath) {
         this.audioPath = audioPath;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public String getTranscript() {
@@ -70,52 +74,28 @@ public class ListeningExerciseDTO implements Serializable {
         this.question = question;
     }
 
-    public String getOptionA() {
-        return optionA;
+    public String getCorrectAnswer() {
+        return correctAnswer;
     }
 
-    public void setOptionA(String optionA) {
-        this.optionA = optionA;
+    public void setCorrectAnswer(String correctAnswer) {
+        this.correctAnswer = correctAnswer;
     }
 
-    public String getOptionB() {
-        return optionB;
+    public Integer getMaxScore() {
+        return maxScore;
     }
 
-    public void setOptionB(String optionB) {
-        this.optionB = optionB;
+    public void setMaxScore(Integer maxScore) {
+        this.maxScore = maxScore;
     }
 
-    public String getOptionC() {
-        return optionC;
+    public ChapterDTO getChapter() {
+        return chapter;
     }
 
-    public void setOptionC(String optionC) {
-        this.optionC = optionC;
-    }
-
-    public String getCorrectOption() {
-        return correctOption;
-    }
-
-    public void setCorrectOption(String correctOption) {
-        this.correctOption = correctOption;
-    }
-
-    public Integer getChart() {
-        return chart;
-    }
-
-    public void setChart(Integer chart) {
-        this.chart = chart;
-    }
-
-    public LessonSkillDTO getLessonSkill() {
-        return lessonSkill;
-    }
-
-    public void setLessonSkill(LessonSkillDTO lessonSkill) {
-        this.lessonSkill = lessonSkill;
+    public void setChapter(ChapterDTO chapter) {
+        this.chapter = chapter;
     }
 
     @Override
@@ -145,14 +125,12 @@ public class ListeningExerciseDTO implements Serializable {
         return "ListeningExerciseDTO{" +
             "id=" + getId() +
             ", audioPath='" + getAudioPath() + "'" +
+            ", imageUrl='" + getImageUrl() + "'" +
             ", transcript='" + getTranscript() + "'" +
             ", question='" + getQuestion() + "'" +
-            ", optionA='" + getOptionA() + "'" +
-            ", optionB='" + getOptionB() + "'" +
-            ", optionC='" + getOptionC() + "'" +
-            ", correctOption='" + getCorrectOption() + "'" +
-            ", chart=" + getChart() +
-            ", lessonSkill=" + getLessonSkill() +
+            ", correctAnswer='" + getCorrectAnswer() + "'" +
+            ", maxScore=" + getMaxScore() +
+            ", chapter=" + getChapter() +
             "}";
     }
 }

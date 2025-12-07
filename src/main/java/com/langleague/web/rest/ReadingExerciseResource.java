@@ -179,4 +179,17 @@ public class ReadingExerciseResource {
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
+
+    /**
+     * {@code GET  /reading-exercises/chapter/:chapterId} : get all reading exercises for a specific chapter.
+     *
+     * @param chapterId the chapter ID
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of exercises in body.
+     */
+    @GetMapping("/chapter/{chapterId}")
+    public ResponseEntity<List<ReadingExerciseDTO>> getReadingExercisesByChapter(@PathVariable Long chapterId) {
+        LOG.debug("REST request to get reading exercises by chapter : {}", chapterId);
+        List<ReadingExerciseDTO> exercises = readingExerciseService.findByChapterId(chapterId);
+        return ResponseEntity.ok().body(exercises);
+    }
 }

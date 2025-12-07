@@ -1,5 +1,6 @@
 package com.langleague.service.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.time.Instant;
 
@@ -12,8 +13,13 @@ public class NotificationDTO implements Serializable {
     private Long id;
     private Long userId;
     private String userLogin;
+
+    @NotBlank(message = "Title is required")
     private String title;
+
+    @NotBlank(message = "Message is required")
     private String message;
+
     private String type; // REMINDER, ANNOUNCEMENT, ACHIEVEMENT, etc.
     private Boolean isRead;
     private Instant createdAt;

@@ -1,6 +1,7 @@
 package com.langleague.repository;
 
 import com.langleague.domain.Authority;
+import java.util.Set;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
@@ -9,4 +10,9 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface AuthorityRepository extends JpaRepository<Authority, String> {}
+public interface AuthorityRepository extends JpaRepository<Authority, String> {
+    /**
+     * Find authorities by names (batch query)
+     */
+    Set<Authority> findByNameIn(Set<String> names);
+}

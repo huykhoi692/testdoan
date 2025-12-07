@@ -19,13 +19,13 @@ public class ReadingExerciseDTO implements Serializable {
     @Lob
     private String question;
 
-    @Lob
-    private String options;
-
     @Size(max = 255)
     private String correctAnswer;
 
-    private LessonSkillDTO lessonSkill;
+    @NotNull
+    private Integer maxScore;
+
+    private ChapterDTO chapter;
 
     public Long getId() {
         return id;
@@ -51,14 +51,6 @@ public class ReadingExerciseDTO implements Serializable {
         this.question = question;
     }
 
-    public String getOptions() {
-        return options;
-    }
-
-    public void setOptions(String options) {
-        this.options = options;
-    }
-
     public String getCorrectAnswer() {
         return correctAnswer;
     }
@@ -67,12 +59,20 @@ public class ReadingExerciseDTO implements Serializable {
         this.correctAnswer = correctAnswer;
     }
 
-    public LessonSkillDTO getLessonSkill() {
-        return lessonSkill;
+    public Integer getMaxScore() {
+        return maxScore;
     }
 
-    public void setLessonSkill(LessonSkillDTO lessonSkill) {
-        this.lessonSkill = lessonSkill;
+    public void setMaxScore(Integer maxScore) {
+        this.maxScore = maxScore;
+    }
+
+    public ChapterDTO getChapter() {
+        return chapter;
+    }
+
+    public void setChapter(ChapterDTO chapter) {
+        this.chapter = chapter;
     }
 
     @Override
@@ -103,9 +103,9 @@ public class ReadingExerciseDTO implements Serializable {
             "id=" + getId() +
             ", passage='" + getPassage() + "'" +
             ", question='" + getQuestion() + "'" +
-            ", options='" + getOptions() + "'" +
             ", correctAnswer='" + getCorrectAnswer() + "'" +
-            ", lessonSkill=" + getLessonSkill() +
+            ", maxScore=" + getMaxScore() +
+            ", chapter=" + getChapter() +
             "}";
     }
 }

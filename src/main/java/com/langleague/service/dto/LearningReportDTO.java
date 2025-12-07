@@ -32,6 +32,10 @@ public class LearningReportDTO implements Serializable {
     private Integer uniqueUsers;
     private Integer activeUsers;
 
+    // Admin statistics
+    private Integer totalUsers;
+    private Integer newUsers;
+
     public LearningReportDTO() {}
 
     // Getters and Setters
@@ -153,6 +157,22 @@ public class LearningReportDTO implements Serializable {
 
     public void setActiveUsers(Integer activeUsers) {
         this.activeUsers = activeUsers;
+    }
+
+    public Integer getTotalUsers() {
+        return totalUsers;
+    }
+
+    public void setTotalUsers(Integer totalUsers) {
+        this.totalUsers = totalUsers;
+    }
+
+    public Integer getNewUsers() {
+        return newUsers;
+    }
+
+    public void setNewUsers(Integer newUsers) {
+        this.newUsers = newUsers;
     }
 
     @Override

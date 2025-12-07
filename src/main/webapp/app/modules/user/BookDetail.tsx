@@ -1,186 +1,260 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
+import { Card, Row, Col, Typography, Button, Space, Progress, Tag, List, Spin, Empty, Statistic } from 'antd';
+import {
+  BookOutlined,
+  ReadOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  FileTextOutlined,
+  ArrowRightOutlined,
+  TrophyOutlined,
+} from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Row, Col, Typography, Spin, List, Button, Avatar, Tag, Divider, Rate, message } from 'antd';
-import { ArrowLeftOutlined, FileTextOutlined, CheckCircleFilled, StarOutlined, StarFilled } from '@ant-design/icons';
-import axios from 'axios';
-import { IBook } from 'app/shared/model/book.model';
-import { IChapter } from 'app/shared/model/chapter.model';
-import { IChapterProgress } from 'app/shared/model/chapter-progress.model';
-import DashboardLayout from 'app/shared/layout/dashboard-layout';
+import { useAppDispatch } from 'app/config/store';
+import { getBook, getBookChapters } from 'app/shared/services/book.service';
+import { getBookProgress, getChapterProgressesByBook } from 'app/shared/services/progress.service';
+import { IBook, IChapter, IBookProgress, IChapterProgress } from 'app/shared/model/models';
 
 const { Title, Text, Paragraph } = Typography;
 
 const BookDetail: React.FC = () => {
   const { bookId } = useParams<{ bookId: string }>();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
   const [book, setBook] = useState<IBook | null>(null);
   const [chapters, setChapters] = useState<IChapter[]>([]);
-  const [progress, setProgress] = useState<IChapterProgress[]>([]);
-  const [favorites, setFavorites] = useState<number[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [rating, setRating] = useState(0);
+  const [bookProgress, setBookProgress] = useState<IBookProgress | null>(null);
+  const [chapterProgresses, setChapterProgresses] = useState<IChapterProgress[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchBookDetails = async () => {
+    if (!bookId) return;
+
+    const fetchData = async () => {
       setLoading(true);
       try {
-        const bookResponse = await axios.get(`/api/books/${bookId}`);
-        setBook(bookResponse.data);
+        // Fetch book info
+        const bookData = await dispatch(getBook(parseInt(bookId, 10))).unwrap();
+        setBook(bookData);
 
-        const chaptersResponse = await axios.get(`/api/books/${bookId}/chapters`);
-        setChapters(chaptersResponse.data);
+        // Fetch chapters using book API endpoint
+        const chaptersData = await dispatch(getBookChapters(parseInt(bookId, 10))).unwrap();
+        setChapters(Array.isArray(chaptersData) ? chaptersData : []);
 
-        const progressResponse = await axios.get(`/api/chapter-progresses/book/${bookId}`);
-        setProgress(progressResponse.data);
+        // Fetch progress (optional - user might not have progress yet)
+        try {
+          const progressData = await dispatch(getBookProgress(parseInt(bookId, 10))).unwrap();
+          setBookProgress(progressData);
 
-        const favoritesResponse = await axios.get('/api/favorites');
-        setFavorites(favoritesResponse.data.map(fav => fav.id));
-
-        const ratingResponse = await axios.get(`/api/book-reviews/book/${bookId}/average`);
-        setRating(ratingResponse.data);
+          const chapterProgressData = await dispatch(getChapterProgressesByBook(parseInt(bookId, 10))).unwrap();
+          setChapterProgresses(Array.isArray(chapterProgressData) ? chapterProgressData : []);
+        } catch (progressError) {
+          console.log('No progress data yet for this book');
+        }
       } catch (error) {
-        console.error('Error fetching book details:', error);
+        console.error('Error fetching book data:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    if (bookId) {
-      fetchBookDetails();
-    }
-  }, [bookId]);
+    fetchData();
+  }, [bookId, dispatch]);
 
-  const handleRate = async (value: number) => {
-    try {
-      await axios.post('/api/book-reviews/rate', null, { params: { bookId, rating: value } });
-      setRating(value);
-      message.success('Thanks for your rating!');
-    } catch (error) {
-      message.error('Failed to submit your rating.');
-    }
+  const getChapterProgress = (chapterId: number) => {
+    return chapterProgresses.find(cp => cp.chapterId === chapterId);
   };
 
-  const toggleFavorite = async (chapterId: number) => {
-    const isFavorite = favorites.includes(chapterId);
-    try {
-      if (isFavorite) {
-        await axios.delete(`/api/favorites/chapter/${chapterId}`);
-        setFavorites(favorites.filter(id => id !== chapterId));
-        message.success('Removed from favorites.');
-      } else {
-        await axios.post(`/api/favorites/chapter/${chapterId}`);
-        setFavorites([...favorites, chapterId]);
-        message.success('Added to favorites.');
-      }
-    } catch (error) {
-      message.error('Failed to update favorites.');
-    }
-  };
-
-  const getLevelColor = (level?: string) => {
-    const colors: Record<string, string> = {
-      BEGINNER: 'green',
-      INTERMEDIATE: 'blue',
-      ADVANCED: 'red',
-    };
-    return colors[level || 'BEGINNER'] || 'default';
-  };
-
-  const isChapterCompleted = (chapterId: number) => {
-    return progress.some(p => p.chapter?.id === chapterId && p.completed);
-  };
-
-  if (loading) {
-    return (
-      <DashboardLayout>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'calc(100vh - 200px)' }}>
-          <Spin size="large" />
-        </div>
-      </DashboardLayout>
-    );
-  }
-
-  if (!book) {
-    return (
-      <DashboardLayout>
-        <div style={{ textAlign: 'center', marginTop: 50 }}>
-          <Title level={3}>Book not found</Title>
-          <Button onClick={() => navigate('/dashboard/books')}>Back to Library</Button>
-        </div>
-      </DashboardLayout>
-    );
-  }
+  const completedChapters = chapterProgresses.filter(cp => cp.isCompleted).length;
+  const overallProgress = chapters.length > 0 ? (completedChapters / chapters.length) * 100 : 0;
 
   return (
-    <DashboardLayout>
-      <div style={{ padding: '24px', maxWidth: 1200, margin: '0 auto' }}>
-        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/dashboard/books')} style={{ marginBottom: 24 }}>
-          Back to Library
-        </Button>
+    <div style={{ padding: '24px', maxWidth: 1200, margin: '0 auto' }}>
+      <Spin spinning={loading}>
+        {book && (
+          <>
+            {/* Book Header */}
+            <Card variant="borderless" style={{ marginBottom: 24, borderRadius: 12 }}>
+              <Row gutter={32}>
+                <Col xs={24} md={6}>
+                  <div
+                    style={{
+                      width: '100%',
+                      height: 280,
+                      backgroundColor: '#f5f5f5',
+                      backgroundImage: book.thumbnail ? `url(${book.thumbnail})` : 'none',
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                      borderRadius: 8,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {!book.thumbnail && <BookOutlined style={{ fontSize: 80, color: '#d9d9d9' }} />}
+                  </div>
+                </Col>
 
-        <Card>
-          <Row gutter={[32, 32]}>
-            <Col xs={24} md={8}>
-              <img
-                src={book.thumbnailUrl || '/content/images/placeholder.png'}
-                alt={book.title}
-                style={{ width: '100%', borderRadius: 8 }}
-              />
-            </Col>
-            <Col xs={24} md={16}>
-              <Title level={2}>{book.title}</Title>
-              <Text strong>Author:</Text> <Text>{book.author}</Text>
-              <br />
-              <Text strong>Level:</Text> <Tag color={getLevelColor(book.level)}>{book.level}</Tag>
-              <br />
-              <Rate onChange={handleRate} value={rating} />
-              <Divider />
-              <Paragraph>{book.description}</Paragraph>
-              <Button
-                type="primary"
-                size="large"
-                onClick={() => chapters.length > 0 && navigate(`/dashboard/books/${book.id}/chapters/${chapters[0].id}`)}
-              >
-                Start Reading
-              </Button>
-            </Col>
-          </Row>
-        </Card>
+                <Col xs={24} md={18}>
+                  <Space direction="vertical" size={16} style={{ width: '100%' }}>
+                    <div>
+                      <Title level={2} style={{ marginBottom: 8 }}>
+                        {book.title}
+                      </Title>
+                      <Text type="secondary" style={{ fontSize: 16 }}>
+                        {book.author || 'Không rõ tác giả'}
+                      </Text>
+                    </div>
 
-        <Card style={{ marginTop: 24 }}>
-          <Title level={3}>Chapters</Title>
-          <List
-            itemLayout="horizontal"
-            dataSource={chapters}
-            renderItem={(chapter, index) => (
-              <List.Item
-                actions={[
-                  <Button
-                    key="favorite"
-                    icon={favorites.includes(chapter.id) ? <StarFilled /> : <StarOutlined />}
-                    onClick={() => toggleFavorite(chapter.id)}
-                  />,
-                  <Button key="read" onClick={() => navigate(`/dashboard/books/${book.id}/chapters/${chapter.id}`)}>
-                    Read
-                  </Button>,
-                ]}
-              >
-                <List.Item.Meta
-                  avatar={<Avatar icon={<FileTextOutlined />} />}
-                  title={
-                    <a onClick={() => navigate(`/dashboard/books/${book.id}/chapters/${chapter.id}`)}>
-                      {`Chapter ${index + 1}: ${chapter.title}`}
-                      {isChapterCompleted(chapter.id) && <CheckCircleFilled style={{ color: 'green', marginLeft: 8 }} />}
-                    </a>
-                  }
-                  description={`${chapter.content?.substring(0, 100) || ''}...`}
+                    {book.level && (
+                      <Tag color="blue" style={{ fontSize: 14, padding: '4px 12px' }}>
+                        {book.level}
+                      </Tag>
+                    )}
+
+                    <Paragraph>{book.description || 'Không có mô tả'}</Paragraph>
+
+                    <Row gutter={16}>
+                      <Col span={6}>
+                        <Statistic title="Chương" value={book.totalChapters || chapters.length} prefix={<FileTextOutlined />} />
+                      </Col>
+                      <Col span={6}>
+                        <Statistic title="Trang" value={book.totalPages || 0} prefix={<ReadOutlined />} />
+                      </Col>
+                      <Col span={6}>
+                        <Statistic title="Hoàn thành" value={`${completedChapters}/${chapters.length}`} prefix={<CheckCircleOutlined />} />
+                      </Col>
+                      <Col span={6}>
+                        <Statistic title="Tiến độ" value={Math.round(overallProgress)} suffix="%" prefix={<TrophyOutlined />} />
+                      </Col>
+                    </Row>
+
+                    {bookProgress && (
+                      <div>
+                        <Text type="secondary">Tiến độ tổng thể</Text>
+                        <Progress
+                          percent={Math.round(overallProgress)}
+                          strokeColor={{
+                            '0%': '#108ee9',
+                            '100%': '#87d068',
+                          }}
+                          style={{ marginTop: 8 }}
+                        />
+                      </div>
+                    )}
+                  </Space>
+                </Col>
+              </Row>
+            </Card>
+
+            {/* Chapters List */}
+            <Card variant="borderless" style={{ borderRadius: 12 }}>
+              <Title level={4} style={{ marginBottom: 24 }}>
+                <FileTextOutlined style={{ marginRight: 8 }} />
+                Danh sách chương
+              </Title>
+
+              {chapters.length === 0 ? (
+                <Empty description="Chưa có chương nào" />
+              ) : (
+                <List
+                  itemLayout="horizontal"
+                  dataSource={chapters}
+                  renderItem={(chapter, index) => {
+                    const progress = getChapterProgress(chapter.id);
+                    const isCompleted = progress?.isCompleted || false;
+                    const progressPercent = progress?.progressPercentage || 0;
+
+                    return (
+                      <List.Item
+                        style={{
+                          padding: '16px',
+                          borderRadius: 8,
+                          marginBottom: 12,
+                          backgroundColor: isCompleted ? '#f6ffed' : '#fafafa',
+                          border: isCompleted ? '1px solid #b7eb8f' : '1px solid #f0f0f0',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s',
+                        }}
+                        onMouseEnter={e => {
+                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+                        }}
+                        onMouseLeave={e => {
+                          e.currentTarget.style.boxShadow = 'none';
+                        }}
+                        onClick={() => navigate(`/dashboard/chapters/${chapter.id}`)}
+                      >
+                        <List.Item.Meta
+                          avatar={
+                            <div
+                              style={{
+                                width: 48,
+                                height: 48,
+                                borderRadius: '50%',
+                                backgroundColor: isCompleted ? '#52c41a' : '#1890ff',
+                                color: 'white',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: 18,
+                                fontWeight: 'bold',
+                              }}
+                            >
+                              {isCompleted ? <CheckCircleOutlined /> : index + 1}
+                            </div>
+                          }
+                          title={
+                            <Space>
+                              <Text strong style={{ fontSize: 16 }}>
+                                {chapter.title}
+                              </Text>
+                              {isCompleted && (
+                                <Tag color="success" icon={<CheckCircleOutlined />}>
+                                  Hoàn thành
+                                </Tag>
+                              )}
+                            </Space>
+                          }
+                          description={
+                            <Space direction="vertical" size={8} style={{ width: '100%' }}>
+                              {chapter.description && <Text type="secondary">{chapter.description}</Text>}
+                              <Space size={16} style={{ fontSize: 12, color: '#999' }}>
+                                {chapter.totalWords && (
+                                  <span>
+                                    <ReadOutlined /> {chapter.totalWords} từ vựng
+                                  </span>
+                                )}
+                                {chapter.totalGrammars && (
+                                  <span>
+                                    <FileTextOutlined /> {chapter.totalGrammars} ngữ pháp
+                                  </span>
+                                )}
+                                {chapter.totalExercises && (
+                                  <span>
+                                    <ClockCircleOutlined /> {chapter.totalExercises} bài tập
+                                  </span>
+                                )}
+                              </Space>
+                              {progress && progressPercent > 0 && !isCompleted && (
+                                <Progress percent={Math.round(progressPercent)} size="small" style={{ width: '100%', maxWidth: 400 }} />
+                              )}
+                            </Space>
+                          }
+                        />
+                        <Button type="primary" icon={<ArrowRightOutlined />} onClick={() => navigate(`/dashboard/chapters/${chapter.id}`)}>
+                          {isCompleted ? 'Ôn tập' : progress ? 'Tiếp tục' : 'Bắt đầu'}
+                        </Button>
+                      </List.Item>
+                    );
+                  }}
                 />
-              </List.Item>
-            )}
-          />
-        </Card>
-      </div>
-    </DashboardLayout>
+              )}
+            </Card>
+          </>
+        )}
+      </Spin>
+    </div>
   );
 };
 

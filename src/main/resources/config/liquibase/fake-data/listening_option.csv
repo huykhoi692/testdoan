@@ -1,14 +1,14 @@
-id;option_text;is_correct;listening_exercise_id
-1;Minsu;true;1
-2;Junho;false;1
-3;Yuna;false;1
-4;Sora;false;1
-5;3 người;false;2
-6;4 người;true;2
-7;5 người;false;2
-8;6 người;false;2
-9;Thứ hai;true;3
-10;Thứ ba;false;3
-11;Thứ tư;false;3
-12;Thứ năm;false;3
+id;label;content;is_correct;order_index;listening_exercise_id
+1;A;Kim Minsu;true;1;1
+2;B;Park Jihoon;false;2;1
+3;C;Lee Sora;false;3;1
+4;A;Three;false;1;2
+5;B;Four;true;2;2
+6;C;Five;false;3;2
+7;A;Kimchi;false;1;3
+8;B;Bulgogi;false;2;3
+9;C;Bibimbap;true;3;3
+10;A;Left;true;1;4
+11;B;Right;false;2;4
+12;C;Straight;false;3;4
 

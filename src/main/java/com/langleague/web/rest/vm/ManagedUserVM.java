@@ -27,6 +27,22 @@ public class ManagedUserVM extends AdminUserDTO {
         this.password = password;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ManagedUserVM)) {
+            return false;
+        }
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
     // prettier-ignore
     @Override
     public String toString() {

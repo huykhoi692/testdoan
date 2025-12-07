@@ -12,6 +12,6 @@ import org.springframework.stereotype.Repository;
 @SuppressWarnings("unused")
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-    // Use case 35: Join discussion - get comments by lesson
-    Page<Comment> findByLessonId(Long lessonId, Pageable pageable);
+    @Query("SELECT c FROM Comment c WHERE c.chapter.id = :chapterId")
+    Page<Comment> findByChapterId(Long chapterId, Pageable pageable);
 }

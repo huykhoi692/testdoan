@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+﻿import React, { useEffect } from 'react';
+import { useTranslation } from 'app/shared/utils/useTranslation';
 import { Link } from 'react-router-dom';
 import { Card, Row, Col, Typography, Button, Space, Spin, Tag } from 'antd';
 import { BookOutlined } from '@ant-design/icons';
@@ -8,6 +9,7 @@ import { getBooks } from '../shared/reducers/book.reducer';
 const { Title, Text, Paragraph } = Typography;
 
 const BookList: React.FC = () => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const books = useAppSelector(state => state.book.entities);
   const loading = useAppSelector(state => state.book.loading);

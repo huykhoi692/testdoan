@@ -29,7 +29,16 @@ public class UserAchievement implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(
         value = {
-            "comments", "exerciseResults", "userProgresses", "userVocabularies", "userAchievements", "learningStreaks", "studySessions",
+            "internalUser",
+            "userVocabularies",
+            "userGrammars",
+            "bookReviews",
+            "comments",
+            "exerciseResults",
+            "chapterProgresses",
+            "userAchievements",
+            "learningStreaks",
+            "studySessions",
         },
         allowSetters = true
     )
@@ -91,24 +100,6 @@ public class UserAchievement implements Serializable {
     public UserAchievement achievement(Achievement achievement) {
         this.setAchievement(achievement);
         return this;
-    }
-
-    // Alias methods for backward compatibility
-    public User getUser() {
-        return this.appUser != null ? this.appUser.getUser() : null;
-    }
-
-    public void setUser(User user) {
-        // This is handled through AppUser relationship
-        // Method kept for backward compatibility
-    }
-
-    public Instant getAwardedDate() {
-        return this.awardedTo;
-    }
-
-    public void setAwardedDate(Instant awardedDate) {
-        this.awardedTo = awardedDate;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

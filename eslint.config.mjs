@@ -5,6 +5,7 @@ import prettier from 'eslint-plugin-prettier/recommended';
 import tseslint from 'typescript-eslint';
 import eslint from '@eslint/js';
 import react from 'eslint-plugin-react/configs/recommended.js';
+import reactHooks from 'eslint-plugin-react-hooks';
 // jhipster-needle-eslint-add-import - JHipster will add additional import here
 
 export default tseslint.config(
@@ -27,6 +28,9 @@ export default tseslint.config(
   {
     files: ['src/main/webapp/**/*.{ts,tsx}'],
     extends: [...tseslint.configs.recommendedTypeChecked, react],
+    plugins: {
+      'react-hooks': reactHooks,
+    },
     settings: {
       react: {
         version: 'detect',
@@ -87,6 +91,8 @@ export default tseslint.config(
       'no-invalid-this': 'off',
       'react/prop-types': 'off',
       'react/display-name': 'off',
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'off', // Disabled to avoid warnings about useEffect dependencies
     },
   },
   {

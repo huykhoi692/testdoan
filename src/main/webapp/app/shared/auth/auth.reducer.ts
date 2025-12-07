@@ -11,6 +11,7 @@ export interface IUser {
   activated?: boolean;
   langKey?: string;
   authorities?: string[];
+  createdDate?: string;
 }
 
 export interface AuthState {

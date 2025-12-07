@@ -3,60 +3,85 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 
 const apiUrl = '/api/notifications';
 
-export interface INotification {
+// Notification DTO
+export interface NotificationDTO {
   id?: number;
-  userLogin?: string;
   title?: string;
   message?: string;
-  type?: string;
-  read?: boolean;
-  createdAt?: string;
-  readAt?: string;
-  broadcast?: boolean;
+  type?: 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR';
+  isRead?: boolean;
+  createdDate?: string;
+  userId?: number;
+  userLogin?: string;
 }
 
-export interface INotificationPreferences {
-  emailEnabled?: boolean;
-  inAppEnabled?: boolean;
-  smsEnabled?: boolean;
-  dailyReminderEnabled?: boolean;
-}
-
-// Get user notifications (UC 40: Daily reminder notification)
-export const getMyNotifications = createAsyncThunk('notification/fetch_my', async () => {
-  const response = await axios.get<INotification[]>(`${apiUrl}/my`);
-  return response.data;
-});
-
-// Mark notification as read
-export const markNotificationAsRead = createAsyncThunk('notification/mark_read', async (id: number) => {
-  await axios.put(`${apiUrl}/${id}/read`);
-  return { id };
-});
-
-// Get notification preferences (UC 14: Update notification preferences)
-export const getNotificationPreferences = createAsyncThunk('notification/fetch_preferences', async () => {
-  const response = await axios.get<INotificationPreferences>(`${apiUrl}/preferences`);
-  return response.data;
-});
-
-// Update notification preferences (UC 14: Update notification preferences)
-export const updateNotificationPreferences = createAsyncThunk(
-  'notification/update_preferences',
-  async (preferences: INotificationPreferences) => {
-    const response = await axios.put<INotificationPreferences>(`${apiUrl}/preferences`, preferences);
+// Get unread notification count
+export const getUnreadCount = createAsyncThunk('notification/unread_count', async () => {
+  try {
+    const response = await axios.get<number>(`${apiUrl}/count-unread`);
     return response.data;
+  } catch (error: any) {
+    console.error('Error fetching unread count:', error);
+    return 0;
+  }
+});
+
+// Get unread notifications
+export const getUnreadNotifications = createAsyncThunk(
+  'notification/unread_list',
+  async ({ page = 0, size = 10 }: { page?: number; size?: number } = {}) => {
+    try {
+      const response = await axios.get<any>(`${apiUrl}/unread`, {
+        params: { page, size },
+      });
+      return {
+        content: response.data.content || response.data,
+        totalElements: parseInt(response.headers['x-total-count'] || '0', 10),
+      };
+    } catch (error: any) {
+      console.error('Error fetching unread notifications:', error);
+      return { content: [], totalElements: 0 };
+    }
   },
 );
 
-// Admin: Send notification to specific user (UC 57: Send announcement/notification)
-export const sendNotification = createAsyncThunk('notification/send', async (notification: INotification) => {
-  await axios.post(`${apiUrl}/send`, notification);
-  return notification;
+// Get all notifications
+export const getAllNotifications = createAsyncThunk(
+  'notification/all_list',
+  async ({ page = 0, size = 20 }: { page?: number; size?: number } = {}) => {
+    try {
+      const response = await axios.get<any>(apiUrl, {
+        params: { page, size },
+      });
+      return {
+        content: response.data.content || response.data,
+        totalElements: parseInt(response.headers['x-total-count'] || '0', 10),
+      };
+    } catch (error: any) {
+      console.error('Error fetching notifications:', error);
+      return { content: [], totalElements: 0 };
+    }
+  },
+);
+
+// Mark notification as read
+export const markAsRead = createAsyncThunk('notification/mark_read', async (id: number) => {
+  try {
+    await axios.put(`${apiUrl}/${id}/read`);
+    return id;
+  } catch (error: any) {
+    console.error('Error marking notification as read:', error);
+    throw error;
+  }
 });
 
-// Admin: Broadcast notification to all users (UC 57: Send announcement/notification)
-export const broadcastNotification = createAsyncThunk('notification/broadcast', async (notification: INotification) => {
-  await axios.post(`${apiUrl}/broadcast`, notification);
-  return notification;
+// Mark all as read
+export const markAllAsRead = createAsyncThunk('notification/mark_all_read', async () => {
+  try {
+    const response = await axios.put<number>(`${apiUrl}/mark-all-read`);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error marking all as read:', error);
+    throw error;
+  }
 });

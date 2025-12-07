@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Card, Button, Typography, Space, Row, Col, Alert, message, Spin, Tag, Divider } from 'antd';
 import { AudioOutlined, CheckCircleOutlined, LeftOutlined, PlayCircleOutlined, SoundOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppDispatch } from 'app/config/store';
-import { updateChapterProgress } from 'app/shared/services/progress.service';
-import { getSpeakingExercise, submitSpeakingAnswer } from 'app/shared/services/exercise.service';
-import { ISpeakingExercise } from 'app/shared/model/speaking-exercise.model';
+import { upsertChapterProgress } from 'app/shared/services/progress.service';
+import { ISpeakingExercise } from 'app/shared/model/models';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -24,12 +23,21 @@ const SpeakingExercise: React.FC = () => {
   useEffect(() => {
     if (!exerciseId) return;
 
-    const fetchExercise = async () => {
+    const fetchExercise = () => {
       setLoading(true);
       try {
-        // Fetch real exercise from API
-        const exerciseData = await dispatch(getSpeakingExercise(parseInt(exerciseId, 10))).unwrap();
-        setExercise(exerciseData);
+        // Mock: Get speaking exercise for demo
+        const mockExercise: ISpeakingExercise = {
+          id: parseInt(exerciseId, 10),
+          chapterId: 1,
+          skillType: 'SPEAKING',
+          orderIndex: 1,
+          prompt: 'Hãy giới thiệu về cuộc gặp đầu tiên của bạn với một người quan trọng. Sử dụng mẫu câu: 처음 만났을 때...',
+          sampleAudio: '/audio/chapter1-speaking1-sample.mp3',
+          targetPhrase: '처음 만났을 때 정말 설렜어요',
+          maxScore: 15,
+        };
+        setExercise(mockExercise);
       } catch (error) {
         console.error('Error fetching exercise:', error);
         message.error('Không thể tải bài tập');
@@ -74,24 +82,11 @@ const SpeakingExercise: React.FC = () => {
     message.success('Bài tập đã được gửi! 🎉');
 
     // Update progress
-    if (exercise?.chapter?.id) {
+    if (exercise?.chapterId) {
       dispatch(
-        updateChapterProgress({
-          chapterId: exercise.chapter.id,
-          completed: true,
-        }),
-      );
-    }
-
-    // Submit result to backend
-    if (exercise) {
-      // Create a dummy blob for now since we don't have real recording
-      const dummyBlob = new Blob(['dummy audio'], { type: 'audio/webm' });
-      dispatch(
-        submitSpeakingAnswer({
-          exerciseId: exercise.id,
-          audioBlob: dummyBlob,
-          score: exercise.maxScore, // Assuming full score for completion in this demo
+        upsertChapterProgress({
+          chapterId: exercise.chapterId,
+          exercisesCompleted: 1,
         }),
       );
     }
@@ -211,7 +206,7 @@ const SpeakingExercise: React.FC = () => {
                   fontFamily: "'Noto Sans KR', sans-serif",
                 }}
               >
-                처음 만났을 때 정말 설렜어요
+                {exercise.targetPhrase}
               </Text>
             </div>
           </div>

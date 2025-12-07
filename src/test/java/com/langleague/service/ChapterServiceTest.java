@@ -143,8 +143,8 @@ class ChapterServiceTest {
 
         // Then
         assertThat(result).isPresent();
-        assertThat(result.get().getId()).isEqualTo(1L);
-        assertThat(result.get().getTitle()).isEqualTo("Chapter 1: Introduction");
+        assertThat(result.orElseThrow().getId()).isEqualTo(1L);
+        assertThat(result.orElseThrow().getTitle()).isEqualTo("Chapter 1: Introduction");
     }
 
     @Test

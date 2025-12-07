@@ -1,8 +1,9 @@
 {
   "annotations": {
-    "changelogDate": "20251021152345"
+    "changelogDate": "20251122061523"
   },
-  "applications": ["Langleague"],
+  "applications": "*",
+  "documentation": "Vocabulary Definitions",
   "dto": "mapstruct",
   "fields": [
     {
@@ -46,12 +47,6 @@
     {
       "otherEntityName": "userVocabulary",
       "relationshipName": "userVocabulary",
-      "relationshipSide": "left",
-      "relationshipType": "one-to-many"
-    },
-    {
-      "otherEntityName": "lessonWord",
-      "relationshipName": "lessonWord",
       "relationshipSide": "left",
       "relationshipType": "one-to-many"
     }

@@ -7,6 +7,7 @@ import com.langleague.repository.AppUserRepository;
 import com.langleague.repository.GrammarRepository;
 import com.langleague.repository.UserGrammarRepository;
 import com.langleague.security.SecurityUtils;
+import com.langleague.service.dto.GrammarStatisticsDTO;
 import com.langleague.service.dto.UserGrammarDTO;
 import com.langleague.service.mapper.UserGrammarMapper;
 import java.time.Instant;
@@ -68,6 +69,15 @@ public class UserGrammarService {
      */
     public UserGrammarDTO update(UserGrammarDTO userGrammarDTO) {
         LOG.debug("Request to update UserGrammar : {}", userGrammarDTO);
+
+        // Validate required fields
+        if (userGrammarDTO == null) {
+            throw new IllegalArgumentException("UserGrammarDTO cannot be null");
+        }
+        if (userGrammarDTO.getId() == null) {
+            throw new IllegalArgumentException("ID is required for update");
+        }
+
         UserGrammar userGrammar = userGrammarMapper.toEntity(userGrammarDTO);
         userGrammar = userGrammarRepository.save(userGrammar);
         return userGrammarMapper.toDto(userGrammar);
@@ -141,7 +151,7 @@ public class UserGrammarService {
         Optional<UserGrammar> existing = userGrammarRepository.findByGrammar_IdAndAppUser_InternalUser_Login(grammarId, userLogin);
         if (existing.isPresent()) {
             LOG.info("Grammar {} already saved by user {}", grammarId, userLogin);
-            return userGrammarMapper.toDto(existing.get());
+            return userGrammarMapper.toDto(existing.orElseThrow());
         }
 
         // Fetch entities
@@ -272,31 +282,5 @@ public class UserGrammarService {
     public boolean isSaved(Long grammarId) {
         String userLogin = SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new RuntimeException("User not found"));
         return userGrammarRepository.existsByGrammar_IdAndAppUser_InternalUser_Login(grammarId, userLogin);
-    }
-
-    /**
-     * Inner class for statistics DTO.
-     */
-    public static class GrammarStatisticsDTO {
-
-        private Long totalGrammars;
-        private Long memorizedGrammars;
-
-        // Getters and setters
-        public Long getTotalGrammars() {
-            return totalGrammars;
-        }
-
-        public void setTotalGrammars(Long totalGrammars) {
-            this.totalGrammars = totalGrammars;
-        }
-
-        public Long getMemorizedGrammars() {
-            return memorizedGrammars;
-        }
-
-        public void setMemorizedGrammars(Long memorizedGrammars) {
-            this.memorizedGrammars = memorizedGrammars;
-        }
     }
 }

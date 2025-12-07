@@ -38,6 +38,8 @@ public class AdminUserDTO implements Serializable {
 
     private boolean activated = false;
 
+    private boolean locked = false;
+
     @Size(min = 2, max = 10)
     private String langKey;
 
@@ -51,6 +53,16 @@ public class AdminUserDTO implements Serializable {
 
     private Set<String> authorities;
 
+    // App-specific profile fields (populated from AppUser)
+    private String displayName;
+    private String bio;
+
+    // Optional learning stats (can be populated if available)
+    private Integer totalPoints;
+    private Integer coursesCompleted;
+    private Integer studyHours;
+    private Integer currentStreak;
+
     public AdminUserDTO() {
         // Empty constructor needed for Jackson.
     }
@@ -62,6 +74,7 @@ public class AdminUserDTO implements Serializable {
         this.lastName = user.getLastName();
         this.email = user.getEmail();
         this.activated = user.isActivated();
+        this.locked = user.isLocked();
         this.imageUrl = user.getImageUrl();
         this.langKey = user.getLangKey();
         this.createdBy = user.getCreatedBy();
@@ -69,6 +82,55 @@ public class AdminUserDTO implements Serializable {
         this.lastModifiedBy = user.getLastModifiedBy();
         this.lastModifiedDate = user.getLastModifiedDate();
         this.authorities = user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet());
+    }
+
+    // Getters/Setters for new fields
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
+    public Integer getTotalPoints() {
+        return totalPoints;
+    }
+
+    public void setTotalPoints(Integer totalPoints) {
+        this.totalPoints = totalPoints;
+    }
+
+    public Integer getCoursesCompleted() {
+        return coursesCompleted;
+    }
+
+    public void setCoursesCompleted(Integer coursesCompleted) {
+        this.coursesCompleted = coursesCompleted;
+    }
+
+    public Integer getStudyHours() {
+        return studyHours;
+    }
+
+    public void setStudyHours(Integer studyHours) {
+        this.studyHours = studyHours;
+    }
+
+    public Integer getCurrentStreak() {
+        return currentStreak;
+    }
+
+    public void setCurrentStreak(Integer currentStreak) {
+        this.currentStreak = currentStreak;
     }
 
     public Long getId() {
@@ -127,6 +189,14 @@ public class AdminUserDTO implements Serializable {
         this.activated = activated;
     }
 
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
+
     public String getLangKey() {
         return langKey;
     }
@@ -173,6 +243,23 @@ public class AdminUserDTO implements Serializable {
 
     public void setAuthorities(Set<String> authorities) {
         this.authorities = authorities;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof AdminUserDTO)) {
+            return false;
+        }
+        AdminUserDTO that = (AdminUserDTO) o;
+        return id != null && id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 
     // prettier-ignore

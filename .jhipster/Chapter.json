@@ -1,8 +1,8 @@
 {
   "annotations": {
-    "changelogDate": "20251021152343"
+    "changelogDate": "20251122061522"
   },
-  "applications": ["Langleague"],
+  "applications": "*",
   "dto": "mapstruct",
   "fields": [
     {
@@ -21,8 +21,44 @@
   "pagination": "pagination",
   "relationships": [
     {
-      "otherEntityName": "lesson",
-      "relationshipName": "lesson",
+      "otherEntityName": "word",
+      "relationshipName": "word",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "grammar",
+      "relationshipName": "grammar",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "listeningExercise",
+      "relationshipName": "listeningExercise",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "speakingExercise",
+      "relationshipName": "speakingExercise",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "readingExercise",
+      "relationshipName": "readingExercise",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "writingExercise",
+      "relationshipName": "writingExercise",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "chapterProgress",
+      "relationshipName": "chapterProgress",
       "relationshipSide": "left",
       "relationshipType": "one-to-many"
     }

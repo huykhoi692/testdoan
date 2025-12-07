@@ -1,9 +1,14 @@
 package com.langleague.service;
 
-import com.langleague.domain.*;
-import com.langleague.repository.*;
+import com.langleague.domain.enumeration.LearningStatus;
+import com.langleague.repository.ChapterProgressRepository;
+import com.langleague.repository.StudySessionRepository;
+import com.langleague.repository.UserBookRepository;
+import com.langleague.repository.UserRepository;
 import com.langleague.service.dto.LearningReportDTO;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
@@ -23,18 +28,18 @@ public class LearningReportService {
 
     private static final Logger LOG = LoggerFactory.getLogger(LearningReportService.class);
 
-    private final BookProgressRepository bookProgressRepository;
+    private final UserBookRepository userBookRepository;
     private final ChapterProgressRepository chapterProgressRepository;
     private final StudySessionRepository studySessionRepository;
     private final UserRepository userRepository;
 
     public LearningReportService(
-        BookProgressRepository bookProgressRepository,
+        UserBookRepository userBookRepository,
         ChapterProgressRepository chapterProgressRepository,
         StudySessionRepository studySessionRepository,
         UserRepository userRepository
     ) {
-        this.bookProgressRepository = bookProgressRepository;
+        this.userBookRepository = userBookRepository;
         this.chapterProgressRepository = chapterProgressRepository;
         this.studySessionRepository = studySessionRepository;
         this.userRepository = userRepository;
@@ -58,9 +63,11 @@ public class LearningReportService {
 
                 Long userId = user.getId();
 
-                // OPTIMIZED: Use count queries instead of fetching all entities
-                report.setTotalBooksStarted((int) bookProgressRepository.countByUserId(userId));
-                report.setTotalBooksCompleted((int) bookProgressRepository.countCompletedByUserId(userId));
+                // OPTIMIZED: Use count queries with UserBook instead of BookProgress
+                Long booksStarted = userBookRepository.countByAppUserId(userId);
+                report.setTotalBooksStarted(booksStarted != null ? booksStarted.intValue() : 0);
+                Long booksCompleted = userBookRepository.countByAppUserIdAndLearningStatus(userId, LearningStatus.COMPLETED);
+                report.setTotalBooksCompleted(booksCompleted != null ? booksCompleted.intValue() : 0);
 
                 report.setTotalChaptersStarted((int) chapterProgressRepository.countByUserId(userId));
                 report.setTotalChaptersCompleted((int) chapterProgressRepository.countCompletedByUserId(userId));
@@ -149,6 +156,8 @@ public class LearningReportService {
     /**
      * Get user visit statistics for admin.
      * Use case 51: View user visit reports
+     * OPTIMIZED: Uses aggregation queries instead of loading all entities
+     * TIMEZONE-AWARE: Uses Asia/Ho_Chi_Minh timezone for accurate "today" calculation
      */
     @Transactional(readOnly = true)
     public LearningReportDTO getUserVisitStatistics() {
@@ -157,24 +166,17 @@ public class LearningReportService {
         LearningReportDTO stats = new LearningReportDTO();
         stats.setGeneratedAt(Instant.now());
 
-        // Get all study sessions to calculate visits
-        List<com.langleague.domain.StudySession> allSessions = studySessionRepository.findAll();
-        stats.setTotalVisits(allSessions.size());
+        // OPTIMIZED: Use count queries instead of fetching all
+        stats.setTotalVisits((int) studySessionRepository.count());
+        stats.setUniqueUsers((int) studySessionRepository.countDistinctUsers());
 
-        // Calculate unique users
-        long uniqueUsers = allSessions
-            .stream()
-            .map(com.langleague.domain.StudySession::getAppUser)
-            .filter(java.util.Objects::nonNull)
-            .map(com.langleague.domain.AppUser::getId)
-            .distinct()
-            .count();
-        stats.setUniqueUsers((int) uniqueUsers);
+        // TIMEZONE FIX: Calculate start of day in Vietnam timezone (Asia/Ho_Chi_Minh)
+        // Why: Instant.now().truncatedTo(DAYS) gives UTC 00:00, which is wrong for VN users
+        // At 06:00 AM VN time (01/12), UTC is still 23:00 (30/11) - would count wrong day!
+        ZoneId vietnamZone = ZoneId.of("Asia/Ho_Chi_Minh");
+        Instant startOfDay = LocalDate.now(vietnamZone).atStartOfDay(vietnamZone).toInstant();
 
-        // Get today's sessions
-        Instant startOfDay = Instant.now().truncatedTo(ChronoUnit.DAYS);
-        long todaySessions = allSessions.stream().filter(s -> s.getStartAt() != null && s.getStartAt().isAfter(startOfDay)).count();
-        stats.setTodayVisits((int) todaySessions);
+        stats.setTodayVisits((int) studySessionRepository.countByStartAtAfter(startOfDay));
 
         return stats;
     }
@@ -190,10 +192,10 @@ public class LearningReportService {
         LearningReportDTO stats = new LearningReportDTO();
         stats.setGeneratedAt(Instant.now());
 
-        // Book completion stats
-        List<com.langleague.domain.BookProgress> allBookProgress = bookProgressRepository.findAll();
-        stats.setTotalBooksStarted(allBookProgress.size());
-        stats.setTotalBooksCompleted((int) allBookProgress.stream().filter(com.langleague.domain.BookProgress::getCompleted).count());
+        // Book completion stats - using UserBook
+        List<com.langleague.domain.UserBook> allUserBooks = userBookRepository.findAll();
+        stats.setTotalBooksStarted(allUserBooks.size());
+        stats.setTotalBooksCompleted((int) allUserBooks.stream().filter(ub -> ub.getLearningStatus() == LearningStatus.COMPLETED).count());
 
         // Chapter completion stats
         List<com.langleague.domain.ChapterProgress> allChapterProgress = chapterProgressRepository.findAll();
@@ -203,7 +205,7 @@ public class LearningReportService {
         );
 
         // Calculate completion rate
-        if (allChapterProgress.size() > 0) {
+        if (!allChapterProgress.isEmpty()) {
             double completionRate = (stats.getTotalChaptersCompleted() * 100.0) / allChapterProgress.size();
             stats.setAverageProgress(completionRate);
         }
@@ -230,7 +232,7 @@ public class LearningReportService {
         stats.setTotalStudyMinutes(totalMinutes);
 
         // Average session length
-        if (allSessions.size() > 0) {
+        if (!allSessions.isEmpty()) {
             stats.setAverageSessionMinutes(totalMinutes / allSessions.size());
         }
 
@@ -245,6 +247,67 @@ public class LearningReportService {
             .distinct()
             .count();
         stats.setActiveUsers((int) activeUsers);
+
+        return stats;
+    }
+
+    /**
+     * Get aggregated admin statistics for dashboard overview.
+     * Combines user, completion, and engagement statistics.
+     */
+    @Transactional(readOnly = true)
+    public LearningReportDTO getAdminStatistics() {
+        LOG.debug("Request to get admin overview statistics");
+
+        LearningReportDTO stats = new LearningReportDTO();
+        stats.setGeneratedAt(Instant.now());
+
+        // Get user statistics
+        List<com.langleague.domain.User> allUsers = userRepository.findAll();
+        stats.setTotalUsers(allUsers.size());
+
+        // Fetch all sessions ONCE for reuse
+        List<com.langleague.domain.StudySession> allSessions = studySessionRepository.findAll();
+
+        // Active users (studied in last 7 days)
+        Instant sevenDaysAgo = Instant.now().minus(7, ChronoUnit.DAYS);
+        long activeUsers = allSessions
+            .stream()
+            .filter(s -> s.getStartAt() != null && s.getStartAt().isAfter(sevenDaysAgo))
+            .map(com.langleague.domain.StudySession::getAppUser)
+            .filter(java.util.Objects::nonNull)
+            .map(com.langleague.domain.AppUser::getId)
+            .distinct()
+            .count();
+        stats.setActiveUsers((int) activeUsers);
+
+        // New users (registered in last 30 days)
+        Instant thirtyDaysAgo = Instant.now().minus(30, ChronoUnit.DAYS);
+        long newUsers = allUsers.stream().filter(u -> u.getCreatedDate() != null && u.getCreatedDate().isAfter(thirtyDaysAgo)).count();
+        stats.setNewUsers((int) newUsers);
+
+        // Total books and chapters - using UserBook
+        List<com.langleague.domain.UserBook> allUserBooks = userBookRepository.findAll();
+        List<com.langleague.domain.ChapterProgress> allChapterProgress = chapterProgressRepository.findAll();
+
+        // Null-safe counting for books and chapters
+        stats.setTotalBooksStarted(
+            (int) allUserBooks.stream().filter(ub -> ub.getBook() != null).map(ub -> ub.getBook().getId()).distinct().count()
+        );
+        stats.setTotalChaptersStarted(
+            (int) allChapterProgress.stream().filter(cp -> cp.getChapter() != null).map(cp -> cp.getChapter().getId()).distinct().count()
+        );
+
+        long completedBooks = allUserBooks.stream().filter(ub -> ub.getLearningStatus() == LearningStatus.COMPLETED).count();
+        stats.setTotalBooksCompleted((int) completedBooks);
+
+        long completedChapters = allChapterProgress.stream().filter(cp -> cp.getCompleted() != null && cp.getCompleted()).count();
+        stats.setTotalChaptersCompleted((int) completedChapters);
+
+        // Study time stats (reuse allSessions)
+        int totalMinutes = allSessions.stream().mapToInt(s -> s.getDurationMinutes() != null ? s.getDurationMinutes() : 0).sum();
+        stats.setTotalStudyMinutes(totalMinutes);
+        stats.setTotalStudySessions(allSessions.size());
 
         return stats;
     }

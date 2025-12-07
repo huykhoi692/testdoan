@@ -35,7 +35,7 @@ RUN npm run webapp:prod
 # ==================================================
 # Stage 2: Build Backend
 # ==================================================
-FROM maven:3.9-eclipse-temurin-17 AS backend-build
+FROM maven:3.9-eclipse-temurin-21 AS backend-build
 
 WORKDIR /app
 
@@ -44,8 +44,7 @@ COPY pom.xml ./
 COPY sonar-project.properties ./
 COPY mvnw ./
 COPY mvnw.cmd ./
-COPY .mvn .mvn/
-
+COPY .mvn/ .mvn/
 
 # Copy backend source
 COPY src/main/java ./src/main/java/
@@ -54,16 +53,13 @@ COPY src/main/resources ./src/main/resources/
 # Copy built frontend static files from previous stage
 COPY --from=frontend-build /app/target/classes/static ./src/main/resources/static/
 
-# Build backend JAR (skip frontend plugin since we already built it)
-RUN ./mvnw clean package -DskipTests \
-    -Dskip.npm \
     -Dskip.installnodenpm \
     -Pprod
 
 # ==================================================
 # Stage 3: Runtime Image
 # ==================================================
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 
 # Install curl for healthcheck
 RUN apk add --no-cache curl
@@ -89,4 +85,3 @@ ENV JAVA_OPTS="-Xmx512m -Xms256m -XX:+UseContainerSupport -XX:MaxRAMPercentage=7
 
 # Run application
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar app.jar"]
-

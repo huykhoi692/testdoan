@@ -1,27 +1,24 @@
 import { combineReducers } from '@reduxjs/toolkit';
-import { loadingBarReducer as loadingBar } from 'react-redux-loading-bar';
-import authentication from './authentication';
-import applicationProfile from './application-profile';
 import localeReducer from './locale.reducer';
 import themeReducer from './theme.reducer';
 import bookReducer from './book.reducer';
 import chapterReducer from './chapter.reducer';
 import progressReducer from './progress.reducer';
-import notificationReducer from './notification.reducer';
-import entitiesReducers from 'app/entities/reducers';
+import bookReviewReducer from './book-review.reducer';
+import commentReducer from './comment.reducer';
+import achievementReducer from './achievement.reducer';
+import favoriteReducer from './favorite.reducer';
 
 const rootReducer = combineReducers({
-  authentication,
-  applicationProfile,
   locale: localeReducer,
   theme: themeReducer,
   book: bookReducer,
   chapter: chapterReducer,
   progress: progressReducer,
-  notification: notificationReducer,
-  loadingBar,
-  // Entity reducers
-  ...entitiesReducers,
+  bookReview: bookReviewReducer,
+  comment: commentReducer,
+  achievement: achievementReducer,
+  favorite: favoriteReducer,
 });
 
 export default rootReducer;

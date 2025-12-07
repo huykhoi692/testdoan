@@ -11,22 +11,11 @@ import org.mapstruct.*;
  */
 @Mapper(componentModel = "spring")
 public interface ChapterMapper extends EntityMapper<ChapterDTO, Chapter> {
-    @Mapping(target = "bookId", source = "book.id")
-    @Mapping(target = "bookTitle", source = "book.title")
-    ChapterDTO toDto(Chapter chapter);
-
-    @Mapping(target = "book", ignore = true)
-    @Mapping(target = "lessons", ignore = true)
-    Chapter toEntity(ChapterDTO chapterDTO);
+    @Mapping(target = "book", source = "book", qualifiedByName = "bookId")
+    ChapterDTO toDto(Chapter s);
 
     @Named("bookId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
     BookDTO toDtoBookId(Book book);
-
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "book", ignore = true)
-    @Mapping(target = "lessons", ignore = true)
-    void partialUpdate(@MappingTarget Chapter entity, ChapterDTO dto);
 }

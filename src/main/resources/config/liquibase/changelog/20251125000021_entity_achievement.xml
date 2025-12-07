@@ -15,12 +15,6 @@
             <column name="description" type="${clobType}">
                 <constraints nullable="true"/>
             </column>
-            <column name="icon_url" type="varchar(512)">
-                <constraints nullable="true"/>
-            </column>
-            <column name="points" type="integer">
-                <constraints nullable="true"/>
-            </column>
         </createTable>
     </changeSet>
 

@@ -20,7 +20,7 @@ public class CommentDTO implements Serializable {
 
     private AppUserDTO appUser;
 
-    private LessonDTO lesson;
+    private ChapterDTO chapter;
 
     public Long getId() {
         return id;
@@ -54,12 +54,12 @@ public class CommentDTO implements Serializable {
         this.appUser = appUser;
     }
 
-    public LessonDTO getLesson() {
-        return lesson;
+    public ChapterDTO getChapter() {
+        return chapter;
     }
 
-    public void setLesson(LessonDTO lesson) {
-        this.lesson = lesson;
+    public void setChapter(ChapterDTO chapter) {
+        this.chapter = chapter;
     }
 
     @Override
@@ -91,7 +91,7 @@ public class CommentDTO implements Serializable {
             ", content='" + getContent() + "'" +
             ", createdAt='" + getCreatedAt() + "'" +
             ", appUser=" + getAppUser() +
-            ", lesson=" + getLesson() +
+            ", chapter=" + getChapter() +
             "}";
     }
 }

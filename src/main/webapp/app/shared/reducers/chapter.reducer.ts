@@ -1,13 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
-import {
-  IChapter,
-  getChapters,
-  getChaptersByBookId,
-  getChapter,
-  createChapter,
-  updateChapter,
-  deleteChapter,
-} from '../services/chapter.service';
+import { IChapter } from '../model/models';
+import { getChapters, getChaptersByBookId, getChapter, createChapter, updateChapter, deleteChapter } from '../services/chapter.service';
 
 export interface ChapterState {
   loading: boolean;

@@ -3,17 +3,15 @@ package com.langleague.service.mapper;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.langleague.domain.User;
-import com.langleague.service.dto.AdminUserDTO;
 import com.langleague.service.dto.UserDTO;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
  * Test class for the UserMapper.
+ * Tests the named mapping methods used by MapStruct mappers.
  */
 class UserMapperTest {
 
@@ -22,12 +20,12 @@ class UserMapperTest {
 
     private UserMapper userMapper;
     private User user;
-    private AdminUserDTO adminUserDTO;
 
     @BeforeEach
     public void init() {
         userMapper = new UserMapper();
         user = new User();
+        user.setId(DEFAULT_ID);
         user.setLogin(DEFAULT_LOGIN);
         user.setPassword("password");
         user.setActivated(true);
@@ -36,66 +34,99 @@ class UserMapperTest {
         user.setLastName("doe");
         user.setImageUrl("image_url");
         user.setLangKey("en");
-
-        adminUserDTO = new AdminUserDTO(user);
     }
 
     @Test
-    void usersToAdminUserDTOsShouldMapOnlyNonNullUsers() {
-        List<User> users = new ArrayList<>();
+    void toDtoIdShouldMapOnlyIdField() {
+        UserDTO userDTO = userMapper.toDtoId(user);
+
+        assertThat(userDTO).isNotNull();
+        assertThat(userDTO.getId()).isEqualTo(DEFAULT_ID);
+        assertThat(userDTO.getLogin()).isNull();
+    }
+
+    @Test
+    void toDtoIdWithNullShouldReturnNull() {
+        UserDTO userDTO = userMapper.toDtoId(null);
+
+        assertThat(userDTO).isNull();
+    }
+
+    @Test
+    void toDtoIdSetShouldMapMultipleUsers() {
+        User user2 = new User();
+        user2.setId(2L);
+        user2.setLogin("janedoe");
+
+        Set<User> users = new HashSet<>();
         users.add(user);
-        users.add(null);
+        users.add(user2);
 
-        List<AdminUserDTO> userDTOS = userMapper.usersToAdminUserDTOs(users);
+        Set<UserDTO> userDTOs = userMapper.toDtoIdSet(users);
 
-        assertThat(userDTOS).isNotEmpty().size().isEqualTo(1);
+        assertThat(userDTOs).isNotEmpty().hasSize(2);
+        assertThat(userDTOs).extracting(UserDTO::getId).containsExactlyInAnyOrder(1L, 2L);
     }
 
     @Test
-    void adminUserDTOsToUsersShouldMapOnlyNonNullAdminUserDTOs() {
-        List<AdminUserDTO> adminUserDTOs = new ArrayList<>();
-        adminUserDTOs.add(adminUserDTO);
-        adminUserDTOs.add(null);
+    void toDtoIdSetWithNullShouldReturnEmptySet() {
+        Set<UserDTO> userDTOs = userMapper.toDtoIdSet(null);
 
-        List<User> users = userMapper.userDTOsToUsers(adminUserDTOs);
-
-        assertThat(users).isNotEmpty().size().isEqualTo(1);
+        assertThat(userDTOs).isNotNull().isEmpty();
     }
 
     @Test
-    void adminUserDTOsToUsersWithAuthoritiesStringShouldMapToUsersWithAuthoritiesDomain() {
-        Set<String> authoritiesAsString = new HashSet<>();
-        authoritiesAsString.add("ROLE_USER");
-        adminUserDTO.setAuthorities(authoritiesAsString);
+    void toDtoLoginShouldMapIdAndLoginFields() {
+        UserDTO userDTO = userMapper.toDtoLogin(user);
 
-        List<AdminUserDTO> adminUserDTOs = new ArrayList<>();
-        adminUserDTOs.add(adminUserDTO);
-
-        List<User> users = userMapper.userDTOsToUsers(adminUserDTOs);
-
-        assertThat(users).isNotEmpty().size().isEqualTo(1);
-        assertThat(users.get(0).getAuthorities()).isNotNull();
-        assertThat(users.get(0).getAuthorities()).isNotEmpty();
-        assertThat(users.get(0).getAuthorities().iterator().next().getName()).isEqualTo("ROLE_USER");
+        assertThat(userDTO).isNotNull();
+        assertThat(userDTO.getId()).isEqualTo(DEFAULT_ID);
+        assertThat(userDTO.getLogin()).isEqualTo(DEFAULT_LOGIN);
     }
 
     @Test
-    void adminUserDTOsToUsersMapWithNullAuthoritiesStringShouldReturnUserWithEmptyAuthorities() {
-        adminUserDTO.setAuthorities(null);
+    void toDtoLoginWithNullShouldReturnNull() {
+        UserDTO userDTO = userMapper.toDtoLogin(null);
 
-        List<AdminUserDTO> adminUserDTOs = new ArrayList<>();
-        adminUserDTOs.add(adminUserDTO);
-
-        List<User> users = userMapper.userDTOsToUsers(adminUserDTOs);
-
-        assertThat(users).isNotEmpty().size().isEqualTo(1);
-        assertThat(users.get(0).getAuthorities()).isNotNull();
-        assertThat(users.get(0).getAuthorities()).isEmpty();
+        assertThat(userDTO).isNull();
     }
 
     @Test
-    void userFromId() {
-        assertThat(userMapper.userFromId(DEFAULT_ID).getId()).isEqualTo(DEFAULT_ID);
-        assertThat(userMapper.userFromId(null)).isNull();
+    void toDtoLoginSetShouldMapMultipleUsers() {
+        User user2 = new User();
+        user2.setId(2L);
+        user2.setLogin("janedoe");
+
+        Set<User> users = new HashSet<>();
+        users.add(user);
+        users.add(user2);
+
+        Set<UserDTO> userDTOs = userMapper.toDtoLoginSet(users);
+
+        assertThat(userDTOs).isNotEmpty().hasSize(2);
+        assertThat(userDTOs).extracting(UserDTO::getId).containsExactlyInAnyOrder(1L, 2L);
+        assertThat(userDTOs).extracting(UserDTO::getLogin).containsExactlyInAnyOrder(DEFAULT_LOGIN, "janedoe");
+    }
+
+    @Test
+    void toDtoLoginSetWithNullShouldReturnEmptySet() {
+        Set<UserDTO> userDTOs = userMapper.toDtoLoginSet(null);
+
+        assertThat(userDTOs).isNotNull().isEmpty();
+    }
+
+    @Test
+    void userFromIdShouldCreateUserWithId() {
+        User user = userMapper.userFromId(DEFAULT_ID);
+
+        assertThat(user).isNotNull();
+        assertThat(user.getId()).isEqualTo(DEFAULT_ID);
+    }
+
+    @Test
+    void userFromIdWithNullShouldReturnNull() {
+        User user = userMapper.userFromId(null);
+
+        assertThat(user).isNull();
     }
 }

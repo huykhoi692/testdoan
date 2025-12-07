@@ -58,4 +58,3 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     @Query("SELECT n FROM Notification n WHERE n.user.id IN :userIds AND n.createdAt > :since ORDER BY n.createdAt DESC")
     List<Notification> findRecentForUsers(@Param("userIds") List<Long> userIds, @Param("since") Instant since);
 }
-

@@ -9,10 +9,10 @@
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="milestone_day" type="integer">
-                <constraints nullable="false"/>
+            <column name="milestone_days" type="integer">
+                <constraints nullable="true"/>
             </column>
-            <column name="achieved_at" type="${datetimeType}">
+            <column name="reward_name" type="varchar(255)">
                 <constraints nullable="true"/>
             </column>
             <column name="study_session_id" type="bigint">
@@ -22,7 +22,7 @@
     </changeSet>
 
     <changeSet id="20251125000026-2" author="system">
-        <addForeignKeyConstraint baseColumnNames="study_session_id" baseTableName="streak_milestone" 
+        <addForeignKeyConstraint baseColumnNames="study_session_id" baseTableName="streak_milestone"
             constraintName="fk_streak_milestone_study_session_id" referencedColumnNames="id" referencedTableName="study_session"/>
     </changeSet>
 

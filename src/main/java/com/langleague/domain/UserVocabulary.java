@@ -8,7 +8,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A UserVocabulary.
+ * User vocabulary progress (Flashcards)
  */
 @Entity
 @Table(name = "user_vocabulary")
@@ -32,24 +32,39 @@ public class UserVocabulary implements Serializable {
     @Column(name = "last_reviewed")
     private Instant lastReviewed;
 
+    @Column(name = "review_count")
+    private Integer reviewCount;
+
+    // SRS (Spaced Repetition System) fields
+    @Column(name = "ease_factor")
+    private Integer easeFactor = 250; // 2.5 * 100
+
+    @Column(name = "interval_days")
+    private Integer intervalDays = 0;
+
+    @Column(name = "next_review_date")
+    private java.time.LocalDate nextReviewDate;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(
         value = {
-            "comments", "exerciseResults", "userProgresses", "userVocabularies", "userAchievements", "learningStreaks", "studySessions",
+            "internalUser",
+            "userVocabularies",
+            "userGrammars",
+            "bookReviews",
+            "comments",
+            "exerciseResults",
+            "chapterProgresses",
+            "userAchievements",
+            "learningStreaks",
+            "studySessions",
         },
         allowSetters = true
     )
     private AppUser appUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(
-        value = { "lessonWords", "lessonSkills", "mediaFiles", "comments", "userProgresses", "userVocabularies", "chapter" },
-        allowSetters = true
-    )
-    private Lesson lesson;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "wordExamples", "userVocabularies", "lessonWords" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "wordExamples", "userVocabularies", "chapter" }, allowSetters = true)
     private Word word;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -106,6 +121,58 @@ public class UserVocabulary implements Serializable {
         this.lastReviewed = lastReviewed;
     }
 
+    public Integer getReviewCount() {
+        return this.reviewCount;
+    }
+
+    public UserVocabulary reviewCount(Integer reviewCount) {
+        this.setReviewCount(reviewCount);
+        return this;
+    }
+
+    public void setReviewCount(Integer reviewCount) {
+        this.reviewCount = reviewCount;
+    }
+
+    public Integer getEaseFactor() {
+        return this.easeFactor;
+    }
+
+    public UserVocabulary easeFactor(Integer easeFactor) {
+        this.setEaseFactor(easeFactor);
+        return this;
+    }
+
+    public void setEaseFactor(Integer easeFactor) {
+        this.easeFactor = easeFactor;
+    }
+
+    public Integer getIntervalDays() {
+        return this.intervalDays;
+    }
+
+    public UserVocabulary intervalDays(Integer intervalDays) {
+        this.setIntervalDays(intervalDays);
+        return this;
+    }
+
+    public void setIntervalDays(Integer intervalDays) {
+        this.intervalDays = intervalDays;
+    }
+
+    public java.time.LocalDate getNextReviewDate() {
+        return this.nextReviewDate;
+    }
+
+    public UserVocabulary nextReviewDate(java.time.LocalDate nextReviewDate) {
+        this.setNextReviewDate(nextReviewDate);
+        return this;
+    }
+
+    public void setNextReviewDate(java.time.LocalDate nextReviewDate) {
+        this.nextReviewDate = nextReviewDate;
+    }
+
     public AppUser getAppUser() {
         return this.appUser;
     }
@@ -116,19 +183,6 @@ public class UserVocabulary implements Serializable {
 
     public UserVocabulary appUser(AppUser appUser) {
         this.setAppUser(appUser);
-        return this;
-    }
-
-    public Lesson getLesson() {
-        return this.lesson;
-    }
-
-    public void setLesson(Lesson lesson) {
-        this.lesson = lesson;
-    }
-
-    public UserVocabulary lesson(Lesson lesson) {
-        this.setLesson(lesson);
         return this;
     }
 
@@ -172,6 +226,7 @@ public class UserVocabulary implements Serializable {
             ", remembered='" + getRemembered() + "'" +
             ", isMemorized='" + getIsMemorized() + "'" +
             ", lastReviewed='" + getLastReviewed() + "'" +
+            ", reviewCount=" + getReviewCount() +
             "}";
     }
 }

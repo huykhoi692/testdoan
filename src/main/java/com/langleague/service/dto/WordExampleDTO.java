@@ -1,6 +1,8 @@
 package com.langleague.service.dto;
 
 import jakarta.persistence.Lob;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -13,11 +15,13 @@ public class WordExampleDTO implements Serializable {
     private Long id;
 
     @Lob
+    @NotBlank(message = "Example text is required")
     private String exampleText;
 
     @Lob
     private String translation;
 
+    @NotNull(message = "Word is required")
     private WordDTO word;
 
     public Long getId() {

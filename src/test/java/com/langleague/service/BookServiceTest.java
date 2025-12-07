@@ -160,8 +160,8 @@ class BookServiceTest {
 
         // Then
         assertThat(result).isPresent();
-        assertThat(result.get().getId()).isEqualTo(1L);
-        assertThat(result.get().getTitle()).isEqualTo("Test Book");
+        assertThat(result.orElseThrow().getId()).isEqualTo(1L);
+        assertThat(result.orElseThrow().getTitle()).isEqualTo("Test Book");
         verify(bookRepository, times(1)).findById(1L);
     }
 
@@ -260,7 +260,7 @@ class BookServiceTest {
         // Given
         String level = "BEGINNER";
         List<Book> books = List.of(book);
-        when(bookRepository.findByLevel(level)).thenReturn(books);
+        when(bookRepository.findByLevel(Level.BEGINNER)).thenReturn(books);
         when(bookMapper.toDto(book)).thenReturn(bookDTO);
 
         // When
@@ -270,6 +270,37 @@ class BookServiceTest {
         assertThat(result).isNotNull();
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().getLevel()).isEqualTo(Level.BEGINNER);
-        verify(bookRepository, times(1)).findByLevel(level);
+        verify(bookRepository, times(1)).findByLevel(Level.BEGINNER);
+    }
+
+    @Test
+    void testFindByLevelWithInvalidLevel() {
+        // Given
+        String invalidLevel = "INVALID_LEVEL";
+
+        // When
+        List<BookDTO> result = bookService.findByLevel(invalidLevel);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result).isEmpty();
+        verify(bookRepository, never()).findByLevel(any());
+    }
+
+    @Test
+    void testFindByLevelCaseInsensitive() {
+        // Given
+        String level = "beginner"; // lowercase
+        List<Book> books = List.of(book);
+        when(bookRepository.findByLevel(Level.BEGINNER)).thenReturn(books);
+        when(bookMapper.toDto(book)).thenReturn(bookDTO);
+
+        // When
+        List<BookDTO> result = bookService.findByLevel(level);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result).hasSize(1);
+        verify(bookRepository, times(1)).findByLevel(Level.BEGINNER);
     }
 }

@@ -1,12 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Row, Col, Typography, Button, Space, Tag, Input, Select, Tabs, List, Avatar, Spin } from 'antd';
-import { SoundOutlined, StarOutlined, StarFilled, SearchOutlined, BookOutlined } from '@ant-design/icons';
+import { Card, Row, Col, Typography, Button, Space, Tag, Input, Select, Tabs, List, Avatar, Spin, message } from 'antd';
+import { SoundOutlined, StarOutlined, StarFilled, SearchOutlined, BookOutlined, LoadingOutlined } from '@ant-design/icons';
 import { useParams } from 'react-router-dom';
-import { getWords, getWordsByLesson, IWord } from '../../shared/services/word.service';
+import { useAppDispatch } from 'app/config/store';
+import { getWordsByChapter } from '../../shared/services/word.service';
+import { IWord } from '../../shared/model/models';
+import { ttsService } from '../../shared/services/tts.service';
 
 const { Title, Text } = Typography;
 
-interface Vocabulary extends IWord {
+interface Vocabulary {
+  id?: number;
+  text: string;
+  meaning?: string;
+  pronunciation?: string;
+  partOfSpeech?: string;
+  imageUrl?: string;
+  chapterId?: number;
+  orderIndex?: number;
   korean?: string;
   romanization?: string;
   english?: string;
@@ -18,47 +29,48 @@ interface Vocabulary extends IWord {
 }
 
 const VocabularyList = () => {
-  const { lessonId } = useParams<{ lessonId: string }>();
+  const dispatch = useAppDispatch();
+  const { chapterId } = useParams<{ chapterId: string }>();
   const [loading, setLoading] = useState(true);
   const [vocabularyData, setVocabularyData] = useState<Vocabulary[]>([]);
   const [searchText, setSearchText] = useState('');
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [activeTab, setActiveTab] = useState('all');
   const [favorites, setFavorites] = useState<number[]>([]);
+  const [playingAudio, setPlayingAudio] = useState<number | null>(null);
   const lessonInfo = { title: 'Vocabulary List', subtitle: '' };
 
   useEffect(() => {
     fetchVocabulary();
-  }, [lessonId]);
+  }, [chapterId]);
 
   const fetchVocabulary = async () => {
     try {
       setLoading(true);
-      let wordsData;
+      let wordsData: IWord[] = [];
 
-      if (lessonId) {
-        wordsData = await getWordsByLesson(Number(lessonId));
-      } else {
-        const response = await getWords(0, 50);
-        wordsData = response.content || [];
+      if (chapterId) {
+        wordsData = await dispatch(getWordsByChapter(Number(chapterId))).unwrap();
       }
 
       // Map backend data to frontend format
-      const mappedData: Vocabulary[] = wordsData.map((word: any) => ({
+      const mappedData: Vocabulary[] = wordsData.map((word: IWord) => ({
         id: word.id || 0,
+        text: word.text || '',
+        meaning: word.meaning || '',
+        pronunciation: word.pronunciation || '',
+        partOfSpeech: word.partOfSpeech || 'Noun',
+        imageUrl: word.imageUrl,
+        chapterId: word.chapterId,
+        orderIndex: word.orderIndex,
         korean: word.text || '',
         romanization: word.pronunciation || '',
         english: word.meaning || '',
-        partOfSpeech: word.partOfSpeech || 'Noun',
         example: '',
         exampleTranslation: '',
         category: word.partOfSpeech || 'General',
         isFavorite: false,
         image: word.imageUrl,
-        text: word.text,
-        meaning: word.meaning,
-        pronunciation: word.pronunciation,
-        imageUrl: word.imageUrl,
       }));
 
       setVocabularyData(mappedData);
@@ -76,7 +88,7 @@ const VocabularyList = () => {
           exampleTranslation: 'Hello, I am Minsu.',
           category: 'Greetings',
           isFavorite: true,
-          image: 'content/images/Langleague.jpg',
+          image: 'https://images.unsplash.com/photo-1582610116397-edb318620f90?w=100',
           text: '안녕하세요',
           meaning: 'Hello (formal)',
           pronunciation: 'annyeonghaseyo',
@@ -91,7 +103,7 @@ const VocabularyList = () => {
           exampleTranslation: 'Thank you for helping me.',
           category: 'Greetings',
           isFavorite: false,
-          image: 'content/images/Langleague.jpg',
+          image: 'https://images.unsplash.com/photo-1591035897819-f4bdf739f446?w=100',
           text: '감사합니다',
           meaning: 'Thank you (formal)',
           pronunciation: 'gamsahamnida',
@@ -110,8 +122,22 @@ const VocabularyList = () => {
     }
   };
 
-  const playAudio = (korean: string) => {
-    console.log('Playing audio for:', korean);
+  const playAudio = async (korean: string, wordId?: number) => {
+    if (!korean || (typeof wordId !== 'undefined' && playingAudio === wordId)) return;
+
+    try {
+      if (typeof wordId !== 'undefined') {
+        setPlayingAudio(wordId);
+      }
+      await ttsService.speak(korean, 'ko-KR');
+    } catch (error) {
+      console.error('Error playing audio:', error);
+      message.error('Failed to play audio. Please try again.');
+    } finally {
+      if (typeof wordId !== 'undefined') {
+        setPlayingAudio(null);
+      }
+    }
   };
 
   const filteredVocabulary = vocabularyData.filter(vocab => {
@@ -227,6 +253,7 @@ const VocabularyList = () => {
             <VocabularyGrid
               vocabulary={filteredVocabulary}
               favorites={favorites}
+              playingAudio={playingAudio}
               onToggleFavorite={toggleFavorite}
               onPlayAudio={playAudio}
             />
@@ -243,6 +270,7 @@ const VocabularyList = () => {
             <VocabularyGrid
               vocabulary={filteredVocabulary}
               favorites={favorites}
+              playingAudio={playingAudio}
               onToggleFavorite={toggleFavorite}
               onPlayAudio={playAudio}
             />
@@ -256,13 +284,17 @@ const VocabularyList = () => {
 const VocabularyGrid = ({
   vocabulary,
   favorites,
+  playingAudio,
   onToggleFavorite,
   onPlayAudio,
 }: {
   vocabulary: Vocabulary[];
   favorites: number[];
+  playingAudio: number | null;
   onToggleFavorite: (id: number) => void;
-  onPlayAudio: (korean: string | undefined) => void;
+  // Relax the prop type to accept optional wordId so callers with single-arg
+  // handlers or two-arg handlers both type-check correctly.
+  onPlayAudio: (korean?: string, wordId?: number) => Promise<void> | void;
 }) => {
   return (
     <List
@@ -297,9 +329,11 @@ const VocabularyGrid = ({
                         </Title>
                         <Button
                           type="text"
-                          icon={<SoundOutlined />}
-                          onClick={() => onPlayAudio(item.korean)}
-                          style={{ color: '#667eea' }}
+                          icon={playingAudio === item.id ? <LoadingOutlined /> : <SoundOutlined />}
+                          onClick={() => onPlayAudio(item.korean, item.id || 0)}
+                          disabled={playingAudio !== null}
+                          loading={playingAudio === item.id}
+                          style={{ color: playingAudio === item.id ? '#52c41a' : '#667eea' }}
                         />
                       </Space>
                       <Text type="secondary" style={{ fontSize: '14px', display: 'block', marginTop: '4px' }}>
