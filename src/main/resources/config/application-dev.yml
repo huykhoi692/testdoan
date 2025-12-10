@@ -12,6 +12,11 @@ logging:
     com.langleague: DEBUG
 
 spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 200MB
+      max-request-size: 200MB
   docker:
     compose:
       enabled: false

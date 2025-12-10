@@ -133,6 +133,27 @@ public class MailService {
         sendEmailFromTemplateSync(user, "mail/passwordChangeEmail", "email.password.changed.title");
     }
 
+    /**
+     * Send account locked notification (after failed login attempts)
+     */
+    @Async
+    public void sendAccountLockedEmail(User user, int lockDurationMinutes) {
+        if (user.getEmail() == null) {
+            LOG.debug("Email doesn't exist for user '{}'", user.getLogin());
+            return;
+        }
+        LOG.debug("Sending account locked email to '{}'", user.getEmail());
+        Locale locale = Locale.forLanguageTag(user.getLangKey());
+        Context context = new Context(locale);
+        context.setVariable(USER, user);
+        context.setVariable("lockDurationMinutes", lockDurationMinutes);
+        context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
+
+        String content = templateEngine.process("mail/accountLockedEmail", context);
+        String subject = messageSource.getMessage("email.account.locked.title", null, locale);
+        sendEmailSync(user.getEmail(), subject, content, false, true);
+    }
+
     // ==================== LEARNING REMINDERS ====================
 
     /**

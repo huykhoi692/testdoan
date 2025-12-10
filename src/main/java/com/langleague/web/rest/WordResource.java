@@ -144,6 +144,7 @@ public class WordResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of words in body.
      */
     @GetMapping("")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<WordDTO>> getAllWords(
         @org.springframework.data.web.PageableDefault(
             size = 50,
@@ -163,6 +164,7 @@ public class WordResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the wordDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<WordDTO> getWord(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Word : {}", id);
         Optional<WordDTO> wordDTO = wordService.findOne(id);
@@ -192,6 +194,7 @@ public class WordResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of words in body.
      */
     @GetMapping("/chapter/{chapterId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<WordDTO>> getWordsByChapter(@PathVariable Long chapterId) {
         LOG.debug("REST request to get words by chapter : {}", chapterId);
         List<WordDTO> words = wordService.findByChapterId(chapterId);

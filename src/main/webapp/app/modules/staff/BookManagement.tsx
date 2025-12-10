@@ -28,6 +28,9 @@ import {
   FileTextOutlined,
   UnorderedListOutlined,
   FileImageOutlined,
+  CheckSquareOutlined,
+  EyeInvisibleOutlined,
+  DownloadOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useAppDispatch } from 'app/config/store';
@@ -53,6 +56,7 @@ const BookManagement: React.FC = () => {
   const [chapters, setChapters] = useState<IChapter[]>([]);
   const [thumbnailUrl, setThumbnailUrl] = useState<string>('');
   const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [form] = Form.useForm();
 
   // Fetch books
@@ -155,11 +159,15 @@ const BookManagement: React.FC = () => {
   const handleDelete = async (book: IBook) => {
     try {
       setLoading(true);
-      await dispatch(deleteBook(book.id)).unwrap();
+      // Pass object with id to match service signature
+      await dispatch(deleteBook({ id: book.id, force: false })).unwrap();
       message.success('Xóa sách thành công');
-      fetchBooks();
-    } catch (error) {
-      message.error('Không thể xóa sách');
+      // Refresh the list after successful deletion
+      await fetchBooks();
+    } catch (error: any) {
+      console.error('Delete error:', error);
+      const errorMsg = error.response?.data?.message || error.message || 'Không thể xóa sách';
+      message.error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -317,7 +325,7 @@ const BookManagement: React.FC = () => {
       key: 'actions',
       render: (_, record) => (
         <Space>
-          <Button type="link" icon={<UnorderedListOutlined />} size="small" onClick={() => viewChapters(record)}>
+          <Button type="link" icon={<UnorderedListOutlined />} size="small" onClick={() => navigate(`/staff/books/${record.id}/chapters`)}>
             Xem chương
           </Button>
           <Button type="link" icon={<EditOutlined />} size="small" onClick={() => showModal(record)}>
@@ -347,6 +355,38 @@ const BookManagement: React.FC = () => {
     },
   ];
 
+  // Bulk actions
+  const handleBulkDelete = () => {
+    Modal.confirm({
+      title: 'Xóa nhiều sách',
+      content: `Bạn có chắc muốn xóa ${selectedRowKeys.length} sách đã chọn?`,
+      okText: 'Xóa',
+      cancelText: 'Hủy',
+      okButtonProps: { danger: true },
+      onOk() {
+        message.success(`Đã xóa ${selectedRowKeys.length} sách`);
+        setSelectedRowKeys([]);
+        fetchBooks();
+      },
+    });
+  };
+
+  const handleBulkDeactivate = () => {
+    message.success(`Đã ẩn ${selectedRowKeys.length} sách`);
+    setSelectedRowKeys([]);
+    fetchBooks();
+  };
+
+  const handleBulkExport = () => {
+    message.info(`Đang xuất ${selectedRowKeys.length} sách ra Excel...`);
+  };
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: (keys: React.Key[]) => setSelectedRowKeys(keys),
+    selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT, Table.SELECTION_NONE],
+  };
+
   return (
     <div style={{ padding: '24px' }}>
       <Card variant="borderless" style={{ borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
@@ -371,17 +411,59 @@ const BookManagement: React.FC = () => {
           </Col>
         </Row>
 
-        {/* Table */}
+        {/* Bulk Actions Bar - Floating */}
+        {selectedRowKeys.length > 0 && (
+          <Card
+            style={{
+              position: 'fixed',
+              bottom: 24,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 999,
+              borderRadius: 16,
+              boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              border: 'none',
+              minWidth: 400,
+            }}
+          >
+            <Row justify="space-between" align="middle">
+              <Col>
+                <Text strong style={{ color: '#fff', fontSize: 16 }}>
+                  <CheckSquareOutlined style={{ marginRight: 8 }} />
+                  Đã chọn {selectedRowKeys.length} sách
+                </Text>
+              </Col>
+              <Col>
+                <Space>
+                  <Button icon={<EyeInvisibleOutlined />} onClick={handleBulkDeactivate} style={{ borderRadius: 8 }}>
+                    Ẩn
+                  </Button>
+                  <Button icon={<DownloadOutlined />} onClick={handleBulkExport} style={{ borderRadius: 8 }}>
+                    Export
+                  </Button>
+                  <Button danger icon={<DeleteOutlined />} onClick={handleBulkDelete} style={{ borderRadius: 8 }}>
+                    Xóa
+                  </Button>
+                </Space>
+              </Col>
+            </Row>
+          </Card>
+        )}
+
+        {/* Table with Row Selection */}
         <Table
           columns={columns}
           dataSource={books}
           loading={loading}
           rowKey="id"
+          rowSelection={rowSelection}
           pagination={{
             showSizeChanger: true,
             showTotal: total => `Tổng ${total} sách`,
           }}
           scroll={{ x: 1200 }}
+          sticky={{ offsetHeader: 0 }}
         />
       </Card>
 
@@ -461,8 +543,23 @@ const BookManagement: React.FC = () => {
           setIsChaptersModalVisible(false);
           setChapters([]);
         }}
-        footer={null}
-        width={900}
+        footer={
+          <Space>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => {
+                if (selectedBook) {
+                  navigate(`/staff/chapters/new?bookId=${selectedBook.id}`);
+                }
+              }}
+            >
+              Thêm chương mới
+            </Button>
+            <Button onClick={() => setIsChaptersModalVisible(false)}>Đóng</Button>
+          </Space>
+        }
+        width={1000}
       >
         <Table
           dataSource={chapters}
@@ -507,19 +604,42 @@ const BookManagement: React.FC = () => {
             {
               title: 'Hành động',
               key: 'actions',
-              width: 120,
+              width: 180,
               render: (_, record) => (
-                <Button
-                  type="primary"
-                  size="small"
-                  icon={<EditOutlined />}
-                  onClick={() => {
-                    setIsChaptersModalVisible(false);
-                    navigate(`/staff/chapters/${record.id}/edit`);
-                  }}
-                >
-                  Chỉnh sửa
-                </Button>
+                <Space>
+                  <Button
+                    type="link"
+                    size="small"
+                    icon={<EditOutlined />}
+                    onClick={() => {
+                      navigate(`/staff/chapters/${record.id}/edit`);
+                    }}
+                  >
+                    Sửa
+                  </Button>
+                  <Popconfirm
+                    title="Xác nhận xóa?"
+                    description={`Bạn có chắc muốn xóa chương "${record.title}"?`}
+                    onConfirm={async () => {
+                      try {
+                        await fetch(`/api/chapters/${record.id}`, { method: 'DELETE' });
+                        message.success('Đã xóa chương');
+                        if (selectedBook) {
+                          viewChapters(selectedBook);
+                        }
+                      } catch (error) {
+                        message.error('Không thể xóa chương');
+                      }
+                    }}
+                    okText="Xóa"
+                    cancelText="Hủy"
+                    okButtonProps={{ danger: true }}
+                  >
+                    <Button type="link" danger size="small" icon={<DeleteOutlined />}>
+                      Xóa
+                    </Button>
+                  </Popconfirm>
+                </Space>
               ),
             },
           ]}

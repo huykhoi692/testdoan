@@ -12,7 +12,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -52,6 +56,8 @@ public class ChapterProgressService {
      * @param chapterProgressDTO the entity to save.
      * @return the persisted entity.
      */
+    @Retryable(retryFor = { ObjectOptimisticLockingFailureException.class }, maxAttempts = 3, backoff = @Backoff(delay = 100))
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public ChapterProgressDTO update(ChapterProgressDTO chapterProgressDTO) {
         LOG.debug("Request to update ChapterProgress : {}", chapterProgressDTO);
         ChapterProgress chapterProgress = chapterProgressMapper.toEntity(chapterProgressDTO);
@@ -65,6 +71,8 @@ public class ChapterProgressService {
      * @param chapterProgressDTO the entity to update partially.
      * @return the persisted entity.
      */
+    @Retryable(retryFor = { ObjectOptimisticLockingFailureException.class }, maxAttempts = 3, backoff = @Backoff(delay = 100))
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Optional<ChapterProgressDTO> partialUpdate(ChapterProgressDTO chapterProgressDTO) {
         LOG.debug("Request to partially update ChapterProgress : {}", chapterProgressDTO);
 
@@ -203,7 +211,10 @@ public class ChapterProgressService {
             return 0.0;
         }
 
-        double totalPercent = progresses.stream().mapToInt(p -> p.getPercent() != null ? p.getPercent() : 0).sum();
+        double totalPercent = progresses
+            .stream()
+            .mapToInt(p -> p.getPercent() != null ? p.getPercent() : 0)
+            .sum();
         return totalPercent / progresses.size();
     }
 
@@ -253,7 +264,10 @@ public class ChapterProgressService {
     @Transactional(readOnly = true)
     public List<MyChapterDTO> getMyInProgressChapters(String userLogin) {
         LOG.debug("Request to get in-progress chapters for user {}", userLogin);
-        return getMyChapters(userLogin).stream().filter(chapter -> !chapter.getCompleted()).collect(Collectors.toList());
+        return getMyChapters(userLogin)
+            .stream()
+            .filter(chapter -> !chapter.getCompleted())
+            .collect(Collectors.toList());
     }
 
     /**

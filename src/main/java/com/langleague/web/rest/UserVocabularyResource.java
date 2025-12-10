@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -56,6 +57,7 @@ public class UserVocabularyResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserVocabularyDTO> createUserVocabulary(@Valid @RequestBody UserVocabularyDTO userVocabularyDTO)
         throws URISyntaxException {
         LOG.debug("REST request to save UserVocabulary : {}", userVocabularyDTO);
@@ -79,6 +81,7 @@ public class UserVocabularyResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserVocabularyDTO> updateUserVocabulary(
         @PathVariable(value = "id", required = false) final Long id,
         @RequestBody UserVocabularyDTO userVocabularyDTO
@@ -113,6 +116,7 @@ public class UserVocabularyResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserVocabularyDTO> partialUpdateUserVocabulary(
         @PathVariable(value = "id", required = false) final Long id,
         @RequestBody UserVocabularyDTO userVocabularyDTO
@@ -144,6 +148,7 @@ public class UserVocabularyResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of userVocabularies in body.
      */
     @GetMapping("")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<UserVocabularyDTO>> getAllUserVocabularies(
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
     ) {
@@ -160,6 +165,7 @@ public class UserVocabularyResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the userVocabularyDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserVocabularyDTO> getUserVocabulary(@PathVariable("id") Long id) {
         LOG.debug("REST request to get UserVocabulary : {}", id);
         Optional<UserVocabularyDTO> userVocabularyDTO = userVocabularyService.findOne(id);
@@ -173,6 +179,7 @@ public class UserVocabularyResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> deleteUserVocabulary(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete UserVocabulary : {}", id);
         userVocabularyService.delete(id);
@@ -189,10 +196,12 @@ public class UserVocabularyResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the saved userVocabularyDTO.
      */
     @PostMapping("/save-word")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserVocabularyDTO> saveWord(@RequestParam("wordId") Long wordId) {
         LOG.debug("REST request to save word : {}", wordId);
-        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
+        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated")
+        );
 
         UserVocabularyDTO result = userVocabularyService.saveWord(wordId, userLogin);
         return ResponseEntity.ok().body(result);
@@ -207,10 +216,12 @@ public class UserVocabularyResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of saved words in body.
      */
     @GetMapping({ "/saved", "/my-words" })
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<UserVocabularyDTO>> getSavedWords(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         LOG.debug("REST request to get saved words");
-        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
+        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated")
+        );
 
         Page<UserVocabularyDTO> page = userVocabularyService.getSavedWords(userLogin, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
@@ -226,13 +237,15 @@ public class UserVocabularyResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)}.
      */
     @PutMapping("/word/{wordId}/memorized")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> updateMemorizationStatus(
         @PathVariable("wordId") Long wordId,
         @RequestParam("isMemorized") Boolean isMemorized
     ) {
         LOG.debug("REST request to update word {} memorized status to {}", wordId, isMemorized);
-        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
+        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated")
+        );
 
         userVocabularyService.updateMemorizationStatus(wordId, userLogin, isMemorized);
         return ResponseEntity.ok().build();
@@ -246,10 +259,12 @@ public class UserVocabularyResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/word/{wordId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> unsaveWord(@PathVariable("wordId") Long wordId) {
         LOG.debug("REST request to unsave word : {}", wordId);
-        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
+        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated")
+        );
 
         userVocabularyService.unsaveWord(wordId, userLogin);
         return ResponseEntity.noContent().build();
@@ -263,6 +278,7 @@ public class UserVocabularyResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of words in body.
      */
     @GetMapping("/my-words/memorized")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<UserVocabularyDTO>> getMemorizedWords(
         @RequestParam(defaultValue = "true") Boolean isMemorized,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
@@ -280,6 +296,7 @@ public class UserVocabularyResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of words in body.
      */
     @GetMapping("/my-words/review-today")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<UserVocabularyDTO>> getWordsToReview(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         LOG.debug("REST request to get words to review today");
         Page<UserVocabularyDTO> page = userVocabularyService.getWordsToReview(pageable);
@@ -295,6 +312,7 @@ public class UserVocabularyResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of words in body.
      */
     @GetMapping("/my-words/chapter/{chapterId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<UserVocabularyDTO>> getSavedWordsByChapter(
         @PathVariable Long chapterId,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
@@ -313,6 +331,7 @@ public class UserVocabularyResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)}.
      */
     @PutMapping("/review/{wordId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> updateReviewResult(@PathVariable Long wordId, @RequestParam Integer quality) {
         LOG.debug("REST request to update review result for word: {} with quality: {}", wordId, quality);
         if (quality < 0 || quality > 5) {
@@ -329,10 +348,12 @@ public class UserVocabularyResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the saved userVocabularyDTO.
      */
     @PostMapping("/save/{wordId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserVocabularyDTO> saveWordById(@PathVariable Long wordId) {
         LOG.debug("REST request to save word by ID: {}", wordId);
-        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
+        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated")
+        );
 
         UserVocabularyDTO result = userVocabularyService.saveWord(wordId, userLogin);
         return ResponseEntity.ok().body(result);
@@ -345,10 +366,12 @@ public class UserVocabularyResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/unsave/{wordId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> unsaveWordById(@PathVariable Long wordId) {
         LOG.debug("REST request to unsave word by ID: {}", wordId);
-        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
+        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated")
+        );
 
         userVocabularyService.unsaveWord(wordId, userLogin);
         return ResponseEntity.noContent().build();
@@ -360,6 +383,7 @@ public class UserVocabularyResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the statistics in body.
      */
     @GetMapping("/statistics")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<VocabularyStatisticsDTO> getStatistics() {
         LOG.debug("REST request to get vocabulary statistics");
         VocabularyStatisticsDTO stats = userVocabularyService.getStatistics();
@@ -374,6 +398,7 @@ public class UserVocabularyResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and true/false in body.
      */
     @GetMapping("/is-saved/{wordId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Boolean> isSaved(@PathVariable Long wordId) {
         LOG.debug("REST request to check if word is saved: {}", wordId);
         boolean saved = userVocabularyService.isSaved(wordId);
@@ -386,6 +411,7 @@ public class UserVocabularyResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and progress data in body.
      */
     @GetMapping("/my-words/progress")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<LearningProgressDTO> getLearningProgress() {
         LOG.debug("REST request to get learning progress");
         LearningProgressDTO progress = userVocabularyService.getLearningProgress();
@@ -400,13 +426,23 @@ public class UserVocabularyResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)}.
      */
     @PostMapping("/batch-save")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> batchSaveWords(@RequestBody List<Long> wordIds) {
         LOG.debug("REST request to batch save words: {}", wordIds);
-        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
 
-        userVocabularyService.batchSaveWords(wordIds, userLogin);
-        return ResponseEntity.ok().build();
+        try {
+            String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+                new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated")
+            );
+
+            userVocabularyService.batchSaveWords(wordIds, userLogin);
+            return ResponseEntity.ok().build();
+        } catch (BadRequestAlertException e) {
+            throw e;
+        } catch (Exception e) {
+            LOG.error("Error batch saving words: {}", e.getMessage(), e);
+            throw new BadRequestAlertException(e.getMessage(), ENTITY_NAME, "batchsavefailed");
+        }
     }
 
     /**
@@ -416,10 +452,12 @@ public class UserVocabularyResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and count in body.
      */
     @GetMapping("/count")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Long> countMyVocabulary() {
         LOG.debug("REST request to count my vocabulary");
-        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
+        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated")
+        );
 
         Long count = userVocabularyService.countByUserLogin(userLogin);
         return ResponseEntity.ok().body(count);

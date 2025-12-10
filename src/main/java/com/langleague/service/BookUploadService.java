@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,6 +41,7 @@ public class BookUploadService {
     private final ChatbotService chatbotService;
     private final ObjectMapper objectMapper;
     private final BookUploadMapper bookUploadMapper;
+    private final BookUploadAsyncProcessor asyncProcessor;
 
     public BookUploadService(
         BookUploadRepository bookUploadRepository,
@@ -55,7 +55,8 @@ public class BookUploadService {
         FileStorageService fileStorageService,
         ChatbotService chatbotService,
         ObjectMapper objectMapper,
-        BookUploadMapper bookUploadMapper
+        BookUploadMapper bookUploadMapper,
+        BookUploadAsyncProcessor asyncProcessor
     ) {
         this.bookUploadRepository = bookUploadRepository;
         this.bookRepository = bookRepository;
@@ -69,13 +70,25 @@ public class BookUploadService {
         this.chatbotService = chatbotService;
         this.objectMapper = objectMapper;
         this.bookUploadMapper = bookUploadMapper;
+        this.asyncProcessor = asyncProcessor;
     }
 
     /**
-     * Upload a file and create BookUpload record
+     * Upload a file and create BookUpload record (AI mode)
      */
     public BookUploadDTO initiateUpload(MultipartFile file) throws Exception {
-        LOG.info("Initiating book upload for file: {}", file.getOriginalFilename());
+        return initiateUpload(file, null, true);
+    }
+
+    /**
+     * Upload a file with manual metadata (Hybrid mode)
+     *
+     * @param file the file to upload
+     * @param metadata manual metadata (null if using AI)
+     * @param useAI true to use AI extraction, false for manual input
+     */
+    public BookUploadDTO initiateUpload(MultipartFile file, BookMetadataDTO metadata, boolean useAI) throws Exception {
+        LOG.info("Initiating book upload for file: {} (useAI: {})", file.getOriginalFilename(), useAI);
 
         // Validate file
         validateFile(file);
@@ -100,51 +113,31 @@ public class BookUploadService {
         bookUpload.setUploadedBy(appUser);
         bookUpload.setUploadedAt(Instant.now());
         bookUpload.setRetryCount(0);
+        bookUpload.setUseAI(useAI);
 
         bookUpload = bookUploadRepository.save(bookUpload);
 
-        // Process async
-        processUploadAsync(bookUpload.getId(), file);
+        if (useAI) {
+            // CRITICAL FIX: Call async processor from separate service
+            // This ensures @Async annotation works properly (external call through proxy)
+            // Internal calls within same class don't trigger Spring AOP proxy
+            asyncProcessor.processUploadAsync(bookUpload.getId(), file);
+        } else {
+            // Create book directly from manual metadata
+            if (metadata == null) {
+                throw new Exception("Metadata is required when not using AI");
+            }
+            createBookFromManualInput(bookUpload.getId(), metadata);
+        }
 
         return bookUploadMapper.toDto(bookUpload);
     }
 
     /**
-     * Process upload asynchronously
+     * REMOVED: processUploadAsync method moved to BookUploadAsyncProcessor
+     * Reason: @Async doesn't work when called from same class (internal call)
+     * See: BookUploadAsyncProcessor.processUploadAsync()
      */
-    @Async
-    public void processUploadAsync(Long uploadId, MultipartFile file) {
-        LOG.info("Starting async processing for upload ID: {}", uploadId);
-
-        try {
-            // Update status to PROCESSING
-            updateUploadStatus(uploadId, UploadStatus.PROCESSING);
-
-            // Extract book info using chatbot
-            BookExtractionDTO extractionDTO = chatbotService.extractBookInfo(file);
-            chatbotService.validateExtraction(extractionDTO);
-
-            // Save chatbot response
-            String chatbotResponse = objectMapper.writeValueAsString(extractionDTO);
-            BookUpload upload = bookUploadRepository.findById(uploadId).orElseThrow();
-            upload.setChatbotResponse(chatbotResponse);
-            bookUploadRepository.save(upload);
-
-            // Create book and chapters
-            Book createdBook = createBookFromExtraction(extractionDTO, upload);
-
-            // Update upload record
-            upload.setCreatedBook(createdBook);
-            upload.setStatus(UploadStatus.COMPLETED);
-            upload.setProcessedAt(Instant.now());
-            bookUploadRepository.save(upload);
-
-            LOG.info("Successfully processed upload ID: {}", uploadId);
-        } catch (Exception e) {
-            LOG.error("Failed to process upload ID: {}", uploadId, e);
-            handleProcessingError(uploadId, e);
-        }
-    }
 
     /**
      * Create Book and Chapters from extraction DTO
@@ -180,7 +173,7 @@ public class BookUploadService {
     private void createChapter(ChapterExtractionDTO chapterDTO, Book book) {
         Chapter chapter = new Chapter();
         chapter.setTitle(chapterDTO.getTitle());
-        // Note: Chapter entity doesn't have description field
+
         // chapter.setDescription(chapterDTO.getDescription());
         chapter.setOrderIndex(chapterDTO.getOrderIndex());
         chapter.setBook(book);
@@ -244,6 +237,45 @@ public class BookUploadService {
     }
 
     /**
+     * Create book directly from manual metadata (no AI)
+     */
+    private void createBookFromManualInput(Long uploadId, BookMetadataDTO metadata) {
+        LOG.info("Creating book from manual input for upload ID: {}", uploadId);
+
+        try {
+            BookUpload upload = bookUploadRepository.findById(uploadId).orElseThrow();
+
+            // Update status to PROCESSING
+            upload.setStatus(UploadStatus.PROCESSING);
+            bookUploadRepository.save(upload);
+
+            // Create Book
+            Book book = new Book();
+            book.setTitle(metadata.getTitle());
+            book.setLevel(metadata.getLevel());
+            book.setDescription(metadata.getDescription());
+            book.setThumbnail(metadata.getThumbnailUrl());
+            book.setIsActive(false); // Admin review required
+            book.setAverageRating(0.0);
+            book.setTotalReviews(0L);
+
+            book = bookRepository.save(book);
+
+            // Update upload record
+            upload.setCreatedBook(book);
+            upload.setStatus(UploadStatus.COMPLETED);
+            upload.setProcessedAt(Instant.now());
+            upload.setChatbotResponse("Manual input - no AI used");
+            bookUploadRepository.save(upload);
+
+            LOG.info("Successfully created book from manual input. Upload ID: {}, Book ID: {}", uploadId, book.getId());
+        } catch (Exception e) {
+            LOG.error("Failed to create book from manual input: {}", e.getMessage());
+            handleProcessingError(uploadId, e);
+        }
+    }
+
+    /**
      * Validate uploaded file
      */
     private void validateFile(MultipartFile file) throws Exception {
@@ -251,24 +283,44 @@ public class BookUploadService {
             throw new Exception("File is empty");
         }
 
-        // Check file size (max 50MB)
-        long maxSize = 50 * 1024 * 1024; // 50MB
+        // Check file size (max 200MB)
+        long maxSize = 200 * 1024 * 1024; // 200MB
         if (file.getSize() > maxSize) {
-            throw new Exception("File size exceeds maximum limit of 50MB");
+            throw new Exception("File size exceeds maximum limit of 200MB");
         }
 
-        // Check file type
+        // Check file type - support more formats
         String contentType = file.getContentType();
+        String fileName = file.getOriginalFilename();
+
         List<String> allowedTypes = List.of(
             "application/pdf",
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            "application/msword",
-            "text/plain"
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
+            "application/msword", // .doc
+            "application/epub+zip", // .epub
+            "text/plain" // .txt
         );
 
-        if (contentType == null || !allowedTypes.contains(contentType)) {
-            throw new Exception("Invalid file type. Allowed types: PDF, DOCX, DOC, TXT");
+        // Validate by content type
+        if (contentType != null && allowedTypes.contains(contentType)) {
+            return;
         }
+
+        // Fallback: validate by file extension
+        if (fileName != null) {
+            String lowerFileName = fileName.toLowerCase();
+            if (
+                lowerFileName.endsWith(".pdf") ||
+                lowerFileName.endsWith(".docx") ||
+                lowerFileName.endsWith(".doc") ||
+                lowerFileName.endsWith(".epub") ||
+                lowerFileName.endsWith(".txt")
+            ) {
+                return;
+            }
+        }
+
+        throw new Exception("Invalid file type. Allowed types: PDF, DOCX, DOC, EPUB, TXT (max 200MB)");
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.langleague.web.rest.vm;
 
 import com.langleague.service.dto.AdminUserDTO;
+import com.langleague.service.validator.PasswordStrengthValidator;
 import jakarta.validation.constraints.Size;
 
 /**
@@ -8,11 +9,12 @@ import jakarta.validation.constraints.Size;
  */
 public class ManagedUserVM extends AdminUserDTO {
 
-    public static final int PASSWORD_MIN_LENGTH = 4;
+    public static final int PASSWORD_MIN_LENGTH = 8;
 
     public static final int PASSWORD_MAX_LENGTH = 100;
 
     @Size(min = PASSWORD_MIN_LENGTH, max = PASSWORD_MAX_LENGTH)
+    @PasswordStrengthValidator
     private String password;
 
     public ManagedUserVM() {

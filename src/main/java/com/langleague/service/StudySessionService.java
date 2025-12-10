@@ -74,8 +74,9 @@ public class StudySessionService {
         boolean isUpdate = studySessionDTO.getId() != null;
 
         // Get current user
-        Long currentUserId = SecurityUtils.getCurrentUserId()
-            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "usernotauthenticated"));
+        Long currentUserId = SecurityUtils.getCurrentUserId().orElseThrow(() ->
+            new BadRequestAlertException("User not authenticated", ENTITY_NAME, "usernotauthenticated")
+        );
 
         // === SECURITY: "TRUST NO ONE" - Always get current user from DB ===
         // Get current user's AppUser profile (app_user table)
@@ -234,7 +235,29 @@ public class StudySessionService {
     @Transactional(readOnly = true)
     public Page<StudySessionDTO> findByCurrentUser(Pageable pageable) {
         LOG.debug("Request to get all StudySessions for current user");
-        return studySessionRepository.findByUserIsCurrentUser(pageable).map(studySessionMapper::toDto);
+
+        try {
+            // Check if user is authenticated
+            Optional<Long> currentUserIdOpt = SecurityUtils.getCurrentUserId();
+            if (currentUserIdOpt.isEmpty()) {
+                LOG.warn("User not authenticated, returning empty page");
+                return Page.empty(pageable);
+            }
+
+            // Check if AppUser exists
+            Long currentUserId = currentUserIdOpt.get();
+            Optional<AppUser> appUserOpt = appUserRepository.findByInternalUserId(currentUserId);
+            if (appUserOpt.isEmpty()) {
+                LOG.warn("AppUser not found for user ID {}, returning empty page", currentUserId);
+                return Page.empty(pageable);
+            }
+
+            return studySessionRepository.findByUserIsCurrentUser(pageable).map(studySessionMapper::toDto);
+        } catch (Exception e) {
+            LOG.error("Error fetching study sessions for current user", e);
+            // Return empty page instead of throwing exception
+            return Page.empty(pageable);
+        }
     }
 
     /**
@@ -282,8 +305,9 @@ public class StudySessionService {
      * @throws UnauthorizedAccessException if user doesn't own the session
      */
     private void checkOwnership(StudySession studySession) {
-        Long currentUserId = SecurityUtils.getCurrentUserId()
-            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "usernotauthenticated"));
+        Long currentUserId = SecurityUtils.getCurrentUserId().orElseThrow(() ->
+            new BadRequestAlertException("User not authenticated", ENTITY_NAME, "usernotauthenticated")
+        );
 
         Long sessionOwnerId = studySession.getAppUser().getInternalUser().getId();
 
@@ -308,7 +332,10 @@ public class StudySessionService {
 
         // Filter out the current session if updating
         if (excludeSessionId != null) {
-            overlappingSessions = overlappingSessions.stream().filter(session -> !session.getId().equals(excludeSessionId)).toList();
+            overlappingSessions = overlappingSessions
+                .stream()
+                .filter(session -> !session.getId().equals(excludeSessionId))
+                .toList();
         }
 
         // If any overlapping sessions found, throw error

@@ -33,7 +33,9 @@
     "download": "Download",
     "upload": "Upload",
     "success": "Success",
-    "error": "Error"
+    "error": "Error",
+    "reviews": "reviews",
+    "noDescription": "No description"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -72,8 +74,15 @@
   "menu": {
     "dashboard": "Dashboard",
     "bookLibrary": "Book Library",
+    "myBooks": "My Books",
+    "myChapters": "My Chapters",
+    "flashcard": "Flashcard",
     "myProfile": "My Profile",
-    "settings": "Settings"
+    "settings": "Settings",
+    "userManagement": "User Management",
+    "overview": "Overview",
+    "bookManagement": "Book Management",
+    "uploadBooks": "Upload Books"
   },
   "profile": {
     "title": "Account Information",

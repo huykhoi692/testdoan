@@ -39,12 +39,16 @@ module.exports = async () =>
               options: {
                 url: false,
                 sourceMap: false,
+                modules: false,
               },
             },
             {
               loader: 'postcss-loader',
               options: {
                 sourceMap: false,
+                postcssOptions: {
+                  plugins: [require('autoprefixer')],
+                },
               },
             },
             {
@@ -99,6 +103,14 @@ module.exports = async () =>
         }),
         new CssMinimizerPlugin({
           parallel: true,
+          minimizerOptions: {
+            preset: [
+              'default',
+              {
+                discardComments: { removeAll: true },
+              },
+            ],
+          },
         }),
       ],
     },
@@ -107,6 +119,7 @@ module.exports = async () =>
         // Options similar to the same options in webpackOptions.output
         filename: 'content/[name].[contenthash].css',
         chunkFilename: 'content/[name].[chunkhash].css',
+        ignoreOrder: true,
       }),
       new webpack.LoaderOptionsPlugin({
         minimize: true,

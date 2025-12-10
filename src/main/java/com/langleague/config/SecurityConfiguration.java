@@ -5,7 +5,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 import com.langleague.security.*;
 import com.langleague.security.OAuth2AuthenticationSuccessHandler;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.stream.Collectors;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -135,11 +134,7 @@ public class SecurityConfiguration {
                     .requestMatchers(mvc.pattern("/api/authorities/**"))
                     .hasAuthority("ROLE_ADMIN")
                     // System-wide reports and statistics
-                    .requestMatchers(mvc.pattern("/api/learning-reports/system-stats"))
-                    .hasAuthority("ROLE_ADMIN")
-                    .requestMatchers(mvc.pattern("/api/learning-reports/user-activity"))
-                    .hasAuthority("ROLE_ADMIN")
-                    .requestMatchers(mvc.pattern("/api/learning-reports/popular-content"))
+                    .requestMatchers(mvc.pattern("/api/learning-reports/admin/**"))
                     .hasAuthority("ROLE_ADMIN")
                     // ============================================================
                     // ACCOUNT MANAGEMENT - Authenticated users manage their own account
@@ -160,11 +155,19 @@ public class SecurityConfiguration {
                     // USER PERSONAL DATA - Authenticated users manage their own data
                     // ============================================================
                     // User's personal learning data (can create/update their own)
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/study-sessions/**"))
+                    .authenticated()
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/study-sessions"))
                     .authenticated()
                     .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/study-sessions/**"))
                     .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/study-sessions/**"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/exercise-results/**"))
+                    .authenticated()
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/exercise-results"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/user-vocabularies/**"))
                     .authenticated()
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/user-vocabularies"))
                     .authenticated()
@@ -172,38 +175,60 @@ public class SecurityConfiguration {
                     .authenticated()
                     .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/user-vocabularies/**"))
                     .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/user-grammars/**"))
+                    .authenticated()
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/user-grammars"))
                     .authenticated()
                     .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/user-grammars/**"))
                     .authenticated()
                     .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/user-grammars/**"))
                     .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/book-progress/**"))
+                    .authenticated()
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/book-progress"))
                     .authenticated()
                     .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/book-progress/**"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/book-progress/**"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/chapter-progress/**"))
                     .authenticated()
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/chapter-progress"))
                     .authenticated()
                     .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/chapter-progress/**"))
                     .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/chapter-progress/**"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/learning-streaks/**"))
+                    .authenticated()
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/learning-streaks"))
                     .authenticated()
                     .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/learning-streaks/**"))
                     .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/learning-streaks/**"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/user-achievements/**"))
+                    .authenticated()
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/user-achievements"))
                     .authenticated()
                     // User can manage their own comments, reviews, favorites
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/comments/**"))
+                    .authenticated()
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/comments"))
                     .authenticated()
                     .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/comments/**"))
                     .authenticated()
                     .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/comments/**"))
                     .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/book-reviews/**"))
+                    .authenticated()
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/book-reviews"))
                     .authenticated()
                     .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/book-reviews/**"))
                     .authenticated()
                     .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/book-reviews/**"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/favorites/**"))
                     .authenticated()
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/favorites"))
                     .authenticated()
@@ -217,7 +242,51 @@ public class SecurityConfiguration {
                     .requestMatchers(mvc.pattern("/api/learning-reports/history"))
                     .authenticated()
                     // Notification management
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/notifications/**"))
+                    .authenticated()
                     .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/notifications/**"))
+                    .authenticated()
+                    // ============================================================
+                    // FILE UPLOAD - Different access levels based on file type
+                    // ============================================================
+                    // Avatar upload - authenticated users
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/files/upload/avatar"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/files/upload/avatar-url"))
+                    .authenticated()
+                    // Document upload - Admin & Staff only
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/files/upload/document"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    // Audio/Image upload - authenticated (for exercises, content)
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/files/upload/**"))
+                    .authenticated()
+                    // File download - authenticated users
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/files/download/**"))
+                    .authenticated()
+                    // File deletion - authenticated (user can delete their own)
+                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/files/**"))
+                    .authenticated()
+                    // ============================================================
+                    // USER BOOK LIBRARY - Authenticated users manage their book library
+                    // ============================================================
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/user/my-books/**"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/user/my-books/**"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/user/my-books/**"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/user/my-books/**"))
+                    .authenticated()
+                    // ============================================================
+                    // USER CHAPTER LIBRARY - Authenticated users manage their saved chapters
+                    // ============================================================
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/user/saved-chapters/**"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/user/saved-chapters/**"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.PUT, "/api/user/saved-chapters/**"))
+                    .authenticated()
+                    .requestMatchers(mvc.pattern(HttpMethod.DELETE, "/api/user/saved-chapters/**"))
                     .authenticated()
                     // ============================================================
                     // CONTENT MANAGEMENT - ADMIN & STAFF
@@ -328,6 +397,13 @@ public class SecurityConfiguration {
                     .hasAuthority("ROLE_ADMIN")
                     // Bulk operations - Admin & Staff
                     .requestMatchers(mvc.pattern("/api/bulk-operations/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    .requestMatchers(mvc.pattern("/api/bulk/**"))
+                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
+                    // ============================================================
+                    // STAFF OPERATIONS - Book uploads and content management
+                    // ============================================================
+                    .requestMatchers(mvc.pattern("/api/staff/book-uploads/**"))
                     .hasAnyAuthority("ROLE_ADMIN", "ROLE_STAFF")
                     // ============================================================
                     // READ OPERATIONS - All authenticated users

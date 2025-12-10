@@ -202,7 +202,7 @@ const BookLessons = () => {
                     <Progress
                       percent={(bookInfo.completedLessons / bookInfo.totalLessons) * 100}
                       strokeColor="#fff"
-                      trailColor="rgba(255,255,255,0.3)"
+                      strokeLinecap="round"
                       showInfo={false}
                     />
                   </Space>

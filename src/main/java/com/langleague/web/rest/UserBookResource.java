@@ -234,8 +234,13 @@ public class UserBookResource {
         try {
             BookProgressDTO progress = userBookService.getBookProgress(bookId);
             return ResponseEntity.ok(progress);
+        } catch (RuntimeException e) {
+            LOG.error("Runtime error getting book progress for book {}: {}", bookId, e.getMessage());
+            return ResponseEntity.badRequest()
+                .headers(HeaderUtil.createFailureAlert(applicationName, true, ENTITY_NAME, "progressfailed", e.getMessage()))
+                .build();
         } catch (Exception e) {
-            LOG.error("Error getting book progress: {}", e.getMessage());
+            LOG.error("Error getting book progress for book {}: {}", bookId, e.getMessage(), e);
             return ResponseEntity.badRequest()
                 .headers(HeaderUtil.createFailureAlert(applicationName, true, ENTITY_NAME, "progressfailed", e.getMessage()))
                 .build();

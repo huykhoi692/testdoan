@@ -27,6 +27,7 @@ i18n
       'staff',
       'global',
       'home',
+      'dashboard',
       'settings',
       'error',
       'password',
@@ -58,15 +59,14 @@ i18n
     backend: {
       // Path to translation files
       loadPath: '/i18n/{{lng}}/{{ns}}.json',
-      // Add timeout and failure handling
-      crossDomain: true,
-      withCredentials: false,
     },
 
     react: {
-      // Don't wait for i18n to be fully initialized on first render
-      // This allows inline translations to render immediately while backend loads
-      useSuspense: false,
+      // Wait for i18n to be fully initialized
+      useSuspense: true,
+      // Bind i18n to component updates
+      bindI18n: 'languageChanged',
+      bindI18nStore: '',
     },
   });
 

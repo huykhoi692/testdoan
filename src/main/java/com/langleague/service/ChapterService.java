@@ -4,6 +4,7 @@ import com.langleague.domain.Chapter;
 import com.langleague.repository.ChapterRepository;
 import com.langleague.service.dto.ChapterDTO;
 import com.langleague.service.dto.ChapterDetailDTO;
+import com.langleague.service.dto.WordDTO;
 import com.langleague.service.mapper.ChapterDetailMapper;
 import com.langleague.service.mapper.ChapterMapper;
 import java.util.List;
@@ -31,10 +32,18 @@ public class ChapterService {
 
     private final ChapterDetailMapper chapterDetailMapper;
 
-    public ChapterService(ChapterRepository chapterRepository, ChapterMapper chapterMapper, ChapterDetailMapper chapterDetailMapper) {
+    private final WordService wordService;
+
+    public ChapterService(
+        ChapterRepository chapterRepository,
+        ChapterMapper chapterMapper,
+        ChapterDetailMapper chapterDetailMapper,
+        WordService wordService
+    ) {
         this.chapterRepository = chapterRepository;
         this.chapterMapper = chapterMapper;
         this.chapterDetailMapper = chapterDetailMapper;
+        this.wordService = wordService;
     }
 
     /**
@@ -269,5 +278,17 @@ public class ChapterService {
             return chapterRepository.findPreviousChapter(bookId, currentIndex).map(chapterMapper::toDto);
         }
         return Optional.empty();
+    }
+
+    /**
+     * Get all words for a specific chapter.
+     *
+     * @param chapterId the ID of the chapter
+     * @return list of words
+     */
+    @Transactional(readOnly = true)
+    public List<WordDTO> findWordsByChapterId(Long chapterId) {
+        LOG.debug("Request to get Words by chapter id : {}", chapterId);
+        return wordService.findByChapterId(chapterId);
     }
 }

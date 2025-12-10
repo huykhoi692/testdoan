@@ -1,23 +1,25 @@
-﻿import React, { useState, useEffect } from 'react';
-import { Card, Row, Col, Statistic, Typography, Tag, Space, Progress, Avatar, Timeline, Button, message } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Card, Row, Col, Typography, Tag, Space, Progress, Avatar, Timeline, Button, message, Skeleton } from 'antd';
 import {
   UserOutlined,
   BookOutlined,
   TrophyOutlined,
-  RiseOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
   TeamOutlined,
   LineChartOutlined,
+  ArrowUpOutlined,
 } from '@ant-design/icons';
 import { Line, Column } from '@ant-design/plots';
 import { useAppDispatch } from 'app/config/store';
 import { getAdminStatistics, AdminStatisticsDTO } from 'app/shared/services/learning-report.service';
+import { useTranslation } from 'react-i18next';
 
 const { Title, Text } = Typography;
 
 const AdminOverview: React.FC = () => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation(['admin', 'common']);
   const [loading, setLoading] = useState(false);
   const [statistics, setStatistics] = useState<AdminStatisticsDTO>({});
 
@@ -154,10 +156,10 @@ const AdminOverview: React.FC = () => {
               level={2}
               style={{ color: 'white', margin: 0, marginBottom: 8, fontFamily: 'Inter, system-ui, sans-serif', fontWeight: 600 }}
             >
-              Welcome, Admin! 👋
+              {t('admin:dashboard.welcome')} 👋
             </Title>
             <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: '16px', fontFamily: 'Inter, system-ui, sans-serif' }}>
-              Overview of LangLeague Platform
+              {t('admin:dashboard.subtitle')}
             </Text>
           </Col>
           <Col>
@@ -180,109 +182,180 @@ const AdminOverview: React.FC = () => {
         </Row>
       </Card>
 
-      {/* Stats Cards - Academic Style */}
+      {/* Stats Cards - Enhanced with Gradients */}
       <Row gutter={[24, 24]} style={{ marginBottom: 24 }}>
         <Col xs={24} sm={12} lg={6}>
           <Card
             hoverable
-            style={{ borderRadius: 12, border: '1px solid #e8eaed', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}
-            loading={loading}
+            className="transition-all duration-300 hover:-translate-y-1"
+            style={{
+              borderRadius: 16,
+              border: 'none',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              boxShadow: '0 4px 12px rgba(102, 126, 234, 0.2)',
+            }}
           >
-            <Statistic
-              title={
-                <Text strong style={{ fontFamily: 'Inter, system-ui, sans-serif', fontSize: '14px', color: '#4b5563' }}>
-                  Total Users
-                </Text>
-              }
-              value={userStats.total}
-              prefix={<UserOutlined style={{ color: '#2c5282' }} />}
-              suffix={
-                userStats.growth > 0 ? (
-                  <Tag color="green" style={{ marginLeft: 8, borderRadius: '6px' }}>
-                    +{userStats.growth.toFixed(1)}%
+            {loading ? (
+              <Skeleton active />
+            ) : (
+              <div style={{ textAlign: 'center' }}>
+                <div
+                  style={{
+                    width: 64,
+                    height: 64,
+                    background: 'rgba(255,255,255,0.2)',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 16px',
+                  }}
+                >
+                  <TeamOutlined style={{ fontSize: 32, color: '#fff' }} />
+                </div>
+                <div style={{ marginBottom: 8 }}>
+                  <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 14 }}>{t('admin:dashboard.totalUsers')}</Text>
+                </div>
+                <div style={{ marginBottom: 8 }}>
+                  <Text strong style={{ color: '#fff', fontSize: 32, fontWeight: 700 }}>
+                    {userStats.total}
+                  </Text>
+                </div>
+                {userStats.growth > 0 && (
+                  <Tag color="success" style={{ borderRadius: 8, border: 'none' }}>
+                    <ArrowUpOutlined /> +{userStats.growth}%
                   </Tag>
-                ) : null
-              }
-              valueStyle={{ color: '#1e3a5f', fontWeight: 600 }}
-            />
-            <div style={{ marginTop: 12 }}>
-              <Text type="secondary" style={{ fontSize: '12px', fontFamily: 'Inter, system-ui, sans-serif' }}>
-                Active users: {userStats.active}
-              </Text>
-            </div>
+                )}
+              </div>
+            )}
           </Card>
         </Col>
-
         <Col xs={24} sm={12} lg={6}>
           <Card
             hoverable
-            style={{ borderRadius: 12, border: '1px solid #e8eaed', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}
-            loading={loading}
+            className="transition-all duration-300 hover:-translate-y-1"
+            style={{
+              borderRadius: 16,
+              border: 'none',
+              background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+              boxShadow: '0 4px 12px rgba(240, 147, 251, 0.2)',
+            }}
           >
-            <Statistic
-              title={
-                <Text strong style={{ fontFamily: 'Inter, system-ui, sans-serif', fontSize: '14px', color: '#4b5563' }}>
-                  Books
-                </Text>
-              }
-              value={courseStats.total}
-              prefix={<BookOutlined style={{ color: '#2c5282' }} />}
-              valueStyle={{ color: '#1e3a5f', fontWeight: 600 }}
-            />
-            <div style={{ marginTop: 12 }}>
-              <Text type="secondary" style={{ fontSize: '12px', fontFamily: 'Inter, system-ui, sans-serif' }}>
-                Published: {courseStats.published} | Draft: {courseStats.draft}
-              </Text>
-            </div>
+            {loading ? (
+              <Skeleton active />
+            ) : (
+              <div style={{ textAlign: 'center' }}>
+                <div
+                  style={{
+                    width: 64,
+                    height: 64,
+                    background: 'rgba(255,255,255,0.2)',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 16px',
+                  }}
+                >
+                  <UserOutlined style={{ fontSize: 32, color: '#fff' }} />
+                </div>
+                <div style={{ marginBottom: 8 }}>
+                  <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 14 }}>{t('admin:dashboard.activeUsers')}</Text>
+                </div>
+                <div style={{ marginBottom: 8 }}>
+                  <Text strong style={{ color: '#fff', fontSize: 32, fontWeight: 700 }}>
+                    {userStats.active}
+                  </Text>
+                </div>
+                <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 12 }}>{t('admin:dashboard.thisWeek')}</Text>
+              </div>
+            )}
           </Card>
         </Col>
-
         <Col xs={24} sm={12} lg={6}>
           <Card
             hoverable
-            style={{ borderRadius: 12, border: '1px solid #e8eaed', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}
-            loading={loading}
+            className="transition-all duration-300 hover:-translate-y-1"
+            style={{
+              borderRadius: 16,
+              border: 'none',
+              background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+              boxShadow: '0 4px 12px rgba(79, 172, 254, 0.2)',
+            }}
           >
-            <Statistic
-              title={
-                <Text strong style={{ fontFamily: 'Inter, system-ui, sans-serif', fontSize: '14px', color: '#4b5563' }}>
-                  Completions
+            {loading ? (
+              <Skeleton active />
+            ) : (
+              <div style={{ textAlign: 'center' }}>
+                <div
+                  style={{
+                    width: 64,
+                    height: 64,
+                    background: 'rgba(255,255,255,0.2)',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 16px',
+                  }}
+                >
+                  <BookOutlined style={{ fontSize: 32, color: '#fff' }} />
+                </div>
+                <div style={{ marginBottom: 8 }}>
+                  <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 14 }}>{t('admin:dashboard.totalCourses')}</Text>
+                </div>
+                <div style={{ marginBottom: 8 }}>
+                  <Text strong style={{ color: '#fff', fontSize: 32, fontWeight: 700 }}>
+                    {courseStats.total}
+                  </Text>
+                </div>
+                <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 12 }}>
+                  {courseStats.published} {t('admin:dashboard.published')}
                 </Text>
-              }
-              value={courseStats.completed}
-              prefix={<TrophyOutlined style={{ color: '#52c41a' }} />}
-              valueStyle={{ color: '#52c41a', fontWeight: 600 }}
-            />
-            <div style={{ marginTop: 12 }}>
-              <Text type="secondary" style={{ fontSize: '12px', fontFamily: 'Inter, system-ui, sans-serif' }}>
-                Total lessons completed
-              </Text>
-            </div>
+              </div>
+            )}
           </Card>
         </Col>
-
         <Col xs={24} sm={12} lg={6}>
           <Card
             hoverable
-            style={{ borderRadius: 12, border: '1px solid #e8eaed', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}
-            loading={loading}
+            className="transition-all duration-300 hover:-translate-y-1"
+            style={{
+              borderRadius: 16,
+              border: 'none',
+              background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+              boxShadow: '0 4px 12px rgba(250, 112, 154, 0.2)',
+            }}
           >
-            <Statistic
-              title={
-                <Text strong style={{ fontFamily: 'Inter, system-ui, sans-serif', fontSize: '14px', color: '#4b5563' }}>
-                  New Users
-                </Text>
-              }
-              value={userStats.new}
-              prefix={<RiseOutlined style={{ color: '#1e3a5f' }} />}
-              suffix={<Text type="secondary">/week</Text>}
-              valueStyle={{ color: '#1e3a5f', fontWeight: 600 }}
-            />
-            <div style={{ marginTop: 12 }}>
-              <Text type="secondary" style={{ fontSize: '12px', fontFamily: 'Inter, system-ui, sans-serif' }}>
-                Growth: +{userStats.growth.toFixed(1)}%
-              </Text>
-            </div>
+            {loading ? (
+              <Skeleton active />
+            ) : (
+              <div style={{ textAlign: 'center' }}>
+                <div
+                  style={{
+                    width: 64,
+                    height: 64,
+                    background: 'rgba(255,255,255,0.2)',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 16px',
+                  }}
+                >
+                  <TrophyOutlined style={{ fontSize: 32, color: '#fff' }} />
+                </div>
+                <div style={{ marginBottom: 8 }}>
+                  <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 14 }}>{t('admin:dashboard.completions')}</Text>
+                </div>
+                <div style={{ marginBottom: 8 }}>
+                  <Text strong style={{ color: '#fff', fontSize: 32, fontWeight: 700 }}>
+                    {courseStats.completed}
+                  </Text>
+                </div>
+                <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 12 }}>{t('admin:dashboard.totalAchievements')}</Text>
+              </div>
+            )}
           </Card>
         </Col>
       </Row>
@@ -295,7 +368,7 @@ const AdminOverview: React.FC = () => {
               <Space>
                 <LineChartOutlined style={{ color: '#2c5282' }} />
                 <Text strong style={{ fontFamily: 'Inter, system-ui, sans-serif', fontSize: '16px', color: '#1e3a5f' }}>
-                  User Growth
+                  {t('admin:dashboard.userGrowth')}
                 </Text>
               </Space>
             }
@@ -306,7 +379,7 @@ const AdminOverview: React.FC = () => {
             ) : (
               <div style={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Text type="secondary" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-                  {loading ? 'Loading...' : 'No data available'}
+                  {loading ? t('admin:dashboard.loading') : t('admin:dashboard.noData')}
                 </Text>
               </div>
             )}
@@ -319,7 +392,7 @@ const AdminOverview: React.FC = () => {
               <Space>
                 <TrophyOutlined style={{ color: '#2c5282' }} />
                 <Text strong style={{ fontFamily: 'Inter, system-ui, sans-serif', fontSize: '16px', color: '#1e3a5f' }}>
-                  Top Books
+                  {t('admin:dashboard.topBooks')}
                 </Text>
               </Space>
             }
@@ -330,7 +403,7 @@ const AdminOverview: React.FC = () => {
             ) : (
               <div style={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Text type="secondary" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-                  {loading ? 'Loading...' : 'No data available'}
+                  {loading ? t('admin:dashboard.loading') : t('admin:dashboard.noData')}
                 </Text>
               </div>
             )}

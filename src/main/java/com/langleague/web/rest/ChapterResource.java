@@ -169,6 +169,7 @@ public class ChapterResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of chapters in body.
      */
     @GetMapping("")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ChapterDTO>> getAllChapters(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         LOG.debug("REST request to get a page of Chapters");
         Page<ChapterDTO> page = chapterService.findAll(pageable);
@@ -183,6 +184,7 @@ public class ChapterResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the chapterDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ChapterDTO> getChapter(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Chapter : {}", id);
         Optional<ChapterDTO> chapterDTO = chapterService.findOne(id);
@@ -214,6 +216,7 @@ public class ChapterResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of chapters in body.
      */
     @GetMapping("/book/{bookId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ChapterDTO>> getChaptersByBook(@PathVariable("bookId") Long bookId) {
         LOG.debug("REST request to get Chapters by book id : {}", bookId);
         List<ChapterDTO> chapters = chapterService.findByBookId(bookId);
@@ -228,10 +231,31 @@ public class ChapterResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the chapterDetailDTO with details, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}/details")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ChapterDetailDTO> getChapterWithDetails(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Chapter with details : {}", id);
         Optional<ChapterDetailDTO> chapterDetailDTO = chapterService.findOneWithDetails(id);
         return ResponseUtil.wrapOrNotFound(chapterDetailDTO);
+    }
+
+    /**
+     * {@code GET  /chapters/:id/words} : get all words for a specific chapter.
+     * This is an alias for /words/chapter/:chapterId for frontend compatibility
+     *
+     * @param id the id of the chapter.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of words in body.
+     */
+    @GetMapping("/{id}/words")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<java.util.List<com.langleague.service.dto.WordDTO>> getChapterWords(@PathVariable("id") Long id) {
+        LOG.debug("REST request to get Words for Chapter : {}", id);
+        try {
+            java.util.List<com.langleague.service.dto.WordDTO> words = chapterService.findWordsByChapterId(id);
+            return ResponseEntity.ok().body(words);
+        } catch (Exception e) {
+            LOG.error("Error getting words for chapter {}: {}", id, e.getMessage());
+            return ResponseEntity.ok().body(java.util.Collections.emptyList());
+        }
     }
 
     /**
@@ -243,6 +267,7 @@ public class ChapterResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of matching chapters in body.
      */
     @GetMapping("/search")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ChapterDTO>> searchChapters(
         @RequestParam(required = false) String keyword,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
@@ -260,6 +285,7 @@ public class ChapterResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
      */
     @GetMapping("/count/book/{bookId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Long> countChaptersByBook(@PathVariable("bookId") Long bookId) {
         LOG.debug("REST request to count Chapters by book id : {}", bookId);
         long count = chapterService.countByBookId(bookId);
@@ -288,6 +314,7 @@ public class ChapterResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the next chapterDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}/next")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ChapterDTO> getNextChapter(@PathVariable("id") Long id) {
         LOG.debug("REST request to get next Chapter after chapter id : {}", id);
         Optional<ChapterDTO> nextChapter = chapterService.findNextChapter(id);
@@ -301,6 +328,7 @@ public class ChapterResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the previous chapterDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}/previous")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ChapterDTO> getPreviousChapter(@PathVariable("id") Long id) {
         LOG.debug("REST request to get previous Chapter before chapter id : {}", id);
         Optional<ChapterDTO> previousChapter = chapterService.findPreviousChapter(id);

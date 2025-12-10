@@ -1,5 +1,6 @@
 package com.langleague.web.rest;
 
+import com.langleague.security.AuthoritiesConstants;
 import com.langleague.service.FileStorageService;
 import com.langleague.web.rest.errors.BadRequestAlertException;
 import com.langleague.web.rest.vm.ApiResponse;
@@ -13,6 +14,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -55,8 +57,9 @@ public class FileUploadResource {
             validateImageFile(file, 5 * 1024 * 1024); // 5MB max
 
             // Get current user
-            String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin()
-                .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
+            String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+                new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated")
+            );
 
             // Store file
             String fileName = fileStorageService.storeFile(file, "avatars", userLogin);
@@ -72,6 +75,39 @@ public class FileUploadResource {
         } catch (Exception e) {
             LOG.error("Error uploading avatar: {}", e.getMessage(), e);
             return ResponseEntity.badRequest().body(ApiResponse.error("Failed to upload avatar: " + e.getMessage(), "UPLOAD_FAILED"));
+        }
+    }
+
+    /**
+     * {@code POST  /files/upload/avatar-url} : Set avatar from URL.
+     * Use case 13: Change avatar (from web URL)
+     *
+     * @param request containing imageUrl
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and file URL in body.
+     */
+    @PostMapping("/upload/avatar-url")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<Map<String, String>>> uploadAvatarFromUrl(@RequestBody Map<String, String> request) {
+        String imageUrl = request.get("imageUrl");
+        LOG.debug("REST request to set avatar from URL: {}", imageUrl);
+
+        try {
+            if (imageUrl == null || imageUrl.trim().isEmpty()) {
+                throw new BadRequestAlertException("Image URL is required", ENTITY_NAME, "imageurlrequired");
+            }
+
+            // Validate URL format
+            if (!imageUrl.startsWith("http://") && !imageUrl.startsWith("https://")) {
+                throw new BadRequestAlertException("Invalid URL format", ENTITY_NAME, "invalidurl");
+            }
+
+            Map<String, String> result = new HashMap<>();
+            result.put("imageUrl", imageUrl);
+
+            return ResponseEntity.ok(ApiResponse.success(result, "Avatar URL set successfully"));
+        } catch (Exception e) {
+            LOG.error("Error setting avatar URL: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest().body(ApiResponse.error("Failed to set avatar URL: " + e.getMessage(), "UPLOAD_FAILED"));
         }
     }
 
@@ -142,16 +178,17 @@ public class FileUploadResource {
     /**
      * {@code POST  /files/upload/document} : Upload document file.
      *
-     * @param file the document file to upload (max 50MB, pdf/doc/docx).
+     * @param file the document file to upload (max 200MB, pdf/doc/docx/epub/txt).
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and file URL in body.
      */
     @PostMapping("/upload/document")
+    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.ADMIN + "', '" + AuthoritiesConstants.STAFF + "')")
     public ResponseEntity<ApiResponse<Map<String, String>>> uploadDocument(@RequestParam("file") MultipartFile file) {
         LOG.debug("REST request to upload document file: {}", file.getOriginalFilename());
 
         try {
             // Validate file
-            validateDocumentFile(file, 50 * 1024 * 1024); // 50MB max
+            validateDocumentFile(file, 200 * 1024 * 1024); // 200MB max
 
             // Store file
             String fileName = fileStorageService.storeFile(file, "documents", null);
@@ -270,13 +307,28 @@ public class FileUploadResource {
         }
 
         String contentType = file.getContentType();
-        if (
-            contentType == null ||
-            (!contentType.equals("application/pdf") &&
-                !contentType.equals("application/msword") &&
-                !contentType.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
-        ) {
-            throw new BadRequestAlertException("Only PDF and Word documents are allowed", ENTITY_NAME, "invalidfiletype");
+        String fileName = file.getOriginalFilename();
+        boolean isValidType =
+            contentType != null &&
+            (contentType.equals("application/pdf") ||
+                contentType.equals("application/msword") ||
+                contentType.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document") ||
+                contentType.equals("application/epub+zip") ||
+                contentType.equals("text/plain"));
+
+        // Fallback to file extension check for epub and txt
+        if (!isValidType && fileName != null) {
+            String lowerFileName = fileName.toLowerCase();
+            isValidType =
+                lowerFileName.endsWith(".pdf") ||
+                lowerFileName.endsWith(".doc") ||
+                lowerFileName.endsWith(".docx") ||
+                lowerFileName.endsWith(".epub") ||
+                lowerFileName.endsWith(".txt");
+        }
+
+        if (!isValidType) {
+            throw new BadRequestAlertException("Only PDF, Word, EPUB and TXT documents are allowed", ENTITY_NAME, "invalidfiletype");
         }
     }
 }

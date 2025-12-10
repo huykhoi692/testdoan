@@ -19,6 +19,7 @@ import {
 } from '@ant-design/icons';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
+import { TOKEN_KEY } from 'app/config/constants';
 import {
   getUnreadCount,
   getUnreadNotifications,
@@ -121,6 +122,11 @@ const getAdminMenuItems = (t: any) => [
     icon: <TeamOutlined />,
     label: t('menu.userManagement'),
   },
+  {
+    key: '/admin/book-approval',
+    icon: <BookOutlined />,
+    label: 'Duyệt Sách',
+  },
 ];
 
 const getStaffMenuItems = (t: any) => [
@@ -219,7 +225,7 @@ const DashboardLayout = () => {
       setCurrentUser(user);
     } catch (error: any) {
       // Fallback: decode JWT token
-      const token = localStorage.getItem('authToken') || sessionStorage.getItem('jhi-authenticationToken');
+      const token = localStorage.getItem(TOKEN_KEY);
       if (token) {
         const decodedUser = decodeJwtUser(token);
         if (decodedUser) {
@@ -297,9 +303,10 @@ const DashboardLayout = () => {
 
   const handleUserMenuClick = ({ key }: { key: string }) => {
     if (key === 'logout') {
-      localStorage.removeItem('authToken');
-      sessionStorage.removeItem('jhi-authenticationToken');
-      localStorage.removeItem('jhi-authenticationToken');
+      // Clear token from all storage locations (for backward compatibility)
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem('authToken'); // legacy key
+      sessionStorage.removeItem(TOKEN_KEY); // legacy location
       navigate('/login');
     } else if (key === 'profile') {
       navigate('/dashboard/profile');

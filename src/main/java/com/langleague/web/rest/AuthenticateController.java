@@ -7,6 +7,7 @@ import static com.langleague.security.SecurityUtils.USER_ID_CLAIM;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.langleague.security.CaptchaService;
 import com.langleague.security.DomainUserDetailsService.UserWithId;
+import com.langleague.security.LoginAttemptService;
 import com.langleague.web.rest.vm.LoginVM;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -53,24 +54,21 @@ public class AuthenticateController {
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final CaptchaService captchaService;
+    private final LoginAttemptService loginAttemptService;
 
     @Value("${spring.profiles.active:}")
     private String activeProfile;
 
-    //    @Value("${jhipster.security.authentication.jwt.token-validity-in-seconds:0}")
-    //    private long tokenValidityInSeconds;
-    //
-    //    @Value("${jhipster.security.authentication.jwt.token-validity-in-seconds-for-remember-me:0}")
-    //    private long tokenValidityInSecondsForRememberMe;
-
     public AuthenticateController(
         JwtEncoder jwtEncoder,
         AuthenticationManagerBuilder authenticationManagerBuilder,
-        CaptchaService captchaService
+        CaptchaService captchaService,
+        LoginAttemptService loginAttemptService
     ) {
         this.captchaService = captchaService;
         this.jwtEncoder = jwtEncoder;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
+        this.loginAttemptService = loginAttemptService;
     }
 
     /**
@@ -96,21 +94,31 @@ public class AuthenticateController {
         }
 
         // --- Authenticate user credentials ---
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-            loginVM.getUsername(),
-            loginVM.getPassword()
-        );
-        // --- Set JWT token in Authorization header ---
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        try {
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                loginVM.getUsername(),
+                loginVM.getPassword()
+            );
+            // --- Set JWT token in Authorization header ---
+            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // Handle null rememberMe - default to false
-        boolean rememberMe = loginVM.isRememberMe() != null && loginVM.isRememberMe();
-        String jwt = this.createToken(authentication, rememberMe);
+            // SUCCESS: Reset failed login attempts
+            loginAttemptService.loginSucceeded(loginVM.getUsername());
 
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setBearerAuth(jwt);
-        return new ResponseEntity<>(new JWTToken(jwt), httpHeaders, HttpStatus.OK);
+            // Handle null rememberMe - default to false
+            boolean rememberMe = loginVM.isRememberMe() != null && loginVM.isRememberMe();
+            String jwt = this.createToken(authentication, rememberMe);
+
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.setBearerAuth(jwt);
+            return new ResponseEntity<>(new JWTToken(jwt), httpHeaders, HttpStatus.OK);
+        } catch (org.springframework.security.core.AuthenticationException e) {
+            // FAILURE: Increment failed login attempts
+            loginAttemptService.loginFailed(loginVM.getUsername());
+            LOG.warn("Authentication failed for user: {}", loginVM.getUsername());
+            throw e;
+        }
     }
 
     /**
@@ -136,6 +144,15 @@ public class AuthenticateController {
             validity = now.plus(this.tokenValidityInSeconds, ChronoUnit.SECONDS);
         }
 
+        LOG.debug(
+            "Creating JWT token for user: {}, issuedAt: {}, expiresAt: {}, validitySeconds: {}, rememberMe: {}",
+            authentication.getName(),
+            now,
+            validity,
+            rememberMe ? this.tokenValidityInSecondsForRememberMe : this.tokenValidityInSeconds,
+            rememberMe
+        );
+
         // @formatter:off
         JwtClaimsSet.Builder builder = JwtClaimsSet.builder()
             .issuedAt(now)
@@ -147,7 +164,9 @@ public class AuthenticateController {
         }
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
-        return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, builder.build())).getTokenValue();
+        String token = this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, builder.build())).getTokenValue();
+        LOG.debug("JWT token created successfully for user: {}", authentication.getName());
+        return token;
     }
 
     /**

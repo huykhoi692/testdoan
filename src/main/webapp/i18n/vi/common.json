@@ -33,7 +33,9 @@
     "download": "Tải xuống",
     "upload": "Tải lên",
     "success": "Thành công",
-    "error": "Lỗi"
+    "error": "Lỗi",
+    "reviews": "đánh giá",
+    "noDescription": "Không có mô tả"
   },
   "dashboard": {
     "title": "Bảng điều khiển",
@@ -72,8 +74,15 @@
   "menu": {
     "dashboard": "Bảng điều khiển",
     "bookLibrary": "Thư viện sách",
+    "myBooks": "Sách của tôi",
+    "myChapters": "Chương của tôi",
+    "flashcard": "Thẻ ghi nhớ",
     "myProfile": "Hồ sơ của tôi",
-    "settings": "Cài đặt"
+    "settings": "Cài đặt",
+    "userManagement": "Quản lý người dùng",
+    "overview": "Tổng quan",
+    "bookManagement": "Quản lý sách",
+    "uploadBooks": "Tải sách lên"
   },
   "profile": {
     "title": "Thông tin tài khoản",

@@ -472,13 +472,13 @@ const StaffContentEditor: React.FC = () => {
       const url = result.fileUrl || result.fileName || '';
       setImageUrl(url);
       message.success('Tải ảnh thành công');
-      return false;
     } catch (error: any) {
-      message.error('Không thể tải ảnh');
-      return false;
+      message.error(error?.message || 'Không thể tải ảnh');
+      console.error('Image upload error:', error);
     } finally {
       setUploadingImage(false);
     }
+    return false;
   };
 
   const handleAudioUpload = async (file: File) => {
@@ -488,13 +488,13 @@ const StaffContentEditor: React.FC = () => {
       const url = result.fileUrl || result.fileName || '';
       setAudioUrl(url);
       message.success('Tải audio thành công');
-      return false;
     } catch (error: any) {
-      message.error('Không thể tải audio');
-      return false;
+      message.error(error?.message || 'Không thể tải audio');
+      console.error('Audio upload error:', error);
     } finally {
       setUploadingAudio(false);
     }
+    return false;
   };
 
   // ==================== Table Columns ====================

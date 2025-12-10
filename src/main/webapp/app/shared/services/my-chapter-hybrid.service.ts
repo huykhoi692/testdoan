@@ -95,7 +95,7 @@ export const removeChapter = (chapterId: number) => {
   return axios.delete(`${API_URL_SAVED}/${chapterId}`);
 };
 
-// Toggle favorite
+// Toggle favorite - calls the UserChapter endpoint for saved chapters
 export const toggleFavorite = (chapterId: number) => {
   return axios.put<UserChapterDTO>(`${API_URL_SAVED}/${chapterId}/favorite`);
 };

@@ -381,7 +381,7 @@ public class UserVocabularyService {
     }
 
     /**
-     * Save multiple words at once.
+     * Batch save multiple words for a user.
      * Use case 21: Interact with vocabulary
      *
      * @param wordIds   list of word IDs
@@ -390,28 +390,54 @@ public class UserVocabularyService {
     public void batchSaveWords(java.util.List<Long> wordIds, String userLogin) {
         LOG.debug("Request to batch save {} words for user {}", wordIds.size(), userLogin);
 
-        AppUser appUser = appUserRepository.findByInternalUser_Login(userLogin).orElseThrow(() -> new RuntimeException("User not found"));
+        try {
+            if (wordIds == null || wordIds.isEmpty()) {
+                LOG.warn("Empty word IDs list provided");
+                return;
+            }
 
-        for (Long wordId : wordIds) {
-            // Check if already saved
-            if (!userVocabularyRepository.existsByWord_IdAndAppUser_InternalUser_Login(wordId, userLogin)) {
-                Word word = wordRepository.findById(wordId).orElse(null);
-                if (word != null) {
-                    UserVocabulary userVocabulary = new UserVocabulary();
-                    userVocabulary.setWord(word);
-                    userVocabulary.setAppUser(appUser);
-                    userVocabulary.setLastReviewed(Instant.now());
-                    userVocabulary.setRemembered(false);
-                    userVocabulary.setIsMemorized(false);
-                    userVocabulary.setReviewCount(0);
-                    userVocabulary.setEaseFactor(250);
-                    userVocabulary.setIntervalDays(0);
-                    userVocabulary.setNextReviewDate(LocalDate.now());
-                    userVocabularyRepository.save(userVocabulary);
+            AppUser appUser = appUserRepository
+                .findByInternalUser_Login(userLogin)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+            int savedCount = 0;
+            int skippedCount = 0;
+
+            for (Long wordId : wordIds) {
+                try {
+                    // Check if already saved
+                    if (!userVocabularyRepository.existsByWord_IdAndAppUser_InternalUser_Login(wordId, userLogin)) {
+                        Word word = wordRepository.findById(wordId).orElse(null);
+                        if (word != null) {
+                            UserVocabulary userVocabulary = new UserVocabulary();
+                            userVocabulary.setWord(word);
+                            userVocabulary.setAppUser(appUser);
+                            userVocabulary.setLastReviewed(Instant.now());
+                            userVocabulary.setRemembered(false);
+                            userVocabulary.setIsMemorized(false);
+                            userVocabulary.setReviewCount(0);
+                            userVocabulary.setEaseFactor(250);
+                            userVocabulary.setIntervalDays(0);
+                            userVocabulary.setNextReviewDate(LocalDate.now());
+                            userVocabularyRepository.save(userVocabulary);
+                            savedCount++;
+                        } else {
+                            LOG.warn("Word with ID {} not found", wordId);
+                            skippedCount++;
+                        }
+                    } else {
+                        skippedCount++;
+                    }
+                } catch (Exception e) {
+                    LOG.error("Error saving word with ID {}: {}", wordId, e.getMessage());
+                    // Continue with next word instead of failing entire batch
                 }
             }
+            LOG.info("Batch save completed for user {}: {} saved, {} skipped", userLogin, savedCount, skippedCount);
+        } catch (Exception e) {
+            LOG.error("Error in batch save words for user {}: {}", userLogin, e.getMessage(), e);
+            throw new RuntimeException("Failed to batch save words: " + e.getMessage(), e);
         }
-        LOG.info("Batch saved {} words for user {}", wordIds.size(), userLogin);
     }
 
     /**

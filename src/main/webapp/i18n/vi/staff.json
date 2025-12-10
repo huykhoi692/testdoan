@@ -93,6 +93,43 @@
       "viewBook": "Xem Sách",
       "retry": "Thử lại",
       "error": "Lỗi"
+    },
+    "bookManagement": {
+      "title": "Quản lý Sách",
+      "search": "Tìm kiếm sách...",
+      "addBook": "Thêm Sách",
+      "editBook": "Chỉnh sửa Sách",
+      "deleteBook": "Xóa Sách",
+      "deleteConfirm": "Bạn có chắc chắn muốn xóa sách này?",
+      "bookTitle": "Tên Sách",
+      "author": "Tác Giả",
+      "level": "Cấp độ",
+      "chapters": "Chương",
+      "status": "Trạng thái",
+      "actions": "Hành động",
+      "viewChapters": "Xem Chương",
+      "processWithAI": "Xử lý với AI",
+      "form": {
+        "title": "Tên sách",
+        "author": "Tác giả",
+        "description": "Mô tả",
+        "level": "Cấp độ",
+        "thumbnail": "Ảnh bìa",
+        "uploadThumbnail": "Tải ảnh bìa lên",
+        "status": "Trạng thái"
+      },
+      "createSuccess": "Tạo sách thành công",
+      "updateSuccess": "Cập nhật sách thành công",
+      "deleteSuccess": "Xóa sách thành công",
+      "processSuccess": "Sách đang được xử lý với AI",
+      "loadError": "Không thể tải danh sách sách",
+      "createError": "Không thể tạo sách",
+      "updateError": "Không thể cập nhật sách",
+      "deleteError": "Không thể xóa sách",
+      "processError": "Không thể xử lý sách với AI",
+      "errorLoadBooks": "Không thể tải danh sách sách",
+      "errorDelete": "Không thể xóa sách",
+      "errorReprocess": "Không thể xử lý lại sách"
     }
   },
   "user": {

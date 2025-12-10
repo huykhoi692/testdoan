@@ -1,9 +1,21 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'app/shared/utils/useTranslation';
-import { Card, Form, Input, Button, Switch, message, Typography, Space, Divider, Avatar, Upload } from 'antd';
-import { SettingOutlined, UserOutlined, BellOutlined, LockOutlined, SaveOutlined, CameraOutlined } from '@ant-design/icons';
+import { Card, Form, Input, Button, Switch, message, Typography, Space, Divider, Avatar, Upload, Modal, Tabs } from 'antd';
+import {
+  SettingOutlined,
+  UserOutlined,
+  BellOutlined,
+  LockOutlined,
+  SaveOutlined,
+  CameraOutlined,
+  UploadOutlined,
+  LinkOutlined,
+  CopyOutlined,
+  CheckCircleOutlined,
+} from '@ant-design/icons';
 import type { UploadProps } from 'antd';
 import axios from 'axios';
+import { TabPane } from 'reactstrap';
 
 const { Title, Text } = Typography;
 
@@ -26,6 +38,11 @@ const StaffSettings: React.FC = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string>('');
+  const [avatarModalVisible, setAvatarModalVisible] = useState(false);
+  const [imageUrlInput, setImageUrlInput] = useState('');
+  const [pastedImage, setPastedImage] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('upload');
+  const pasteAreaRef = useRef<HTMLDivElement>(null);
   const [settings, setSettings] = useState<StaffSettings>({
     notifications: {
       emailNotifications: true,
@@ -123,6 +140,115 @@ const StaffSettings: React.FC = () => {
     }
   };
 
+  const handleAvatarFromUrl = async () => {
+    if (!imageUrlInput || !imageUrlInput.trim()) {
+      message.error('Vui lòng nhập URL hình ảnh');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await axios.post('/api/files/upload/avatar-url', {
+        imageUrl: imageUrlInput,
+      });
+
+      // Backend returns: { success: true, data: { imageUrl }, message: "..." }
+      const newImageUrl = response.data.data?.imageUrl || response.data.imageUrl || imageUrlInput;
+
+      // Update account with new avatar URL
+      await axios.post('/api/account', {
+        imageUrl: newImageUrl,
+      });
+
+      // Add cache-busting timestamp
+      const urlWithTimestamp = `${newImageUrl}?t=${Date.now()}`;
+      setAvatarUrl(urlWithTimestamp);
+      message.success('Cập nhật ảnh đại diện thành công!');
+      setAvatarModalVisible(false);
+      setImageUrlInput('');
+      setPastedImage(null);
+
+      // Reload to show new avatar
+      await loadSettings();
+    } catch (error) {
+      console.error('Error setting avatar from URL:', error);
+      message.error('Không thể cập nhật ảnh từ URL');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const uploadAvatarFile = async (file: File) => {
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await axios.post('/api/files/upload/avatar', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      // Backend returns: { success: true, data: { fileUrl, fileName }, message: "..." }
+      const fileUrl = response.data.data?.fileUrl || response.data.fileUrl || response.data.url || '';
+
+      if (fileUrl) {
+        // Add cache-busting timestamp
+        const urlWithTimestamp = `${fileUrl}?t=${Date.now()}`;
+        setAvatarUrl(urlWithTimestamp);
+
+        // Also update the account with new avatar
+        await axios.post('/api/account', {
+          imageUrl: fileUrl,
+        });
+
+        message.success('Tải ảnh thành công!');
+        setAvatarModalVisible(false);
+
+        // Reload to show new avatar
+        await loadSettings();
+      } else {
+        throw new Error('No file URL returned from server');
+      }
+    } catch (error) {
+      console.error('Avatar upload error:', error);
+      message.error('Không thể tải ảnh lên');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePaste = async (e: React.ClipboardEvent) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.type.indexOf('image') !== -1) {
+        const file = item.getAsFile();
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = event => {
+            setPastedImage(event.target?.result as string);
+          };
+          reader.readAsDataURL(file);
+          await uploadAvatarFile(file);
+        }
+        break;
+      }
+    }
+  };
+
+  const handlePasteAreaClick = () => {
+    message.info('Nhấn Ctrl+V (hoặc Cmd+V) để paste ảnh đã copy');
+    pasteAreaRef.current?.focus();
+  };
+
+  useEffect(() => {
+    if (avatarModalVisible && activeTab === 'paste') {
+      pasteAreaRef.current?.focus();
+    }
+  }, [avatarModalVisible, activeTab]);
+
   const uploadProps: UploadProps = {
     name: 'file',
     showUploadList: false,
@@ -142,15 +268,30 @@ const StaffSettings: React.FC = () => {
       formData.append('file', file);
 
       try {
-        // Use correct API endpoint /api/files/upload/avatar
         const response = await axios.post('/api/files/upload/avatar', formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
-        // API returns { success: true, data: { fileUrl, fileName, ... }, message: "..." }
-        const fileUrl = response.data.data?.fileUrl || response.data.url || '';
-        setAvatarUrl(fileUrl);
-        message.success(t('settings.avatarUploaded'));
+
+        // API returns { success: true, data: { fileUrl, fileName }, message: "..." }
+        const fileUrl = response.data.data?.fileUrl || response.data.fileUrl || response.data.url || '';
+
+        if (fileUrl) {
+          setAvatarUrl(fileUrl);
+
+          // Update account with new avatar
+          await axios.post('/api/account', {
+            imageUrl: fileUrl,
+          });
+
+          message.success(t('settings.avatarUploaded'));
+
+          // Reload settings to reflect change
+          await loadSettings();
+        } else {
+          throw new Error('No file URL returned');
+        }
       } catch (error) {
+        console.error('Avatar upload error:', error);
         message.error(t('settings.avatarUploadFailed'));
       }
 
@@ -176,13 +317,11 @@ const StaffSettings: React.FC = () => {
         style={{ marginBottom: '24px', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
       >
         <div style={{ display: 'flex', marginBottom: '24px' }}>
-          <div style={{ marginRight: '24px' }}>
+          <div style={{ marginRight: '24px', textAlign: 'center' }}>
             <Avatar size={100} src={avatarUrl} icon={<UserOutlined />} />
-            <Upload {...uploadProps}>
-              <Button icon={<CameraOutlined />} style={{ marginTop: '12px', width: '100px' }}>
-                {t('settings.change')}
-              </Button>
-            </Upload>
+            <Button icon={<CameraOutlined />} style={{ marginTop: '12px', width: '100px' }} onClick={() => setAvatarModalVisible(true)}>
+              {t('settings.change')}
+            </Button>
           </div>
           <div style={{ flex: 1 }}>
             <Form form={form} layout="vertical" onFinish={handleSaveProfile}>
@@ -321,6 +460,159 @@ const StaffSettings: React.FC = () => {
           </Form.Item>
         </Form>
       </Card>
+
+      {/* Avatar Upload Modal */}
+      <Modal
+        title={
+          <div style={{ fontSize: 18, fontWeight: 600 }}>
+            <UserOutlined style={{ marginRight: 8, color: '#1890ff' }} />
+            Cập nhật ảnh đại diện
+          </div>
+        }
+        open={avatarModalVisible}
+        onCancel={() => {
+          setAvatarModalVisible(false);
+          setImageUrlInput('');
+          setPastedImage(null);
+          setActiveTab('upload');
+        }}
+        footer={null}
+        width={600}
+      >
+        <Tabs activeKey={activeTab} onChange={setActiveTab} style={{ marginTop: 16 }}>
+          {/* Tab 1: Upload from device */}
+          <TabPane
+            tab={
+              <span>
+                <UploadOutlined />
+                Tải từ thiết bị
+              </span>
+            }
+            key="upload"
+          >
+            <div style={{ padding: '24px 0', textAlign: 'center' }}>
+              <Upload.Dragger accept="image/*" showUploadList={false} beforeUpload={uploadProps.beforeUpload} disabled={loading}>
+                <p className="ant-upload-drag-icon">
+                  <UploadOutlined style={{ fontSize: 48, color: '#1890ff' }} />
+                </p>
+                <p className="ant-upload-text" style={{ fontSize: 16 }}>
+                  Click hoặc kéo thả ảnh vào đây
+                </p>
+                <p className="ant-upload-hint" style={{ color: '#999' }}>
+                  Hỗ trợ: JPG, PNG, WEBP, GIF (tối đa 10MB)
+                </p>
+              </Upload.Dragger>
+            </div>
+          </TabPane>
+
+          {/* Tab 2: From URL */}
+          <TabPane
+            tab={
+              <span>
+                <LinkOutlined />
+                Từ URL
+              </span>
+            }
+            key="url"
+          >
+            <div style={{ padding: '24px 0' }}>
+              <Space direction="vertical" style={{ width: '100%' }} size="large">
+                <div>
+                  <Text strong style={{ marginBottom: 8, display: 'block' }}>
+                    Nhập URL hình ảnh
+                  </Text>
+                  <Input
+                    size="large"
+                    placeholder="https://example.com/image.jpg"
+                    value={imageUrlInput}
+                    onChange={e => setImageUrlInput(e.target.value)}
+                    onPressEnter={handleAvatarFromUrl}
+                    disabled={loading}
+                    prefix={<LinkOutlined style={{ color: '#999' }} />}
+                  />
+                  <Text type="secondary" style={{ fontSize: 12, marginTop: 4, display: 'block' }}>
+                    Nhập URL của hình ảnh từ internet
+                  </Text>
+                </div>
+                <Button
+                  type="primary"
+                  size="large"
+                  onClick={handleAvatarFromUrl}
+                  loading={loading}
+                  disabled={!imageUrlInput}
+                  block
+                  style={{ borderRadius: 8 }}
+                >
+                  Cập nhật
+                </Button>
+              </Space>
+            </div>
+          </TabPane>
+
+          {/* Tab 3: Paste from clipboard */}
+          <TabPane
+            tab={
+              <span>
+                <CopyOutlined />
+                Paste ảnh
+              </span>
+            }
+            key="paste"
+          >
+            <div style={{ padding: '24px 0' }}>
+              <div
+                ref={pasteAreaRef}
+                tabIndex={0}
+                onPaste={handlePaste}
+                onClick={handlePasteAreaClick}
+                style={{
+                  border: '2px dashed #d9d9d9',
+                  borderRadius: 8,
+                  padding: 40,
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  background: pastedImage ? '#f0f5ff' : '#fafafa',
+                  outline: 'none',
+                  transition: 'all 0.3s',
+                }}
+                onFocus={e => {
+                  e.currentTarget.style.borderColor = '#1890ff';
+                  e.currentTarget.style.background = '#f0f5ff';
+                }}
+                onBlur={e => {
+                  e.currentTarget.style.borderColor = '#d9d9d9';
+                  if (!pastedImage) e.currentTarget.style.background = '#fafafa';
+                }}
+              >
+                {pastedImage ? (
+                  <Space direction="vertical" size="large">
+                    <CheckCircleOutlined style={{ fontSize: 48, color: '#52c41a' }} />
+                    <img src={pastedImage} alt="Pasted" style={{ maxWidth: '100%', maxHeight: 200, borderRadius: 8 }} />
+                    <Text type="success" strong>
+                      Ảnh đã được paste thành công!
+                    </Text>
+                  </Space>
+                ) : (
+                  <Space direction="vertical" size="large">
+                    <CopyOutlined style={{ fontSize: 48, color: '#1890ff' }} />
+                    <div>
+                      <Text strong style={{ fontSize: 16, display: 'block', marginBottom: 8 }}>
+                        Paste ảnh đã copy
+                      </Text>
+                      <Text type="secondary" style={{ fontSize: 14 }}>
+                        Copy ảnh từ bất kỳ đâu và nhấn Ctrl+V (Cmd+V trên Mac)
+                      </Text>
+                    </div>
+                    <Text type="secondary" style={{ fontSize: 12, fontStyle: 'italic' }}>
+                      Click vào đây và nhấn Ctrl+V
+                    </Text>
+                  </Space>
+                )}
+              </div>
+            </div>
+          </TabPane>
+        </Tabs>
+      </Modal>
     </div>
   );
 };

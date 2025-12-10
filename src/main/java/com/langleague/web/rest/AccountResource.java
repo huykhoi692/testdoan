@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -37,13 +36,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @RestController
 @RequestMapping("/api")
 public class AccountResource {
-
-    private static class AccountResourceException extends RuntimeException {
-
-        private AccountResourceException(String message) {
-            super(message);
-        }
-    }
 
     private static final Logger LOG = LoggerFactory.getLogger(AccountResource.class);
 
@@ -102,7 +94,7 @@ public class AccountResource {
      * {@code GET  /activate} : activate the registered user.
      *
      * @param key the activation key.
-     * @throws RuntimeException {@code 500 (Internal Server Error)} if the user couldn't be activated.
+     * @throws ResourceNotFoundException {@code 404 (Not Found)} if the activation key is invalid.
      */
     @GetMapping("/activate")
     public void activateAccount(@RequestParam(value = "key") String key) {
@@ -110,16 +102,16 @@ public class AccountResource {
         Optional<User> user = userService.activateRegistration(key);
         if (user.isEmpty()) {
             LOG.error("No user was found for activation key: {}", key);
-            throw new AccountResourceException("No user was found for this activation key");
+            throw new ResourceNotFoundException("No user was found for this activation key");
         }
-        LOG.info("User activated successfully: {}", user.orElseThrow(() -> new AccountResourceException("User not found")).getLogin());
+        LOG.info("User activated successfully: {}", user.get().getLogin());
     }
 
     /**
      * {@code GET  /account} : get the current user.
      *
      * @return the current user.
-     * @throws RuntimeException {@code 500 (Internal Server Error)} if the user couldn't be returned.
+     * @throws UserNotAuthenticatedException {@code 401 (Unauthorized)} if user is not authenticated.
      */
     @GetMapping("/account")
     public AdminUserDTO getAccount() {
@@ -136,7 +128,7 @@ public class AccountResource {
                     });
                 return dto;
             })
-            .orElseThrow(() -> new AccountResourceException("User could not be found"));
+            .orElseThrow(() -> new UserNotAuthenticatedException("User could not be found"));
     }
 
     /**
@@ -144,13 +136,14 @@ public class AccountResource {
      *
      * @param userDTO the current user information.
      * @throws EmailAlreadyUsedException {@code 400 (Bad Request)} if the email is already used.
-     * @throws RuntimeException {@code 500 (Internal Server Error)} if the user login wasn't found.
+     * @throws UserNotAuthenticatedException {@code 401 (Unauthorized)} if user is not authenticated.
      */
     @RequestMapping(value = "/account", method = { RequestMethod.POST, RequestMethod.PUT })
     // Accept partial AdminUserDTO for current user updates; don't trigger @Valid validation
     public void saveAccount(@RequestBody AdminUserDTO userDTO) {
-        String userLogin = SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new AccountResourceException("Current user login not found"));
+        String userLogin = SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new UserNotAuthenticatedException("Current user login not found")
+        );
         LOG.debug(
             "Saving account for userLogin={} with payload email={}, firstName={}, lastName={}",
             userLogin,
@@ -160,16 +153,13 @@ public class AccountResource {
         );
         Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userDTO.getEmail());
         LOG.debug("Existing user for email {}: {}", userDTO.getEmail(), existingUser.map(User::getLogin).orElse("<none>"));
-        if (
-            existingUser.isPresent() &&
-            (!existingUser.orElseThrow(() -> new AccountResourceException("User not found")).getLogin().equalsIgnoreCase(userLogin))
-        ) {
+        if (existingUser.isPresent() && (!existingUser.get().getLogin().equalsIgnoreCase(userLogin))) {
             throw new EmailAlreadyUsedException();
         }
         LOG.debug("Proceeding to find logged-in user by login: {}", userLogin);
         Optional<User> user = userRepository.findOneByLogin(userLogin);
         if (user.isEmpty()) {
-            throw new AccountResourceException("User could not be found");
+            throw new UserNotAuthenticatedException("User could not be found");
         }
         userService.updateUser(
             userDTO.getFirstName(),
@@ -222,7 +212,7 @@ public class AccountResource {
      *
      * @param keyAndPassword the generated key and the new password.
      * @throws InvalidPasswordException {@code 400 (Bad Request)} if the password is incorrect.
-     * @throws RuntimeException {@code 500 (Internal Server Error)} if the password could not be reset.
+     * @throws ResourceNotFoundException {@code 404 (Not Found)} if the reset key is invalid.
      */
     @PostMapping(path = "/account/reset-password/finish")
     public void finishPasswordReset(@RequestBody KeyAndPasswordVM keyAndPassword) {
@@ -232,7 +222,7 @@ public class AccountResource {
         Optional<User> user = userService.completePasswordReset(keyAndPassword.getNewPassword(), keyAndPassword.getKey());
 
         if (user.isEmpty()) {
-            throw new AccountResourceException("No user was found for this reset key");
+            throw new ResourceNotFoundException("No user was found for this reset key");
         }
     }
 
@@ -250,9 +240,12 @@ public class AccountResource {
      */
     @GetMapping("/account/test-email")
     public void testEmailService() {
-        String userLogin = SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new AccountResourceException("Current user login not found"));
-        User user = userRepository.findOneByLogin(userLogin).orElseThrow(() -> new AccountResourceException("User could not be found"));
+        String userLogin = SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new UserNotAuthenticatedException("Current user login not found")
+        );
+        User user = userRepository
+            .findOneByLogin(userLogin)
+            .orElseThrow(() -> new UserNotAuthenticatedException("User could not be found"));
 
         mailService.sendEmail(
             user.getEmail(),
@@ -270,8 +263,9 @@ public class AccountResource {
      */
     @PostMapping("/account/lock")
     public void lockOwnAccount() {
-        String userLogin = SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new AccountResourceException("Current user login not found"));
+        String userLogin = SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new UserNotAuthenticatedException("Current user login not found")
+        );
         userService.lockAccount(userLogin);
     }
 
@@ -281,8 +275,9 @@ public class AccountResource {
      */
     @PostMapping("/account/unlock")
     public void unlockOwnAccount() {
-        String userLogin = SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new AccountResourceException("Current user login not found"));
+        String userLogin = SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new UserNotAuthenticatedException("Current user login not found")
+        );
         userService.unlockAccount(userLogin);
     }
 
@@ -292,9 +287,11 @@ public class AccountResource {
      * Updates User.imageUrl field (supports both URLs and base64)
      */
     @PutMapping("/account/avatar")
-    public Map<String, String> updateAvatar(@RequestBody String imageUrl) {
-        String userLogin = SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new AccountResourceException("Current user login not found"));
+    public Map<String, String> updateAvatar(@RequestBody Map<String, String> payload) {
+        String userLogin = SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new UserNotAuthenticatedException("Current user login not found")
+        );
+        String imageUrl = payload.get("imageUrl");
         LOG.debug("Received avatar update for userLogin={} payloadLength={}", userLogin, imageUrl == null ? 0 : imageUrl.length());
 
         // Option 1: If it's already a URL (http/https), use it directly
@@ -347,10 +344,9 @@ public class AccountResource {
             }
         } catch (Exception e) {
             LOG.error("Failed to save avatar for user {}: {}", userLogin, e.getMessage(), e);
-            throw new AccountResourceException("Failed to update avatar");
+            throw new BadRequestAlertException("Failed to update avatar", "avatar", "uploadfailed");
         }
-        Map<String, String> empty = new HashMap<>();
-        return empty;
+        return new HashMap<>();
     }
 
     /**
@@ -359,8 +355,9 @@ public class AccountResource {
      */
     @PutMapping("/account/profile")
     public AdminUserDTO updateProfile(@RequestBody Map<String, String> profileData) {
-        String userLogin = SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new AccountResourceException("Current user login not found"));
+        String userLogin = SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new UserNotAuthenticatedException("Current user login not found")
+        );
         LOG.debug("Updating profile for userLogin={} with displayName={}", userLogin, profileData.get("displayName"));
         appUserService.updateProfile(userLogin, profileData.get("displayName"), profileData.get("bio"));
         // Return refreshed session DTO so frontend can immediately update UI without an extra GET
@@ -376,7 +373,7 @@ public class AccountResource {
                     });
                 return dto;
             })
-            .orElseThrow(() -> new AccountResourceException("User could not be found"));
+            .orElseThrow(() -> new UserNotAuthenticatedException("User could not be found"));
     }
     // TODO: Use case 14, 15, 7 (notifications, learning goals, phone verification)
     // Will be handled in separate logic layer as requested by user

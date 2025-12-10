@@ -57,7 +57,9 @@ class SecurityUtilsUnitTest {
     @Test
     void testGetCurrentUserJWT() {
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-        securityContext.setAuthentication(new UsernamePasswordAuthenticationToken("admin", "token"));
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.USER));
+        securityContext.setAuthentication(new UsernamePasswordAuthenticationToken("admin", null, authorities));
         SecurityContextHolder.setContext(securityContext);
         Optional<String> result = SecurityUtils.getCurrentUserJWT();
         assertThat(result).isEmpty();
@@ -66,7 +68,9 @@ class SecurityUtilsUnitTest {
     @Test
     void testIsAuthenticated() {
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-        securityContext.setAuthentication(new UsernamePasswordAuthenticationToken("admin", "admin"));
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.USER));
+        securityContext.setAuthentication(new UsernamePasswordAuthenticationToken("admin", "admin", authorities));
         SecurityContextHolder.setContext(securityContext);
         boolean result = SecurityUtils.isAuthenticated();
         assertThat(result).isTrue();

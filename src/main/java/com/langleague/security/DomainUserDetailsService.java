@@ -24,9 +24,11 @@ public class DomainUserDetailsService implements UserDetailsService {
     private static final Logger LOG = LoggerFactory.getLogger(DomainUserDetailsService.class);
 
     private final UserRepository userRepository;
+    private final LoginAttemptService loginAttemptService;
 
-    public DomainUserDetailsService(UserRepository userRepository) {
+    public DomainUserDetailsService(UserRepository userRepository, LoginAttemptService loginAttemptService) {
         this.userRepository = userRepository;
+        this.loginAttemptService = loginAttemptService;
     }
 
     @Override
@@ -49,9 +51,19 @@ public class DomainUserDetailsService implements UserDetailsService {
     }
 
     private org.springframework.security.core.userdetails.User createSpringSecurityUser(String lowercaseLogin, User user) {
+        // Check temporary lock first (from failed login attempts)
+        if (loginAttemptService.isLocked(user)) {
+            long remainingMinutes = loginAttemptService.getRemainingLockTimeMinutes(user);
+            throw new UserAccountLockedException(
+                "Account temporarily locked due to multiple failed login attempts. Try again in " + remainingMinutes + " minutes."
+            );
+        }
+
+        // Check permanent lock (admin action)
         if (user.isLocked()) {
             throw new UserAccountLockedException("User " + lowercaseLogin + " account is locked");
         }
+
         if (!user.isActivated()) {
             throw new UserNotActivatedException("User " + lowercaseLogin + " was not activated");
         }

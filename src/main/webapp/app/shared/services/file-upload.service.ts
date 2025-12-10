@@ -46,7 +46,7 @@ export const uploadMultipleFiles = createAsyncThunk('file/upload_multiple', asyn
 // Upload image - Matches POST /api/files/upload-image
 export const uploadImage = createAsyncThunk('file/upload_image', async (file: File) => {
   const formData = new FormData();
-  formData.append('image', file);
+  formData.append('file', file); // Changed from 'image' to 'file' to match backend parameter
 
   const response = await axios.post<FileUploadResponse>(`${API_URL}/upload-image`, formData, {
     headers: {

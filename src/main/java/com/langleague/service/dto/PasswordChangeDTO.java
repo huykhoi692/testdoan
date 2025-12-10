@@ -1,5 +1,6 @@
 package com.langleague.service.dto;
 
+import com.langleague.service.validator.PasswordStrengthValidator;
 import java.io.Serializable;
 
 /**
@@ -10,6 +11,8 @@ public class PasswordChangeDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String currentPassword;
+
+    @PasswordStrengthValidator
     private String newPassword;
 
     public PasswordChangeDTO() {

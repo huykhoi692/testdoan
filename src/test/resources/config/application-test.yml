@@ -81,10 +81,6 @@ jhipster:
         # Token is valid 24 hours
         token-validity-in-seconds: 86400
         token-validity-in-seconds-for-remember-me: 2592000
-  metrics:
-    logs:
-      enabled: true
-      report-frequency: 60
 
 # ===================================================================
 # Application specific properties

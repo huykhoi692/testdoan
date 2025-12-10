@@ -28,12 +28,8 @@ export const changePassword = createAsyncThunk(
 );
 
 // Update avatar - Matches PUT /api/account/avatar
-export const updateAvatar = createAsyncThunk('account/update_avatar', async (formData: FormData) => {
-  const response = await axios.put<{ imageUrl: string }>(`${API_URL}/avatar`, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
+export const updateAvatar = createAsyncThunk('account/update_avatar', async (imageUrl: string) => {
+  const response = await axios.put<{ url: string }>(`${API_URL}/avatar`, { imageUrl });
   return response.data;
 });
 

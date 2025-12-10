@@ -9,12 +9,20 @@
     "rememberMe": "Remember me",
     "forgotPassword": "Forgot Password?",
     "loginButton": "Log in",
+    "signingIn": "Signing in...",
     "orContinueWith": "Or continue with",
+    "orUseAccount": "or use your account",
     "success": "Login successful!",
     "welcomeMessage": "Welcome to LangLeague",
+    "welcomeBack": "Welcome Back!",
+    "welcomeBackMessage": "To keep connected with us please login with your personal info",
     "newToLangleague": "Don't have an account?",
     "signUp": "Sign up",
-    "error": "Login failed. Please check your credentials.",
+    "error": {
+      "generic": "Login failed. Please check your credentials.",
+      "captchaInvalid": "Invalid captcha code. Please try again.",
+      "invalidCredentials": "Invalid email or password. Please try again."
+    },
     "invalidCaptcha": "Invalid captcha code",
     "form": {
       "password.placeholder": "Your password",
@@ -31,5 +39,8 @@
       "passwordRequired": "Please enter your password",
       "captchaRequired": "Please enter the captcha"
     }
+  },
+  "common": {
+    "loading": "Loading..."
   }
 }

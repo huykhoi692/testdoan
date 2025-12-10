@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -62,6 +63,7 @@ public class CommentResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<CommentDTO> createComment(@RequestBody CommentDTO commentDTO) throws URISyntaxException {
         LOG.debug("REST request to save Comment : {}", commentDTO);
         if (commentDTO.getId() != null) {
@@ -86,6 +88,7 @@ public class CommentResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<CommentDTO> updateComment(
         @PathVariable(value = "id", required = false) final Long id,
         @RequestBody CommentDTO commentDTO
@@ -103,8 +106,9 @@ public class CommentResource {
         }
 
         // Verify ownership or admin role
-        String currentUser = SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
+        String currentUser = SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated")
+        );
 
         Optional<CommentDTO> existingComment = commentService.findOne(id);
         if (existingComment.isPresent()) {
@@ -141,6 +145,7 @@ public class CommentResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<CommentDTO> partialUpdateComment(
         @PathVariable(value = "id", required = false) final Long id,
         @RequestBody CommentDTO commentDTO
@@ -158,8 +163,9 @@ public class CommentResource {
         }
 
         // Verify ownership or admin role
-        String currentUser = SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
+        String currentUser = SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated")
+        );
 
         Optional<CommentDTO> existingComment = commentService.findOne(id);
         if (existingComment.isPresent()) {
@@ -191,6 +197,7 @@ public class CommentResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of comments in body.
      */
     @GetMapping("")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<CommentDTO>> getAllComments(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         LOG.debug("REST request to get a page of Comments");
         Page<CommentDTO> page = commentService.findAll(pageable);
@@ -205,6 +212,7 @@ public class CommentResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the commentDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<CommentDTO> getComment(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Comment : {}", id);
         Optional<CommentDTO> commentDTO = commentService.findOne(id);
@@ -219,12 +227,14 @@ public class CommentResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)} or {@code 403 (Forbidden)}.
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> deleteComment(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete Comment : {}", id);
 
         // Verify ownership or admin role
-        String currentUser = SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
+        String currentUser = SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated")
+        );
 
         Optional<CommentDTO> existingComment = commentService.findOne(id);
         if (existingComment.isPresent()) {

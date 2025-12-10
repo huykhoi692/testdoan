@@ -90,6 +90,8 @@ module.exports = async options => {
                 path.resolve(__dirname, '../tsconfig.json'),
               ],
             },
+            managedPaths: [path.resolve(__dirname, '../node_modules')],
+            hashAlgorithm: 'md5',
           },
       resolve: {
         extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],

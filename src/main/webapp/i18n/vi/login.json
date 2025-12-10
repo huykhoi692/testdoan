@@ -9,12 +9,20 @@
     "rememberMe": "Ghi nhớ đăng nhập",
     "forgotPassword": "Quên mật khẩu?",
     "loginButton": "Đăng nhập",
+    "signingIn": "Đang đăng nhập...",
     "orContinueWith": "Hoặc tiếp tục với",
+    "orUseAccount": "hoặc sử dụng tài khoản của bạn",
     "success": "Đăng nhập thành công!",
     "welcomeMessage": "Chào mừng đến với LangLeague",
+    "welcomeBack": "Chào mừng trở lại!",
+    "welcomeBackMessage": "Để tiếp tục kết nối với chúng tôi, vui lòng đăng nhập bằng thông tin cá nhân của bạn",
     "newToLangleague": "Chưa có tài khoản?",
     "signUp": "Đăng ký",
-    "error": "Đăng nhập thất bại. Vui lòng kiểm tra thông tin đăng nhập.",
+    "error": {
+      "generic": "Đăng nhập thất bại. Vui lòng kiểm tra thông tin đăng nhập.",
+      "captchaInvalid": "Mã xác nhận không đúng. Vui lòng thử lại.",
+      "invalidCredentials": "Email hoặc mật khẩu không đúng. Vui lòng thử lại."
+    },
     "invalidCaptcha": "Mã xác nhận không đúng",
     "form": {
       "password.placeholder": "Mật khẩu của bạn",
@@ -31,5 +39,8 @@
       "passwordRequired": "Vui lòng nhập mật khẩu của bạn",
       "captchaRequired": "Vui lòng nhập mã xác nhận"
     }
+  },
+  "common": {
+    "loading": "Đang tải..."
   }
 }

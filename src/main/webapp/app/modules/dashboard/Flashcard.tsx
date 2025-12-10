@@ -13,68 +13,40 @@ import {
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import BulkVocabularyAdd from './BulkVocabularyAdd';
+import {
+  UserVocabularyDTO,
+  UserGrammarDTO,
+  VocabularyStatistics,
+  GrammarStatistics,
+  getMyVocabulary,
+  getVocabularyToReview,
+  getVocabularyStatistics,
+  reviewVocabulary,
+  unsaveVocabulary,
+  getMyGrammar,
+  getGrammarToReview,
+  getGrammarStatistics,
+  reviewGrammar,
+  unsaveGrammar,
+} from 'app/shared/services/flashcard.service';
 import './flashcard.scss';
-
-interface Word {
-  id: number;
-  word: string;
-  pronunciation?: string;
-  meaning: string;
-  wordExamples?: Array<{
-    exampleText: string;
-    translation: string;
-  }>;
-}
-
-interface Grammar {
-  id: number;
-  title: string;
-  structure?: string;
-  explanation: string;
-  example?: string;
-}
-
-interface UserVocabulary {
-  id: number;
-  word: Word;
-  isMemorized: boolean;
-  nextReviewDate?: string;
-  repetitions?: number;
-  easinessFactor?: number;
-}
-
-interface UserGrammar {
-  id: number;
-  grammar: Grammar;
-  isMemorized: boolean;
-  nextReviewDate?: string;
-}
-
-interface VocabularyStatistics {
-  totalWords: number;
-  memorizedWords: number;
-  wordsToReview: number;
-}
-
-interface GrammarStatistics {
-  totalGrammars: number;
-  memorizedGrammars: number;
-  grammarsToReview: number;
-}
+import { useAppDispatch } from 'app/config/store';
 
 const Flashcard: React.FC = () => {
   const { t } = useTranslation(['flashcards', 'common']);
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const [activeTab, setActiveTab] = useState<'vocabulary' | 'grammar'>('vocabulary');
-  const [vocabularyCards, setVocabularyCards] = useState<UserVocabulary[]>([]);
-  const [grammarCards, setGrammarCards] = useState<UserGrammar[]>([]);
+  const [vocabularyCards, setVocabularyCards] = useState<UserVocabularyDTO[]>([]);
+  const [grammarCards, setGrammarCards] = useState<UserGrammarDTO[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [vocabStatistics, setVocabStatistics] = useState<VocabularyStatistics | null>(null);
   const [grammarStatistics, setGrammarStatistics] = useState<GrammarStatistics | null>(null);
   const [reviewMode, setReviewMode] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [bulkAddVisible, setBulkAddVisible] = useState(false);
 
   useEffect(() => {
     loadAllData();
@@ -95,46 +67,55 @@ const Flashcard: React.FC = () => {
   // Load vocabulary flashcards
   const loadVocabularyCards = async () => {
     try {
-      const endpoint = reviewMode ? '/api/user-vocabularies/my-words/review-today' : '/api/user-vocabularies/my-words';
-      const response = await axios.get<UserVocabulary[]>(endpoint);
-      setVocabularyCards(response.data);
+      const action = reviewMode ? getVocabularyToReview() : getMyVocabulary();
+      const cards = await dispatch(action).unwrap();
+      console.log('📚 Loaded vocabulary cards:', cards);
+      if (cards.length > 0) {
+        console.log('📊 First card:', cards[0]);
+      }
+      setVocabularyCards(cards);
       if (activeTab === 'vocabulary') {
         setCurrentIndex(0);
         setIsFlipped(false);
       }
     } catch (error) {
-      console.error('Error loading vocabulary:', error);
-      message.error(t('flashcards.messages.loadFailed'));
+      console.error('❌ Error loading vocabulary:', error);
+      message.error(t('common.error') || 'Không thể tải từ vựng');
     }
   };
 
   // Load grammar flashcards
   const loadGrammarCards = async () => {
     try {
-      const endpoint = reviewMode ? '/api/user-grammars/my-grammars/review' : '/api/user-grammars/my-grammars';
-      const response = await axios.get<UserGrammar[]>(endpoint);
-      setGrammarCards(response.data);
+      const action = reviewMode ? getGrammarToReview() : getMyGrammar();
+      const cards = await dispatch(action).unwrap();
+      console.log('📚 Loaded grammar cards:', cards);
+      if (cards.length > 0) {
+        console.log('📊 First card:', cards[0]);
+      }
+      setGrammarCards(cards);
       if (activeTab === 'grammar') {
         setCurrentIndex(0);
         setIsFlipped(false);
       }
     } catch (error) {
-      console.error('Error loading grammar cards:', error);
-      message.error('Failed to load grammar cards');
+      console.error('❌ Error loading grammar cards:', error);
+      message.error(t('common.error') || 'Không thể tải ngữ pháp');
     }
   };
 
   // Load statistics
   const loadStatistics = async () => {
     try {
-      const [vocabStatsResponse, grammarStatsResponse] = await Promise.all([
-        axios.get<VocabularyStatistics>('/api/user-vocabularies/statistics'),
-        axios.get<GrammarStatistics>('/api/user-grammars/statistics'),
+      const [vocabStats, grammarStats] = await Promise.all([
+        dispatch(getVocabularyStatistics()).unwrap(),
+        dispatch(getGrammarStatistics()).unwrap(),
       ]);
-      setVocabStatistics(vocabStatsResponse.data);
-      setGrammarStatistics(grammarStatsResponse.data);
+      setVocabStatistics(vocabStats);
+      setGrammarStatistics(grammarStats);
     } catch (error) {
       console.error('Error loading statistics:', error);
+      message.error(t('common.error') || 'Không thể tải thống kê');
     }
   };
 
@@ -159,10 +140,8 @@ const Flashcard: React.FC = () => {
     if (!currentCard) return;
 
     try {
-      await axios.put(`/api/user-vocabularies/review/${currentCard.word.id}`, null, {
-        params: { quality },
-      });
-      message.success('Review recorded!');
+      await dispatch(reviewVocabulary({ wordId: currentCard.word.id, quality })).unwrap();
+      message.success('Đã ghi nhận kết quả ôn tập!');
       handleNext();
       await loadStatistics();
       if (reviewMode) {
@@ -170,7 +149,7 @@ const Flashcard: React.FC = () => {
       }
     } catch (error) {
       console.error('Error updating vocabulary review:', error);
-      message.error('Failed to record review');
+      message.error(t('common.error') || 'Không thể ghi nhận kết quả ôn tập');
     }
   };
 
@@ -179,10 +158,8 @@ const Flashcard: React.FC = () => {
     if (!currentCard) return;
 
     try {
-      await axios.put(`/api/user-grammars/review/${currentCard.grammar.id}`, null, {
-        params: { isMemorized },
-      });
-      message.success('Review recorded!');
+      await dispatch(reviewGrammar({ grammarId: currentCard.grammar.id, isMemorized })).unwrap();
+      message.success('Đã ghi nhận kết quả ôn tập!');
       handleNext();
       await loadStatistics();
       if (reviewMode) {
@@ -190,7 +167,7 @@ const Flashcard: React.FC = () => {
       }
     } catch (error) {
       console.error('Error updating grammar review:', error);
-      message.error('Failed to record review');
+      message.error(t('common.error') || 'Không thể ghi nhận kết quả ôn tập');
     }
   };
 
@@ -201,18 +178,18 @@ const Flashcard: React.FC = () => {
 
     try {
       if (activeTab === 'vocabulary') {
-        await axios.delete(`/api/user-vocabularies/unsave/${(currentCard as UserVocabulary).word.id}`);
-        message.success(t('flashcards.messages.removeSuccess'));
+        await dispatch(unsaveVocabulary((currentCard as UserVocabularyDTO).word.id)).unwrap();
+        message.success('Đã xóa từ vựng khỏi flashcard');
         await loadVocabularyCards();
       } else {
-        await axios.delete(`/api/user-grammars/unsave/${(currentCard as UserGrammar).grammar.id}`);
-        message.success(t('flashcards.messages.removeSuccess'));
+        await dispatch(unsaveGrammar((currentCard as UserGrammarDTO).grammar.id)).unwrap();
+        message.success('Đã xóa ngữ pháp khỏi flashcard');
         await loadGrammarCards();
       }
       await loadStatistics();
     } catch (error) {
       console.error('Error removing card:', error);
-      message.error(t('flashcards.messages.removeFailed'));
+      message.error('Không thể xóa thẻ');
     }
   };
 
@@ -225,72 +202,84 @@ const Flashcard: React.FC = () => {
   const currentCards = activeTab === 'vocabulary' ? vocabularyCards : grammarCards;
   const currentCard = currentCards[currentIndex];
 
-  const renderVocabularyCard = (card: UserVocabulary, flipped: boolean) => {
+  const renderVocabularyCard = (card: UserVocabularyDTO, flipped: boolean) => {
+    console.log('🎴 Rendering vocabulary card:', { card, flipped, text: card.word.text, meaning: card.word.meaning });
+
     if (!flipped) {
-      // Front side - Word
+      // Front side - Korean Word
       return (
         <div className="card-content">
-          <h1 className="card-word">{card.word.word}</h1>
+          <h1 className="card-word">{card.word.text || '(No text)'}</h1>
           {card.word.pronunciation && <p className="card-pronunciation">[{card.word.pronunciation}]</p>}
+          {card.word.partOfSpeech && (
+            <Tag color="blue" style={{ marginTop: 8 }}>
+              {card.word.partOfSpeech}
+            </Tag>
+          )}
           <Tag color={card.isMemorized ? 'success' : 'warning'} className="card-tag">
-            {card.isMemorized ? 'Memorized' : 'Learning'}
+            {card.isMemorized ? 'Đã thuộc' : 'Đang học'}
           </Tag>
-          {card.repetitions !== undefined && <p className="card-meta">Repetitions: {card.repetitions}</p>}
+          {card.reviewCount !== undefined && <p className="card-meta">Số lần ôn tập: {card.reviewCount}</p>}
         </div>
       );
     } else {
       // Back side - Meaning and Examples
       return (
         <div className="card-content">
-          <h2 className="card-meaning">{card.word.meaning}</h2>
-          {card.word.wordExamples && card.word.wordExamples.length > 0 && (
+          <h2 className="card-meaning">{card.word.meaning || '(Chưa có nghĩa)'}</h2>
+          {card.word.imageUrl && (
+            <div style={{ textAlign: 'center', margin: '16px 0' }}>
+              <img src={card.word.imageUrl} alt={card.word.text} style={{ maxWidth: '300px', borderRadius: '8px' }} />
+            </div>
+          )}
+          {card.word.wordExamples && card.word.wordExamples.length > 0 ? (
             <div className="card-examples">
               {card.word.wordExamples.map((example, idx) => (
                 <div key={idx} className="example-item">
                   <p className="example-sentence">
-                    <strong>Example:</strong> {example.exampleText}
+                    <strong>Ví dụ:</strong> {example.exampleText}
                   </p>
                   <p className="example-translation">{example.translation}</p>
                 </div>
               ))}
             </div>
+          ) : (
+            <p style={{ color: '#999', fontStyle: 'italic', marginTop: '16px' }}>(Chưa có ví dụ)</p>
           )}
         </div>
       );
     }
   };
 
-  const renderGrammarCard = (card: UserGrammar, flipped: boolean) => {
+  const renderGrammarCard = (card: UserGrammarDTO, flipped: boolean) => {
+    console.log('🎴 Rendering grammar card:', { card, flipped, description: card.grammar.description });
+
     if (!flipped) {
-      // Front side - Title
+      // Front side - Grammar Title (Korean)
       return (
         <div className="card-content">
           <h1 className="card-word">{card.grammar.title}</h1>
+          {card.grammar.level && (
+            <Tag color="purple" style={{ marginTop: 8 }}>
+              {card.grammar.level}
+            </Tag>
+          )}
           <Tag color={card.isMemorized ? 'success' : 'warning'} className="card-tag">
-            {card.isMemorized ? t('flashcard.mastered') : t('flashcard.learning')}
+            {card.isMemorized ? 'Đã thuộc' : 'Đang học'}
           </Tag>
+          {card.reviewCount !== undefined && <p className="card-meta">Số lần ôn tập: {card.reviewCount}</p>}
         </div>
       );
     } else {
-      // Back side - Details
+      // Back side - Description (explanation + examples)
       return (
         <div className="card-content">
-          {card.grammar.structure && (
-            <div className="grammar-section">
-              <h3>Structure:</h3>
-              <p>{card.grammar.structure}</p>
-            </div>
-          )}
           <div className="grammar-section">
-            <h3>Explanation:</h3>
-            <p>{card.grammar.explanation}</p>
-          </div>
-          {card.grammar.example && (
-            <div className="grammar-section">
-              <h3>Example:</h3>
-              <p>{card.grammar.example}</p>
+            <h3>Giải thích và ví dụ:</h3>
+            <div style={{ whiteSpace: 'pre-wrap', lineHeight: '1.8', padding: '10px 0' }}>
+              {card.grammar.description || '(Chưa có mô tả cho điểm ngữ pháp này)'}
             </div>
-          )}
+          </div>
         </div>
       );
     }
@@ -380,8 +369,8 @@ const Flashcard: React.FC = () => {
         >
           {reviewMode ? 'Review Mode (Due Today)' : 'Study Mode (All Cards)'}
         </Button>
-        <Button type="primary" size="large" onClick={() => navigate('/dashboard/flashcard/add')} icon={<PlusOutlined />}>
-          Add to Flashcard
+        <Button type="primary" size="large" onClick={() => setBulkAddVisible(true)} icon={<PlusOutlined />}>
+          Add to Flashcard (Bulk)
         </Button>
       </div>
 
@@ -425,13 +414,13 @@ const Flashcard: React.FC = () => {
               <div className="flashcard-inner">
                 <div className="flashcard-front">
                   {activeTab === 'vocabulary'
-                    ? renderVocabularyCard(currentCard as UserVocabulary, false)
-                    : renderGrammarCard(currentCard as UserGrammar, false)}
+                    ? renderVocabularyCard(currentCard as UserVocabularyDTO, false)
+                    : renderGrammarCard(currentCard as UserGrammarDTO, false)}
                 </div>
                 <div className="flashcard-back">
                   {activeTab === 'vocabulary'
-                    ? renderVocabularyCard(currentCard as UserVocabulary, true)
-                    : renderGrammarCard(currentCard as UserGrammar, true)}
+                    ? renderVocabularyCard(currentCard as UserVocabularyDTO, true)
+                    : renderGrammarCard(currentCard as UserGrammarDTO, true)}
                 </div>
               </div>
             </div>
@@ -509,6 +498,16 @@ const Flashcard: React.FC = () => {
           />
         )}
       </Card>
+
+      {/* Bulk Add Vocabulary Modal */}
+      <BulkVocabularyAdd
+        visible={bulkAddVisible}
+        onClose={() => setBulkAddVisible(false)}
+        onSuccess={() => {
+          loadAllData();
+          message.success('Đã thêm từ vựng thành công!');
+        }}
+      />
     </div>
   );
 };

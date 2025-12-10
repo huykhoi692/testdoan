@@ -2,6 +2,7 @@ package com.langleague.web.rest;
 
 import com.langleague.security.AuthoritiesConstants;
 import com.langleague.service.BookUploadService;
+import com.langleague.service.dto.BookMetadataDTO;
 import com.langleague.service.dto.BookUploadDTO;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -37,7 +38,7 @@ public class BookUploadResource {
     }
 
     /**
-     * POST /api/staff/book-uploads : Upload a book file
+     * POST /api/staff/book-uploads : Upload a book file (AI mode - default)
      *
      * @param file the file to upload
      * @return the ResponseEntity with status 201 (Created) and the upload details
@@ -53,6 +54,48 @@ public class BookUploadResource {
                 .body(result);
         } catch (Exception e) {
             LOG.error("Error uploading book: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .headers(HeaderUtil.createFailureAlert(applicationName, true, ENTITY_NAME, "uploadfailed", e.getMessage()))
+                .build();
+        }
+    }
+
+    /**
+     * POST /api/staff/book-uploads/manual : Upload a book with manual metadata (no AI)
+     *
+     * @param file the file to upload
+     * @param title book title
+     * @param level book level
+     * @param description book description
+     * @param thumbnailUrl book thumbnail URL
+     * @return the ResponseEntity with status 201 (Created) and the upload details
+     */
+    @PostMapping("/manual")
+    public ResponseEntity<BookUploadDTO> uploadBookManual(
+        @RequestParam("file") MultipartFile file,
+        @RequestParam("title") String title,
+        @RequestParam("level") String level,
+        @RequestParam(value = "description", required = false) String description,
+        @RequestParam(value = "thumbnailUrl", required = false) String thumbnailUrl
+    ) {
+        LOG.debug("REST request to upload book file manually: {}", file.getOriginalFilename());
+
+        try {
+            // Create metadata DTO
+            BookMetadataDTO metadata = new BookMetadataDTO();
+            metadata.setTitle(title);
+            metadata.setLevel(com.langleague.domain.enumeration.Level.valueOf(level.toUpperCase()));
+            metadata.setDescription(description);
+            metadata.setThumbnailUrl(thumbnailUrl);
+
+            // Upload with manual metadata (no AI)
+            BookUploadDTO result = bookUploadService.initiateUpload(file, metadata, false);
+
+            return ResponseEntity.status(HttpStatus.CREATED)
+                .headers(HeaderUtil.createAlert(applicationName, "Book created successfully from manual input", ENTITY_NAME))
+                .body(result);
+        } catch (Exception e) {
+            LOG.error("Error uploading book manually: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .headers(HeaderUtil.createFailureAlert(applicationName, true, ENTITY_NAME, "uploadfailed", e.getMessage()))
                 .build();

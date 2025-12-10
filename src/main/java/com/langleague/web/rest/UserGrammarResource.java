@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -55,6 +56,7 @@ public class UserGrammarResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserGrammarDTO> createUserGrammar(@Valid @RequestBody UserGrammarDTO userGrammarDTO) throws URISyntaxException {
         LOG.debug("REST request to save UserGrammar : {}", userGrammarDTO);
         if (userGrammarDTO.getId() != null) {
@@ -77,6 +79,7 @@ public class UserGrammarResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
+    @org.springframework.security.access.prepost.PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserGrammarDTO> updateUserGrammar(
         @PathVariable(value = "id", required = false) final Long id,
         @RequestBody UserGrammarDTO userGrammarDTO
@@ -111,6 +114,7 @@ public class UserGrammarResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserGrammarDTO> partialUpdateUserGrammar(
         @PathVariable(value = "id", required = false) final Long id,
         @RequestBody UserGrammarDTO userGrammarDTO
@@ -142,6 +146,7 @@ public class UserGrammarResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of userGrammars in body.
      */
     @GetMapping("")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<UserGrammarDTO>> getAllUserGrammars(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         LOG.debug("REST request to get a page of UserGrammars");
         Page<UserGrammarDTO> page = userGrammarService.findAll(pageable);
@@ -156,6 +161,7 @@ public class UserGrammarResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the userGrammarDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserGrammarDTO> getUserGrammar(@PathVariable("id") Long id) {
         LOG.debug("REST request to get UserGrammar : {}", id);
         Optional<UserGrammarDTO> userGrammarDTO = userGrammarService.findOne(id);
@@ -169,6 +175,7 @@ public class UserGrammarResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> deleteUserGrammar(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete UserGrammar : {}", id);
         userGrammarService.delete(id);
@@ -184,10 +191,12 @@ public class UserGrammarResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the saved userGrammarDTO.
      */
     @PostMapping("/save/{grammarId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserGrammarDTO> saveGrammar(@PathVariable Long grammarId) {
         LOG.debug("REST request to save grammar: {}", grammarId);
-        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
+        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated")
+        );
 
         UserGrammarDTO result = userGrammarService.saveGrammar(grammarId, userLogin);
         return ResponseEntity.ok().body(result);
@@ -200,6 +209,7 @@ public class UserGrammarResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of grammars in body.
      */
     @GetMapping("/my-grammars")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<UserGrammarDTO>> getSavedGrammars(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         LOG.debug("REST request to get saved grammars for current user");
         Page<UserGrammarDTO> page = userGrammarService.getSavedGrammars(pageable);
@@ -215,6 +225,7 @@ public class UserGrammarResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of grammars in body.
      */
     @GetMapping("/my-grammars/memorized")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<UserGrammarDTO>> getMemorizedGrammars(
         @RequestParam(defaultValue = "true") Boolean isMemorized,
         @org.springdoc.core.annotations.ParameterObject Pageable pageable
@@ -232,6 +243,7 @@ public class UserGrammarResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of grammars in body.
      */
     @GetMapping("/my-grammars/review")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<UserGrammarDTO>> getGrammarsToReview(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         LOG.debug("REST request to get grammars to review");
         Page<UserGrammarDTO> page = userGrammarService.getGrammarsToReview(pageable);
@@ -247,6 +259,7 @@ public class UserGrammarResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)}.
      */
     @PutMapping("/review/{grammarId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> updateReviewResult(@PathVariable Long grammarId, @RequestParam Boolean isMemorized) {
         LOG.debug("REST request to update review result for grammar: {} with status: {}", grammarId, isMemorized);
         userGrammarService.updateReviewResult(grammarId, isMemorized);
@@ -260,10 +273,12 @@ public class UserGrammarResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/unsave/{grammarId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> unsaveGrammar(@PathVariable Long grammarId) {
         LOG.debug("REST request to unsave grammar: {}", grammarId);
-        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
+        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated")
+        );
 
         userGrammarService.unsaveGrammar(grammarId, userLogin);
         return ResponseEntity.noContent().build();
@@ -276,6 +291,7 @@ public class UserGrammarResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and true/false in body.
      */
     @GetMapping("/is-saved/{grammarId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Boolean> isSaved(@PathVariable Long grammarId) {
         LOG.debug("REST request to check if grammar is saved: {}", grammarId);
         boolean saved = userGrammarService.isSaved(grammarId);
@@ -288,6 +304,7 @@ public class UserGrammarResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the statistics in body.
      */
     @GetMapping("/statistics")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<GrammarStatisticsDTO> getStatistics() {
         LOG.debug("REST request to get grammar statistics");
         GrammarStatisticsDTO stats = userGrammarService.getStatistics();

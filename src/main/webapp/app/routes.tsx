@@ -3,11 +3,11 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import DashboardLayout from './shared/layout/dashboard-layout';
 import PrivateRoute from './shared/auth/PrivateRoute';
 import BookUploadManager from 'app/modules/staff/BookUploadManager';
+import ChapterStepperEditor from 'app/modules/staff/ChapterStepperEditor';
 
 // ==================== PUBLIC PAGES ====================
 const Home = React.lazy(() => import('./modules/home/home'));
-const Login = React.lazy(() => import('./modules/account/login-page'));
-const Register = React.lazy(() => import('./modules/account/register-page'));
+const AuthSlider = React.lazy(() => import('./modules/account/auth-slider'));
 const ForgotPassword = React.lazy(() => import('./modules/account/forgot-password-page'));
 const ContactUs = React.lazy(() => import('./modules/home/contact-us'));
 
@@ -44,6 +44,7 @@ const FavoritesPage = React.lazy(() => import('./modules/user/FavoritesPage'));
 const AdminOverview = React.lazy(() => import('./modules/admin/AdminOverview'));
 const UserManagement = React.lazy(() => import('./modules/admin/UserManagement'));
 const CourseManagement = React.lazy(() => import('./modules/admin/CourseManagement'));
+const BookApproval = React.lazy(() => import('./modules/admin/BookApproval'));
 const AdminSettings = React.lazy(() => import('./modules/admin/AdminSettings'));
 
 // ==================== STAFF PAGES ====================
@@ -60,8 +61,8 @@ const AppRoutes = () => {
     <Routes>
       {/* ==================== PUBLIC ROUTES ==================== */}
       <Route index element={<Home />} />
-      <Route path="login" element={<Login />} />
-      <Route path="register" element={<Register />} />
+      <Route path="login" element={<AuthSlider />} />
+      <Route path="register" element={<AuthSlider />} />
       <Route path="forgot-password" element={<ForgotPassword />} />
       <Route path="contact" element={<ContactUs />} />
 
@@ -121,6 +122,7 @@ const AppRoutes = () => {
         <Route index element={<AdminOverview />} />
         <Route path="users" element={<UserManagement />} />
         <Route path="courses" element={<CourseManagement />} />
+        <Route path="book-approval" element={<BookApproval />} />
         <Route path="settings" element={<AdminSettings />} />
       </Route>
 
@@ -138,6 +140,7 @@ const AppRoutes = () => {
         <Route path="books/:bookId/chapters" element={<StaffChapterManagement />} />
         <Route path="chapters/:chapterId/content" element={<StaffContentEditor />} />
         <Route path="chapters/:chapterId/edit" element={<ChapterContentEditor />} />
+        <Route path="chapters/:chapterId/stepper" element={<ChapterStepperEditor />} />
         <Route path="books/:bookId/editor" element={<ChapterContentEditor />} />
         <Route path="editor/:chapterId" element={<ChapterContentEditor />} />
         <Route path="upload" element={<UploadBooks />} />

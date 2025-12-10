@@ -133,7 +133,10 @@
       "createError": "Failed to create book",
       "updateError": "Failed to update book",
       "deleteError": "Failed to delete book",
-      "processError": "Failed to process book with AI"
+      "processError": "Failed to process book with AI",
+      "errorLoadBooks": "Failed to load book list",
+      "errorDelete": "Failed to delete book",
+      "errorReprocess": "Failed to reprocess book"
     },
     "chapterManagement": {
       "title": "Chapter Management",

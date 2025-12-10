@@ -1,40 +1,151 @@
 /* Global App Styles with Dark Mode Support */
 
 :root {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f5f5f5;
-  --text-primary: #000000;
+  /* Primary brand colors - SYNCED WITH design-system.ts */
+  --color-primary: #58cc02;
+  --color-primary-dark: #46a302;
+  --color-primary-light: #d7ffb8;
+  --color-secondary: #ffc800;
+  --color-secondary-dark: #e5b400;
+
+  /* Semantic colors */
+  --color-success: #58cc02;
+  --color-warning: #ffc800;
+  --color-error: #ff4b4b;
+  --color-info: #1cb0f6;
+
+  /* Background colors - Modern Clean Palette */
+  --bg-primary: #ffffff; /* Pure white for cards */
+  --bg-secondary: #f8f9fb; /* Soft gray with blue tint (upgraded from #f5f5f5) */
+  --bg-tertiary: #f1f5f9; /* Slate gray light (upgraded from #e8e8e8) */
+
+  /* Text colors */
+  --text-primary: #262626;
   --text-secondary: #666666;
+  --text-disabled: #bfbfbf;
+  --text-white: #ffffff;
+
+  /* Border colors */
   --border-color: #d9d9d9;
+  --border-light: #f0f0f0;
+  --border-default: #d9d9d9;
+
+  /* Shadows */
   --shadow: rgba(0, 0, 0, 0.1);
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1);
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #58cc02 0%, #46a302 100%);
+  --gradient-secondary: linear-gradient(135deg, #ffc800 0%, #ffb000 100%);
+  --gradient-info: linear-gradient(135deg, #1cb0f6 0%, #0e8fd6 100%);
 }
 
 html.dark {
-  --bg-primary: #141414;
-  --bg-secondary: #1f1f1f;
+  /* Primary brand colors - slightly adjusted for dark mode */
+  --color-primary: #6bd60a;
+  --color-primary-dark: #58cc02;
+  --color-primary-light: #2d4a1a;
+  --color-secondary: #ffd633;
+  --color-secondary-dark: #ffc800;
+
+  /* Background colors - Dark Mode Premium (Slate) */
+  --bg-primary: #1e293b; /* Slate 800 - Blue-gray dark (upgraded from #141414) */
+  --bg-secondary: #0f172a; /* Slate 900 - Deep charcoal (upgraded from #1f1f1f) */
+  --bg-tertiary: #334155; /* Slate 700 - Medium blue-gray (upgraded from #2d2d2d) */
+
+  /* Text colors */
   --text-primary: #ffffff;
   --text-secondary: #a0a0a0;
-  --border-color: #434343;
+  --text-disabled: #4a4a4a;
+  --text-white: #ffffff;
+
+  /* Border colors - Updated for Slate theme */
+  --border-color: #334155; /* Slate 700 - matches tertiary bg (upgraded from #434343) */
+  --border-light: #1e293b; /* Slate 800 - matches primary bg (upgraded from #2d2d2d) */
+  --border-default: #334155;
+
+  /* Shadows - darker for dark mode */
   --shadow: rgba(0, 0, 0, 0.5);
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.6);
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
-/* Apply theme variables to body */
+/* ============================================
+   GLOBAL STYLES
+   ============================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
+  font-family:
+    'Nunito',
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+  background-color: var(--bg-secondary); /* Soft gray-blue background */
+  color: var(--text-primary); /* #3C3C3C instead of pure black */
+  line-height: 1.5;
   transition:
     background-color 0.3s ease,
     color 0.3s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Dark mode for common elements */
+/* Smooth scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-disabled);
+}
+
+/* Selection color */
+::selection {
+  background-color: var(--color-primary-light);
+  color: var(--text-primary);
+}
+
+::-moz-selection {
+  background-color: var(--color-primary-light);
+  color: var(--text-primary);
+}
+
+/* ============================================
+   ANT DESIGN DARK MODE OVERRIDES
+   ============================================ */
 html.dark {
   .app-container {
     background-color: var(--bg-primary);
     color: var(--text-primary);
   }
 
-  /* Layout components */
+  /* Layout */
   .ant-layout {
     background-color: var(--bg-primary);
   }
@@ -54,32 +165,37 @@ html.dark {
   }
 
   .ant-layout-sider {
-    background: linear-gradient(180deg, #0f1419 0%, #1a1f26 100%) !important;
+    background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%) !important;
   }
 
-  /* Cards and panels */
+  /* Cards */
   .ant-card {
-    background-color: var(--bg-secondary);
+    background-color: var(--bg-primary);
     border-color: var(--border-color);
+    color: var(--text-primary);
   }
 
   /* Inputs */
   .ant-input,
   .ant-input-number,
-  .ant-select-selector {
+  .ant-select-selector,
+  .ant-picker {
     background-color: var(--bg-secondary);
     border-color: var(--border-color);
     color: var(--text-primary);
   }
 
   .ant-input:focus,
-  .ant-input-focused {
+  .ant-input-focused,
+  .ant-input-number:focus,
+  .ant-select-focused .ant-select-selector {
     background-color: var(--bg-secondary);
+    border-color: var(--color-primary);
   }
 
   /* Tables */
   .ant-table {
-    background-color: var(--bg-secondary);
+    background-color: var(--bg-primary);
     color: var(--text-primary);
   }
 
@@ -91,20 +207,27 @@ html.dark {
 
   .ant-table-tbody > tr > td {
     border-color: var(--border-color);
+    color: var(--text-primary);
   }
 
   .ant-table-tbody > tr:hover > td {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: var(--bg-secondary);
   }
 
   /* Modals */
   .ant-modal-content {
-    background-color: var(--bg-secondary);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
   }
 
   .ant-modal-header {
-    background-color: var(--bg-secondary);
+    background-color: var(--bg-primary);
     border-color: var(--border-color);
+    color: var(--text-primary);
+  }
+
+  .ant-modal-title {
+    color: var(--text-primary);
   }
 
   /* Dropdowns */
@@ -116,8 +239,12 @@ html.dark {
     color: var(--text-primary);
   }
 
+  .ant-select-item:hover {
+    background-color: var(--bg-tertiary);
+  }
+
   .ant-select-item-option-selected {
-    background-color: rgba(102, 126, 234, 0.2);
+    background-color: rgba(88, 204, 2, 0.2);
   }
 
   /* Buttons */
@@ -126,9 +253,9 @@ html.dark {
     border-color: var(--border-color);
     color: var(--text-primary);
 
-    &:hover {
-      border-color: #667eea;
-      color: #667eea;
+    &:hover:not(:disabled) {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
     }
   }
 
@@ -139,11 +266,16 @@ html.dark {
   }
 
   .ant-menu-item {
-    color: rgba(255, 255, 255, 0.85);
+    color: var(--text-secondary);
+  }
+
+  .ant-menu-item:hover {
+    color: var(--text-primary);
   }
 
   .ant-menu-item-selected {
-    background-color: rgba(102, 126, 234, 0.2);
+    background-color: rgba(88, 204, 2, 0.15);
+    color: var(--color-primary);
   }
 
   /* Typography */
@@ -151,33 +283,14 @@ html.dark {
     color: var(--text-primary);
   }
 
-  /* Space and dividers */
+  /* Dividers */
   .ant-divider {
     border-color: var(--border-color);
   }
 
   /* Badges */
   .ant-badge-count {
-    background-color: #667eea;
-  }
-
-  /* Segmented (Language toggle) */
-  .ant-segmented {
-    background-color: var(--bg-secondary) !important;
-  }
-
-  .ant-segmented-item {
-    color: var(--text-secondary);
-  }
-
-  .ant-segmented-item-selected {
-    background-color: rgba(102, 126, 234, 0.3) !important;
-    color: var(--text-primary) !important;
-  }
-
-  /* List */
-  .ant-list {
-    color: var(--text-primary);
+    background-color: var(--color-primary);
   }
 
   /* Empty state */
@@ -190,46 +303,74 @@ html.dark {
     color: var(--text-primary);
   }
 
-  /* Toastify */
-  .Toastify__toast {
-    background-color: var(--bg-secondary);
+  /* Progress */
+  .ant-progress-text {
     color: var(--text-primary);
   }
+}
 
-  /* Custom scrollbar for dark mode */
-  ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+/* ============================================
+   RESPONSIVE EXERCISE CONTAINERS
+   ============================================ */
+.listening-exercise-container,
+.reading-exercise-container,
+.writing-exercise-container,
+.speaking-exercise-container,
+.exercise-container {
+  padding: 24px; /* Desktop: p-6 */
+  background: var(--bg-secondary);
+  min-height: 100vh;
+  font-family:
+    'Nunito',
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+  color: var(--text-primary);
+
+  @media (max-width: 768px) {
+    padding: 16px; /* Tablet/Mobile: p-4 */
   }
 
-  ::-webkit-scrollbar-track {
-    background: var(--bg-secondary);
+  @media (max-width: 480px) {
+    padding: 12px; /* Small Mobile: p-3 */
+  }
+}
+
+/* Responsive card padding */
+.listening-exercise-container .ant-card,
+.reading-exercise-container .ant-card,
+.writing-exercise-container .ant-card,
+.speaking-exercise-container .ant-card,
+.exercise-container .ant-card {
+  @media (max-width: 768px) {
+    .ant-card-body {
+      padding: 16px;
+    }
   }
 
-  ::-webkit-scrollbar-thumb {
-    background: #555;
-    border-radius: 5px;
-
-    &:hover {
-      background: #666;
+  @media (max-width: 480px) {
+    .ant-card-body {
+      padding: 12px;
     }
   }
 }
 
-/* Loading spinner */
-.loading-spinner {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  font-size: 18px;
-  color: var(--text-primary);
-}
+/* Responsive audio controls */
+.listening-exercise-container {
+  .ant-row[gutter] {
+    @media (max-width: 480px) {
+      gap: 8px;
+    }
+  }
 
-/* Smooth transitions for all theme changes */
-* {
-  transition:
-    background-color 0.3s ease,
-    border-color 0.3s ease,
-    color 0.3s ease;
+  /* Speed buttons on mobile */
+  .ant-btn-sm {
+    @media (max-width: 480px) {
+      min-width: 40px !important;
+      padding: 0 8px;
+      font-size: 12px;
+    }
+  }
 }

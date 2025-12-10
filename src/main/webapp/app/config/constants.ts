@@ -4,6 +4,9 @@ export const AUTHORITIES = {
   STAFF: 'ROLE_STAFF',
 } as const;
 
+// JWT Token storage key (single source of truth)
+export const TOKEN_KEY = 'jhi-authenticationToken';
+
 export const messages = {
   DATA_ERROR_ALERT: 'Internal Error',
 };

@@ -37,8 +37,9 @@ public class FavoriteResource {
     @PostMapping("/chapter/{chapterId}")
     public ResponseEntity<Void> addFavorite(@PathVariable("chapterId") Long chapterId) {
         LOG.debug("REST request to add chapter to favorites : {}", chapterId);
-        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
+        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated")
+        );
 
         favoriteService.addFavorite(chapterId, userLogin);
         return ResponseEntity.ok().build();
@@ -54,8 +55,9 @@ public class FavoriteResource {
     @DeleteMapping("/chapter/{chapterId}")
     public ResponseEntity<Void> removeFavorite(@PathVariable("chapterId") Long chapterId) {
         LOG.debug("REST request to remove chapter from favorites : {}", chapterId);
-        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
+        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated")
+        );
 
         favoriteService.removeFavorite(chapterId, userLogin);
         return ResponseEntity.noContent().build();
@@ -70,8 +72,9 @@ public class FavoriteResource {
     @GetMapping("")
     public ResponseEntity<List<ChapterDTO>> getFavorites() {
         LOG.debug("REST request to get favorites");
-        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
+        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated")
+        );
 
         List<ChapterDTO> favorites = favoriteService.getFavorites(userLogin);
         return ResponseEntity.ok().body(favorites);
@@ -87,10 +90,35 @@ public class FavoriteResource {
     @GetMapping("/chapter/{chapterId}/check")
     public ResponseEntity<Boolean> isFavorite(@PathVariable("chapterId") Long chapterId) {
         LOG.debug("REST request to check if chapter is favorite : {}", chapterId);
-        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
+        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated")
+        );
 
         boolean isFav = favoriteService.isFavorite(chapterId, userLogin);
         return ResponseEntity.ok().body(isFav);
+    }
+
+    /**
+     * {@code PUT  /favorites/chapter/:chapterId/toggle} : Toggle favorite status for a chapter.
+     * Use case 38: Save favorite lessons
+     *
+     * @param chapterId the id of the chapter to toggle.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and boolean indicating new state.
+     */
+    @PutMapping("/chapter/{chapterId}/toggle")
+    public ResponseEntity<Boolean> toggleFavorite(@PathVariable("chapterId") Long chapterId) {
+        LOG.debug("REST request to toggle favorite for chapter : {}", chapterId);
+        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated")
+        );
+
+        boolean isFav = favoriteService.isFavorite(chapterId, userLogin);
+        if (isFav) {
+            favoriteService.removeFavorite(chapterId, userLogin);
+            return ResponseEntity.ok().body(false);
+        } else {
+            favoriteService.addFavorite(chapterId, userLogin);
+            return ResponseEntity.ok().body(true);
+        }
     }
 }

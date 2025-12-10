@@ -1,18 +1,22 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { Card, Button, Typography, Space, Row, Col, Alert, message, Spin, Input, Tag } from 'antd';
-import { EditOutlined, CheckCircleOutlined, LeftOutlined, FormOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { Card, Button, Typography, Space, Row, Col, Alert, message, Spin, Tag } from 'antd';
+import { EditOutlined, CheckCircleOutlined, FormOutlined, InfoCircleOutlined, LeftOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppDispatch } from 'app/config/store';
 import { upsertChapterProgress } from 'app/shared/services/progress.service';
 import { IWritingExercise } from 'app/shared/model/models';
+import SmartLanguageInput from 'app/shared/components/SmartLanguageInput';
+import useHapticFeedback from 'app/shared/hooks/useHapticFeedback';
+import { showSubmitFeedback } from 'app/shared/components/ExerciseFeedback';
+import { colors, spacing, borderRadius, shadows, typography, cardBaseStyle, pageContainerStyle } from 'app/shared/styles/design-system';
 
 const { Title, Text, Paragraph } = Typography;
-const { TextArea } = Input;
 
 const WritingExercise: React.FC = () => {
   const { exerciseId } = useParams<{ exerciseId: string }>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const haptic = useHapticFeedback();
 
   const [exercise, setExercise] = useState<IWritingExercise | null>(null);
   const [userAnswer, setUserAnswer] = useState<string>('');
@@ -63,17 +67,20 @@ const WritingExercise: React.FC = () => {
 
   const handleSubmit = () => {
     if (!userAnswer.trim()) {
+      haptic.warning();
       message.warning('Vui lòng viết bài trước khi nộp');
       return;
     }
 
     if (!isEnoughWords) {
+      haptic.warning();
       message.warning(`Bài viết của bạn cần ít nhất ${minWords} ký tự tiếng Hàn`);
       return;
     }
 
     setIsSubmitted(true);
-    message.success('Bài viết đã được gửi! 🎉');
+    haptic.success();
+    showSubmitFeedback();
 
     // Update progress
     if (exercise?.chapterId) {
@@ -87,6 +94,7 @@ const WritingExercise: React.FC = () => {
   };
 
   const handleRetry = () => {
+    haptic.tap();
     setUserAnswer('');
     setIsSubmitted(false);
     setShowSample(false);
@@ -116,42 +124,44 @@ const WritingExercise: React.FC = () => {
   }
 
   return (
-    <div style={{ padding: '24px', maxWidth: 900, margin: '0 auto', background: '#f0f2f5', minHeight: '100vh' }}>
+    <div
+      className="writing-exercise-container"
+      style={{
+        ...pageContainerStyle,
+        maxWidth: 900,
+        margin: '0 auto',
+        padding: undefined,
+      }}
+    >
       {/* Header */}
-      <div style={{ marginBottom: '24px' }}>
+      <div style={{ marginBottom: spacing.lg }}>
         <Button icon={<LeftOutlined />} onClick={handleBack} type="text" size="large">
           Quay lại
         </Button>
       </div>
 
-      <Card
-        style={{
-          borderRadius: '16px',
-          boxShadow: '0 4px 20px rgba(102, 126, 234, 0.1)',
-          border: '2px solid rgba(102, 126, 234, 0.1)',
-        }}
-      >
+      <Card style={{ ...cardBaseStyle }}>
         {/* Exercise Header */}
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+        <div style={{ textAlign: 'center', marginBottom: spacing.xl }}>
           <div
             style={{
               width: '80px',
               height: '80px',
-              background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-              borderRadius: '50%',
+              background: colors.secondary.gradient,
+              borderRadius: borderRadius.full,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              margin: '0 auto 20px',
-              boxShadow: '0 4px 12px rgba(240, 147, 251, 0.3)',
+              margin: `0 auto ${spacing.lg}`,
+              boxShadow: shadows.staff,
             }}
           >
-            <FormOutlined style={{ fontSize: '40px', color: '#fff' }} />
+            <FormOutlined style={{ fontSize: '40px', color: '#FFFFFF' }} />
           </div>
-          <Title level={2} style={{ marginBottom: '8px', color: '#1a1a1a' }}>
+          <Title level={2} style={{ marginBottom: spacing.sm, color: colors.text.primary }}>
             Bài tập Luyện viết
           </Title>
-          <Text type="secondary" style={{ fontSize: '16px' }}>
+          <Text type="secondary" style={{ fontSize: typography.fontSize.md, color: colors.text.secondary }}>
             Rèn luyện kỹ năng viết tiếng Hàn
           </Text>
         </div>
@@ -159,43 +169,51 @@ const WritingExercise: React.FC = () => {
         {/* Instructions */}
         <Card
           style={{
-            background: 'linear-gradient(135deg, rgba(240, 147, 251, 0.05) 0%, rgba(245, 87, 108, 0.05) 100%)',
-            border: '2px solid rgba(240, 147, 251, 0.2)',
-            borderRadius: '12px',
-            marginBottom: '32px',
+            background: colors.background.secondary,
+            border: `2px solid ${colors.border.light}`,
+            borderRadius: borderRadius.md,
+            marginBottom: spacing.xl,
           }}
         >
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
             <div>
-              <Text strong style={{ fontSize: '16px', color: '#1a1a1a' }}>
-                <InfoCircleOutlined style={{ marginRight: '8px', color: '#f093fb' }} />
+              <Text strong style={{ fontSize: typography.fontSize.md, color: colors.text.primary }}>
+                <InfoCircleOutlined style={{ marginRight: spacing.sm, color: colors.secondary.DEFAULT }} />
                 Yêu cầu đề bài:
               </Text>
-              <Paragraph style={{ fontSize: '16px', lineHeight: '1.8', color: '#262626', marginTop: '12px', marginBottom: 0 }}>
+              <Paragraph
+                style={{
+                  fontSize: typography.fontSize.md,
+                  lineHeight: '1.8',
+                  color: colors.text.primary,
+                  marginTop: spacing.md,
+                  marginBottom: 0,
+                }}
+              >
                 {exercise.prompt}
               </Paragraph>
             </div>
 
             <Row gutter={16}>
               <Col span={12}>
-                <Card size="small" style={{ background: 'white', border: '1px solid rgba(240, 147, 251, 0.3)' }}>
+                <Card size="small" style={{ background: colors.background.primary, border: `1px solid ${colors.border.light}` }}>
                   <Space direction="vertical" size={4}>
-                    <Text type="secondary" style={{ fontSize: '12px' }}>
+                    <Text type="secondary" style={{ fontSize: typography.fontSize.xs }}>
                       Số ký tự tối thiểu:
                     </Text>
-                    <Text strong style={{ fontSize: '18px', color: '#f093fb' }}>
+                    <Text strong style={{ fontSize: typography.fontSize.lg, color: colors.secondary.DEFAULT }}>
                       {minWords} ký tự
                     </Text>
                   </Space>
                 </Card>
               </Col>
               <Col span={12}>
-                <Card size="small" style={{ background: 'white', border: '1px solid rgba(240, 147, 251, 0.3)' }}>
+                <Card size="small" style={{ background: colors.background.primary, border: `1px solid ${colors.border.light}` }}>
                   <Space direction="vertical" size={4}>
-                    <Text type="secondary" style={{ fontSize: '12px' }}>
+                    <Text type="secondary" style={{ fontSize: typography.fontSize.xs }}>
                       Điểm tối đa:
                     </Text>
-                    <Text strong style={{ fontSize: '18px', color: '#f093fb' }}>
+                    <Text strong style={{ fontSize: typography.fontSize.lg, color: colors.secondary.DEFAULT }}>
                       {exercise.maxScore} điểm
                     </Text>
                   </Space>
@@ -206,37 +224,43 @@ const WritingExercise: React.FC = () => {
         </Card>
 
         {/* Writing Area */}
-        <div style={{ marginBottom: '32px' }}>
-          <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Title level={4} style={{ marginBottom: 0, color: '#1a1a1a' }}>
-              <EditOutlined style={{ marginRight: '8px', color: '#f093fb' }} />
+        <div style={{ marginBottom: spacing.xl }}>
+          <div style={{ marginBottom: spacing.md, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Title level={4} style={{ marginBottom: 0, color: colors.text.primary }}>
+              <EditOutlined style={{ marginRight: spacing.sm, color: colors.secondary.DEFAULT }} />
               Bài viết của bạn:
             </Title>
             <Space>
-              <Tag color={isEnoughWords ? 'success' : 'warning'} style={{ fontSize: '14px', padding: '4px 12px' }}>
+              <Tag
+                color={isEnoughWords ? 'success' : 'warning'}
+                style={{ fontSize: typography.fontSize.base, padding: `${spacing.xs} ${spacing.md}` }}
+              >
                 {wordCount} / {minWords} ký tự
               </Tag>
             </Space>
           </div>
 
-          <TextArea
+          <SmartLanguageInput
             value={userAnswer}
-            onChange={e => setUserAnswer(e.target.value)}
+            onChange={setUserAnswer}
             placeholder="Bắt đầu viết bằng tiếng Hàn..."
             disabled={isSubmitted}
+            language="korean"
+            type="textarea"
             autoSize={{ minRows: 8, maxRows: 12 }}
+            autoCorrect="off"
+            autoCapitalize="none"
             style={{
-              fontSize: '16px',
+              fontSize: typography.fontSize.md,
               lineHeight: '1.8',
-              borderRadius: '12px',
-              border: '2px solid rgba(240, 147, 251, 0.2)',
-              fontFamily: "'Noto Sans KR', sans-serif",
-              background: isSubmitted ? '#f5f5f5' : 'white',
+              borderRadius: borderRadius.md,
+              border: `2px solid ${colors.border.light}`,
+              background: isSubmitted ? colors.background.tertiary : colors.background.primary,
             }}
           />
 
           {!isEnoughWords && userAnswer.length > 0 && (
-            <Text type="warning" style={{ marginTop: '8px', display: 'block' }}>
+            <Text type="warning" style={{ marginTop: spacing.sm, display: 'block' }}>
               ⚠️ Bạn cần viết thêm {minWords - wordCount} ký tự nữa
             </Text>
           )}
@@ -246,31 +270,31 @@ const WritingExercise: React.FC = () => {
         {exercise.sampleAnswer && (
           <Card
             style={{
-              background: 'rgba(102, 126, 234, 0.05)',
-              border: '1px solid rgba(102, 126, 234, 0.2)',
-              borderRadius: '12px',
-              marginBottom: '32px',
+              background: colors.background.secondary,
+              border: `1px solid ${colors.border.light}`,
+              borderRadius: borderRadius.md,
+              marginBottom: spacing.xl,
             }}
           >
-            <div style={{ marginBottom: '12px' }}>
-              <Button type="link" onClick={() => setShowSample(!showSample)} style={{ padding: 0, fontSize: '15px' }}>
+            <div style={{ marginBottom: spacing.md }}>
+              <Button type="link" onClick={() => setShowSample(!showSample)} style={{ padding: 0, fontSize: typography.fontSize.base }}>
                 {showSample ? '▼' : '▶'} Xem bài mẫu tham khảo
               </Button>
             </div>
             {showSample && (
               <div
                 style={{
-                  padding: '16px',
-                  background: 'white',
-                  borderRadius: '8px',
-                  border: '1px solid rgba(102, 126, 234, 0.2)',
+                  padding: spacing.md,
+                  background: colors.background.primary,
+                  borderRadius: borderRadius.sm,
+                  border: `1px solid ${colors.border.light}`,
                 }}
               >
                 <Paragraph
                   style={{
-                    fontSize: '16px',
+                    fontSize: typography.fontSize.md,
                     lineHeight: '1.8',
-                    color: '#262626',
+                    color: colors.text.primary,
                     fontFamily: "'Noto Sans KR', sans-serif",
                     marginBottom: 0,
                   }}
@@ -290,7 +314,7 @@ const WritingExercise: React.FC = () => {
             type="success"
             showIcon
             icon={<CheckCircleOutlined />}
-            style={{ marginBottom: '24px', borderRadius: '12px' }}
+            style={{ marginBottom: spacing.lg, borderRadius: borderRadius.md }}
           />
         )}
 
@@ -306,11 +330,11 @@ const WritingExercise: React.FC = () => {
                 disabled={!isEnoughWords || !userAnswer.trim()}
                 style={{
                   height: '48px',
-                  fontSize: '16px',
-                  borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                  fontSize: typography.fontSize.md,
+                  borderRadius: borderRadius.md,
+                  background: colors.primary.gradient,
                   border: 'none',
-                  fontWeight: 600,
+                  fontWeight: typography.fontWeight.semibold,
                 }}
               >
                 Nộp bài
@@ -319,7 +343,16 @@ const WritingExercise: React.FC = () => {
           ) : (
             <>
               <Col span={12}>
-                <Button size="large" onClick={handleRetry} block style={{ height: '48px', fontSize: '16px', borderRadius: '12px' }}>
+                <Button
+                  size="large"
+                  onClick={handleRetry}
+                  block
+                  style={{
+                    height: '48px',
+                    fontSize: typography.fontSize.md,
+                    borderRadius: borderRadius.md,
+                  }}
+                >
                   Làm lại
                 </Button>
               </Col>
@@ -331,9 +364,9 @@ const WritingExercise: React.FC = () => {
                   block
                   style={{
                     height: '48px',
-                    fontSize: '16px',
-                    borderRadius: '12px',
-                    background: 'linear-gradient(135deg, #52c41a 0%, #73d13d 100%)',
+                    fontSize: typography.fontSize.md,
+                    borderRadius: borderRadius.md,
+                    background: colors.primary.gradient,
                     border: 'none',
                   }}
                 >
@@ -347,26 +380,26 @@ const WritingExercise: React.FC = () => {
         {/* Tips */}
         <Card
           style={{
-            marginTop: '24px',
-            background: 'rgba(240, 147, 251, 0.05)',
-            border: '1px solid rgba(240, 147, 251, 0.2)',
-            borderRadius: '12px',
+            marginTop: spacing.lg,
+            background: colors.background.secondary,
+            border: `1px solid ${colors.border.light}`,
+            borderRadius: borderRadius.md,
           }}
         >
           <Space direction="vertical" size="small">
-            <Text strong style={{ color: '#f093fb' }}>
+            <Text strong style={{ color: colors.secondary.DEFAULT }}>
               💡 Mẹo viết bài:
             </Text>
-            <Text type="secondary" style={{ fontSize: '14px' }}>
+            <Text type="secondary" style={{ fontSize: typography.fontSize.base }}>
               • Sử dụng từ vựng và ngữ pháp đã học trong chương
             </Text>
-            <Text type="secondary" style={{ fontSize: '14px' }}>
+            <Text type="secondary" style={{ fontSize: typography.fontSize.base }}>
               • Viết câu đơn giản và rõ ràng, tránh câu quá dài
             </Text>
-            <Text type="secondary" style={{ fontSize: '14px' }}>
+            <Text type="secondary" style={{ fontSize: typography.fontSize.base }}>
               • Kiểm tra chính tả và ngữ pháp trước khi nộp bài
             </Text>
-            <Text type="secondary" style={{ fontSize: '14px' }}>
+            <Text type="secondary" style={{ fontSize: typography.fontSize.base }}>
               • Tham khảo bài mẫu để học cách diễn đạt tự nhiên
             </Text>
           </Space>

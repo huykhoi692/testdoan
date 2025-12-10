@@ -186,6 +186,52 @@ public class BookService {
     }
 
     /**
+     * Get all inactive books (for admin review).
+     *
+     * @param pageable the pagination information.
+     * @return the page of books.
+     */
+    public Page<BookDTO> findInactive(Pageable pageable) {
+        LOG.debug("Request to get all inactive Books");
+        return bookRepository.findByIsActiveFalse(pageable).map(bookMapper::toDto);
+    }
+
+    /**
+     * Approve a book - set it as active.
+     *
+     * @param id the id of the book.
+     * @return the approved book.
+     */
+    public BookDTO approve(Long id) {
+        LOG.debug("Request to approve Book : {}", id);
+        Book book = bookRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Book not found with id: " + id));
+
+        book.setIsActive(true);
+        book = bookRepository.save(book);
+
+        String currentUser = getCurrentUserLogin();
+        LOG.info("AUDIT: Book approved | ID: {} | Title: '{}' | User: {}", id, book.getTitle(), currentUser);
+
+        return bookMapper.toDto(book);
+    }
+
+    /**
+     * Reject a book - set it as inactive.
+     *
+     * @param id the id of the book.
+     */
+    public void reject(Long id) {
+        LOG.debug("Request to reject Book : {}", id);
+        Book book = bookRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Book not found with id: " + id));
+
+        book.setIsActive(false);
+        bookRepository.save(book);
+
+        String currentUser = getCurrentUserLogin();
+        LOG.info("AUDIT: Book rejected | ID: {} | Title: '{}' | User: {}", id, book.getTitle(), currentUser);
+    }
+
+    /**
      * Hard delete the book by id - ADMIN ONLY.
      * WARNING: This permanently deletes the book and all related data.
      *
@@ -251,12 +297,18 @@ public class BookService {
     @Transactional(readOnly = true)
     public Page<BookDTO> searchBooks(String keyword, Pageable pageable) {
         LOG.debug("Request to search Books with keyword : {}", keyword);
-        if (keyword == null || keyword.trim().isEmpty()) {
-            return findAll(pageable);
+        try {
+            if (keyword == null || keyword.trim().isEmpty()) {
+                return findAllActive(pageable);
+            }
+            return bookRepository
+                .findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(keyword, keyword, pageable)
+                .map(bookMapper::toDto);
+        } catch (Exception e) {
+            LOG.error("Error searching books with keyword: {}", keyword, e);
+            // Return empty page instead of throwing exception
+            return Page.empty(pageable);
         }
-        return bookRepository
-            .findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(keyword, keyword, pageable)
-            .map(bookMapper::toDto);
     }
 
     /**

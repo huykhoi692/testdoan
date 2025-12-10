@@ -33,12 +33,18 @@ module.exports = async options =>
               loader: 'css-loader',
               options: {
                 sourceMap: true,
+                modules: false,
+                importLoaders: 2,
+                esModule: false,
               },
             },
             {
               loader: 'postcss-loader',
               options: {
                 sourceMap: true,
+                postcssOptions: {
+                  plugins: [require('autoprefixer')],
+                },
               },
             },
             {
@@ -46,6 +52,9 @@ module.exports = async options =>
               options: {
                 implementation: sass,
                 sourceMap: true,
+                sassOptions: {
+                  quietDeps: true,
+                },
               },
             },
           ],

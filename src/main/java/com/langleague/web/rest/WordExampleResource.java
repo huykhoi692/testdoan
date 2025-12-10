@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -141,6 +142,7 @@ public class WordExampleResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of wordExamples in body.
      */
     @GetMapping("")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<WordExampleDTO>> getAllWordExamples(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         LOG.debug("REST request to get a page of WordExamples");
         Page<WordExampleDTO> page = wordExampleService.findAll(pageable);
@@ -155,6 +157,7 @@ public class WordExampleResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the wordExampleDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<WordExampleDTO> getWordExample(@PathVariable("id") Long id) {
         LOG.debug("REST request to get WordExample : {}", id);
         Optional<WordExampleDTO> wordExampleDTO = wordExampleService.findOne(id);

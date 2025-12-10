@@ -2,7 +2,6 @@ package com.langleague.security.jwt;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.langleague.security.JwtTestUtility;
 import java.util.Date;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

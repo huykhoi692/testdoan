@@ -34,6 +34,17 @@ public class Achievement implements Serializable {
     @Column(name = "description")
     private String description;
 
+    @Size(max = 50)
+    @Column(name = "criteria_type", length = 50)
+    private String criteriaType;
+
+    @Column(name = "target_value")
+    private Long targetValue;
+
+    @Size(max = 500)
+    @Column(name = "icon_url", length = 500)
+    private String iconUrl;
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "achievement")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "appUser", "achievement" }, allowSetters = true)
@@ -78,6 +89,45 @@ public class Achievement implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getCriteriaType() {
+        return this.criteriaType;
+    }
+
+    public Achievement criteriaType(String criteriaType) {
+        this.setCriteriaType(criteriaType);
+        return this;
+    }
+
+    public void setCriteriaType(String criteriaType) {
+        this.criteriaType = criteriaType;
+    }
+
+    public Long getTargetValue() {
+        return this.targetValue;
+    }
+
+    public Achievement targetValue(Long targetValue) {
+        this.setTargetValue(targetValue);
+        return this;
+    }
+
+    public void setTargetValue(Long targetValue) {
+        this.targetValue = targetValue;
+    }
+
+    public String getIconUrl() {
+        return this.iconUrl;
+    }
+
+    public Achievement iconUrl(String iconUrl) {
+        this.setIconUrl(iconUrl);
+        return this;
+    }
+
+    public void setIconUrl(String iconUrl) {
+        this.iconUrl = iconUrl;
     }
 
     public Set<UserAchievement> getUserAchievements() {

@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -58,6 +59,7 @@ public class ExerciseResultResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ExerciseResultDTO> createExerciseResult(@RequestBody ExerciseResultDTO exerciseResultDTO)
         throws URISyntaxException {
         LOG.debug("REST request to save ExerciseResult : {}", exerciseResultDTO);
@@ -81,6 +83,7 @@ public class ExerciseResultResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ExerciseResultDTO> updateExerciseResult(
         @PathVariable(value = "id", required = false) final Long id,
         @RequestBody ExerciseResultDTO exerciseResultDTO
@@ -115,6 +118,7 @@ public class ExerciseResultResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ExerciseResultDTO> partialUpdateExerciseResult(
         @PathVariable(value = "id", required = false) final Long id,
         @RequestBody ExerciseResultDTO exerciseResultDTO
@@ -146,6 +150,7 @@ public class ExerciseResultResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of exerciseResults in body.
      */
     @GetMapping("")
+    @org.springframework.security.access.prepost.PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ExerciseResultDTO>> getAllExerciseResults(
         @org.springframework.data.web.PageableDefault(
             size = 20,
@@ -166,6 +171,7 @@ public class ExerciseResultResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the exerciseResultDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
+    @org.springframework.security.access.prepost.PreAuthorize("isAuthenticated()")
     public ResponseEntity<ExerciseResultDTO> getExerciseResult(@PathVariable("id") Long id) {
         LOG.debug("REST request to get ExerciseResult : {}", id);
         Optional<ExerciseResultDTO> exerciseResultDTO = exerciseResultService.findOne(id);
@@ -179,6 +185,7 @@ public class ExerciseResultResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
+    @org.springframework.security.access.prepost.PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> deleteExerciseResult(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete ExerciseResult : {}", id);
         exerciseResultService.delete(id);
@@ -195,6 +202,7 @@ public class ExerciseResultResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/submit")
+    @org.springframework.security.access.prepost.PreAuthorize("isAuthenticated()")
     public ResponseEntity<ExerciseResultDTO> submitExercise(@Valid @RequestBody SubmitExerciseDTO submitExerciseDTO)
         throws URISyntaxException {
         LOG.debug("REST request to submit exercise : {}", submitExerciseDTO);
@@ -210,6 +218,7 @@ public class ExerciseResultResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of exerciseResults in body.
      */
     @GetMapping("/my-results")
+    @org.springframework.security.access.prepost.PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ExerciseResultDTO>> getMyExerciseResults() {
         LOG.debug("REST request to get exercise results for current user");
         List<ExerciseResultDTO> results = exerciseResultService.findByCurrentUser();
@@ -223,6 +232,7 @@ public class ExerciseResultResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of exerciseResults in body.
      */
     @GetMapping("/my-results/by-type")
+    @org.springframework.security.access.prepost.PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ExerciseResultDTO>> getMyExerciseResultsByType(@RequestParam ExerciseType exerciseType) {
         LOG.debug("REST request to get exercise results for current user by type: {}", exerciseType);
         List<ExerciseResultDTO> results = exerciseResultService.findByCurrentUserAndExerciseType(exerciseType);
@@ -235,6 +245,7 @@ public class ExerciseResultResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of exerciseResults in body.
      */
     @GetMapping("/my-results/recent")
+    @org.springframework.security.access.prepost.PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ExerciseResultDTO>> getMyRecentExerciseResults() {
         LOG.debug("REST request to get recent exercise results for current user");
         List<ExerciseResultDTO> results = exerciseResultService.findRecentByCurrentUser();
@@ -247,6 +258,7 @@ public class ExerciseResultResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the statistics in body.
      */
     @GetMapping("/my-statistics")
+    @org.springframework.security.access.prepost.PreAuthorize("isAuthenticated()")
     public ResponseEntity<ExerciseStatisticsDTO> getMyExerciseStatistics() {
         LOG.debug("REST request to get exercise statistics for current user");
         ExerciseStatisticsDTO stats = exerciseResultService.getStatisticsForCurrentUser();
@@ -260,6 +272,7 @@ public class ExerciseResultResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of exerciseResults in body.
      */
     @GetMapping("/my-results/by-chapter/{chapterId}")
+    @org.springframework.security.access.prepost.PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ExerciseResultDTO>> getMyExerciseResultsByChapter(@PathVariable Long chapterId) {
         LOG.debug("REST request to get exercise results for current user by chapter: {}", chapterId);
         List<ExerciseResultDTO> results = exerciseResultService.findByCurrentUserAndChapter(chapterId);
@@ -274,6 +287,7 @@ public class ExerciseResultResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of exerciseResults in body.
      */
     @GetMapping("/my-results/by-chapter/{chapterId}/by-type")
+    @org.springframework.security.access.prepost.PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ExerciseResultDTO>> getMyExerciseResultsByChapterAndType(
         @PathVariable Long chapterId,
         @RequestParam ExerciseType exerciseType
@@ -290,6 +304,7 @@ public class ExerciseResultResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the statistics in body.
      */
     @GetMapping("/my-statistics/by-chapter/{chapterId}")
+    @org.springframework.security.access.prepost.PreAuthorize("isAuthenticated()")
     public ResponseEntity<ChapterStatisticsDTO> getMyStatisticsByChapter(@PathVariable Long chapterId) {
         LOG.debug("REST request to get statistics for current user by chapter: {}", chapterId);
         ChapterStatisticsDTO stats = exerciseResultService.getStatisticsForChapter(chapterId);
@@ -303,10 +318,12 @@ public class ExerciseResultResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and count in body.
      */
     @GetMapping("/count")
+    @org.springframework.security.access.prepost.PreAuthorize("isAuthenticated()")
     public ResponseEntity<Long> countMyExercises() {
         LOG.debug("REST request to count my exercises");
-        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
+        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated")
+        );
 
         Long count = exerciseResultService.countByUserLogin(userLogin);
         return ResponseEntity.ok().body(count);

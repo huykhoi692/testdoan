@@ -97,7 +97,7 @@ const Achievements: React.FC = () => {
           <Col xs={24} md={6}>
             <div>
               <Text style={{ color: 'rgba(255,255,255,0.85)', display: 'block', marginBottom: '8px' }}>Completion</Text>
-              <Progress percent={Math.round(completionRate)} strokeColor="white" trailColor="rgba(255,255,255,0.2)" />
+              <Progress percent={Math.round(completionRate)} strokeColor="white" strokeLinecap="round" />
             </div>
           </Col>
         </Row>

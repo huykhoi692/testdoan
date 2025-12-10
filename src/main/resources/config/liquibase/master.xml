@@ -81,11 +81,9 @@
     <include file="config/liquibase/changelog/20251205000003_entity_user_chapter.xml" relativeToChangelogFile="false"/>
 
     <!-- ========================================= -->
-    <!-- 10. SAMPLE DATA (DEV ONLY)               -->
+    <!-- 9. PERFORMANCE INDEXES                    -->
     <!-- ========================================= -->
-
-
-    <include file="config/liquibase/changelog/20251125000099_load_fake_data.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251210000002_add_performance_indexes_clean.xml" relativeToChangelogFile="false"/>
 
 </databaseChangeLog>
 

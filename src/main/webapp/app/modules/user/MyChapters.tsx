@@ -146,11 +146,14 @@ const MyChapters: React.FC = () => {
       cancelText: 'Hủy',
       async onOk() {
         try {
+          console.log('🗑️ Removing chapter:', chapterId);
           await removeChapter(chapterId);
           message.success('Đã xóa chapter khỏi thư viện');
-          loadChapters(activeTab);
-        } catch (error) {
-          message.error('Không thể xóa chapter');
+          // Force reload to update UI
+          await loadChapters(activeTab);
+        } catch (error: any) {
+          console.error('❌ Error removing chapter:', error);
+          message.error(error.response?.data?.message || 'Không thể xóa chapter');
         }
       },
     });
@@ -158,11 +161,20 @@ const MyChapters: React.FC = () => {
 
   const handleToggleFavorite = async (chapterId: number) => {
     try {
-      await toggleFavorite(chapterId);
+      console.log('⭐ Toggling favorite for chapter:', chapterId);
+      const response = await toggleFavorite(chapterId);
+      console.log('✅ Toggle favorite response:', response);
       message.success('Đã cập nhật yêu thích');
-      loadChapters(activeTab);
-    } catch (error) {
-      message.error('Không thể cập nhật yêu thích');
+      // Force reload to update UI
+      await loadChapters(activeTab);
+    } catch (error: any) {
+      console.error('❌ Error toggling favorite:', error);
+      console.error('Error details:', {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message,
+      });
+      message.error(error.response?.data?.message || error.response?.data?.title || 'Không thể cập nhật yêu thích');
     }
   };
 
@@ -204,16 +216,26 @@ const MyChapters: React.FC = () => {
     }
   };
 
-  const handleContinueLearning = (chapterId: number) => {
-    navigate(`/chapters/${chapterId}/lessons`);
+  const handleContinueLearning = (chapter: any) => {
+    // Get chapter and book IDs
+    const chapterId = chapter.chapterId || chapter.chapter?.id || 0;
+    const bookId = chapter.bookId || chapter.book?.id || 0;
+
+    if (chapterId && bookId) {
+      // Navigate to correct route: /dashboard/books/:bookId/chapter/:chapterId
+      navigate(`/dashboard/books/${bookId}/chapter/${chapterId}`);
+    } else {
+      message.error('Không thể tìm thấy thông tin chapter');
+    }
   };
 
   const handleViewBook = (bookId: number) => {
-    navigate(`/books/${bookId}`);
+    navigate(`/dashboard/books/${bookId}`);
   };
 
   const getChapterId = (chapter: any): number => {
-    return chapter.chapterId || 0;
+    // Support both MyChapterDTO (chapterId) and UserChapterDTO (chapter.id or id from API response)
+    return chapter.chapterId || chapter.chapter?.id || chapter.id || 0;
   };
 
   const getChapterTitle = (chapter: any): string => {
@@ -419,7 +441,7 @@ const MyChapters: React.FC = () => {
                           <Button type="text" icon={<SaveOutlined />} onClick={() => handleSaveChapter(chapterId)} />
                         </Tooltip>
                       ),
-                      <Button key="continue" type="primary" icon={<RightOutlined />} onClick={() => handleContinueLearning(chapterId)}>
+                      <Button key="continue" type="primary" icon={<RightOutlined />} onClick={() => handleContinueLearning(chapter)}>
                         {completed ? 'Xem lại' : progressPercent > 0 ? 'Tiếp tục học' : 'Bắt đầu học'}
                       </Button>,
                       <Button key="view" type="link" onClick={() => handleViewBook(bookId)}>

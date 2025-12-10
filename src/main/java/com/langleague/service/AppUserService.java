@@ -88,7 +88,8 @@ public class AppUserService {
             else if (appUserDTO.getInternalUser().getLogin() != null) {
                 user = userRepository
                     .findOneByLogin(appUserDTO.getInternalUser().getLogin())
-                    .orElseThrow(() -> new IllegalArgumentException("User not found with login: " + appUserDTO.getInternalUser().getLogin())
+                    .orElseThrow(() ->
+                        new IllegalArgumentException("User not found with login: " + appUserDTO.getInternalUser().getLogin())
                     );
             } else {
                 throw new IllegalArgumentException("Either user ID or login must be provided");
@@ -114,9 +115,17 @@ public class AppUserService {
     )
     public AppUserDTO update(AppUserDTO appUserDTO) {
         LOG.debug("Request to update AppUser : {}", appUserDTO);
-        AppUser appUser = appUserMapper.toEntity(appUserDTO);
-        appUser = appUserRepository.save(appUser);
-        return appUserMapper.toDto(appUser);
+
+        // Fetch existing entity to preserve version and other managed fields
+        AppUser existingAppUser = appUserRepository
+            .findById(appUserDTO.getId())
+            .orElseThrow(() -> new IllegalArgumentException("AppUser not found with id: " + appUserDTO.getId()));
+
+        // Update fields from DTO
+        appUserMapper.partialUpdate(existingAppUser, appUserDTO);
+
+        existingAppUser = appUserRepository.save(existingAppUser);
+        return appUserMapper.toDto(existingAppUser);
     }
 
     /**

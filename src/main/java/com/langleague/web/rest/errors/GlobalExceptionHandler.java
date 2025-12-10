@@ -260,24 +260,28 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handle RuntimeException - catch-all for runtime errors
-     * Try to determine if it should be a 4xx or 5xx error based on message
+     * Handle ResourceNotFoundException - proper way to handle not found errors
+     */
+    @ExceptionHandler(ResourceNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<ApiResponse<Void>> handleResourceNotFound(ResourceNotFoundException ex) {
+        LOG.warn("Resource not found: {}", ex.getMessage());
+
+        ApiResponse<Void> response = ApiResponse.error(ex.getMessage(), "RESOURCE_NOT_FOUND");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    /**
+     * Handle RuntimeException - catch-all for unexpected runtime errors
+     * Only catches truly unexpected exceptions - specific exceptions should have their own handlers
      */
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<ApiResponse<Void>> handleRuntimeException(RuntimeException ex) {
-        LOG.error("Runtime exception: {}", ex.getMessage(), ex);
+        // Log with full stack trace for debugging
+        LOG.error("Unexpected runtime exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage(), ex);
 
-        // Check if it's a known pattern that should be 400 Bad Request
-        String message = ex.getMessage();
-        if (message != null) {
-            String lowerMessage = message.toLowerCase();
-            if (lowerMessage.contains("not found") || lowerMessage.contains("required") || lowerMessage.contains("invalid")) {
-                ApiResponse<Void> response = ApiResponse.error(message, "BAD_REQUEST");
-                return ResponseEntity.badRequest().body(response);
-            }
-        }
-
+        // For security, don't expose internal error details to client
         ApiResponse<Void> response = ApiResponse.error("An unexpected error occurred. Please try again later.", "RUNTIME_ERROR");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }

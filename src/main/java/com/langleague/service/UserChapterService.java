@@ -1,11 +1,16 @@
 package com.langleague.service;
 
+import com.langleague.domain.AppUser;
+import com.langleague.domain.Chapter;
 import com.langleague.domain.UserChapter;
 import com.langleague.domain.enumeration.LearningStatus;
+import com.langleague.repository.AppUserRepository;
 import com.langleague.repository.ChapterProgressRepository;
+import com.langleague.repository.ChapterRepository;
 import com.langleague.repository.UserChapterRepository;
 import com.langleague.service.dto.UserChapterDTO;
 import com.langleague.service.mapper.UserChapterMapper;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,14 +36,22 @@ public class UserChapterService {
 
     private final ChapterProgressRepository chapterProgressRepository;
 
+    private final AppUserRepository appUserRepository;
+
+    private final ChapterRepository chapterRepository;
+
     public UserChapterService(
         UserChapterRepository userChapterRepository,
         UserChapterMapper userChapterMapper,
-        ChapterProgressRepository chapterProgressRepository
+        ChapterProgressRepository chapterProgressRepository,
+        AppUserRepository appUserRepository,
+        ChapterRepository chapterRepository
     ) {
         this.userChapterRepository = userChapterRepository;
         this.userChapterMapper = userChapterMapper;
         this.chapterProgressRepository = chapterProgressRepository;
+        this.appUserRepository = appUserRepository;
+        this.chapterRepository = chapterRepository;
     }
 
     /**
@@ -171,6 +184,7 @@ public class UserChapterService {
 
     /**
      * Toggle favorite status.
+     * Auto-creates UserChapter if it doesn't exist.
      *
      * @param chapterId the chapter ID
      * @param userLogin the user login
@@ -178,14 +192,40 @@ public class UserChapterService {
      */
     public UserChapterDTO toggleFavorite(Long chapterId, String userLogin) {
         LOG.debug("Request to toggle favorite for chapter {} and user {}", chapterId, userLogin);
-        return userChapterRepository
-            .findByAppUser_InternalUser_LoginAndChapter_Id(userLogin, chapterId)
-            .map(userChapter -> {
-                userChapter.setIsFavorite(!Boolean.TRUE.equals(userChapter.getIsFavorite()));
-                return userChapterRepository.save(userChapter);
-            })
-            .map(userChapterMapper::toDto)
-            .orElseThrow(() -> new RuntimeException("UserChapter not found"));
+
+        Optional<UserChapter> existingUserChapter = userChapterRepository.findByAppUser_InternalUser_LoginAndChapter_Id(
+            userLogin,
+            chapterId
+        );
+
+        if (existingUserChapter.isPresent()) {
+            // Update existing
+            UserChapter userChapter = existingUserChapter.get();
+            userChapter.setIsFavorite(!Boolean.TRUE.equals(userChapter.getIsFavorite()));
+            UserChapter saved = userChapterRepository.save(userChapter);
+            return userChapterMapper.toDto(saved);
+        } else {
+            // Create new UserChapter with favorite = true
+            LOG.info("UserChapter not found, creating new one for chapter {} and user {}", chapterId, userLogin);
+
+            AppUser appUser = appUserRepository
+                .findByInternalUser_Login(userLogin)
+                .orElseThrow(() -> new RuntimeException("AppUser not found for login: " + userLogin));
+
+            Chapter chapter = chapterRepository
+                .findById(chapterId)
+                .orElseThrow(() -> new RuntimeException("Chapter not found: " + chapterId));
+
+            UserChapter newUserChapter = new UserChapter();
+            newUserChapter.setAppUser(appUser);
+            newUserChapter.setChapter(chapter);
+            newUserChapter.setIsFavorite(true);
+            newUserChapter.setLearningStatus(LearningStatus.NOT_STARTED);
+            newUserChapter.setSavedAt(Instant.now());
+
+            UserChapter saved = userChapterRepository.save(newUserChapter);
+            return userChapterMapper.toDto(saved);
+        }
     }
 
     /**
@@ -263,6 +303,7 @@ public class UserChapterService {
 
         // Add chapter details
         if (userChapter.getChapter() != null) {
+            dto.setChapterId(userChapter.getChapter().getId());
             dto.setChapterTitle(userChapter.getChapter().getTitle());
             dto.setChapterOrderIndex(userChapter.getChapter().getOrderIndex());
 

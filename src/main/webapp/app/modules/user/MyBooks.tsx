@@ -11,6 +11,7 @@ import {
   StarOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   getMyBooks,
   getFavoriteBooks,
@@ -26,6 +27,7 @@ const { Title, Text, Paragraph } = Typography;
 const { TabPane } = Tabs;
 
 const MyBooks: React.FC = () => {
+  const { t } = useTranslation(['user', 'common']);
   const navigate = useNavigate();
   const [books, setBooks] = useState<UserBookDTO[]>([]);
   const [loading, setLoading] = useState(false);
@@ -116,7 +118,8 @@ const MyBooks: React.FC = () => {
   };
 
   const handleStartLearning = (bookId: number) => {
-    navigate(`/user/books/${bookId}`);
+    // Navigate to book detail page in dashboard
+    navigate(`/dashboard/books/${bookId}`);
   };
 
   const getLevelColor = (level?: string) => {

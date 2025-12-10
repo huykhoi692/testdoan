@@ -16,6 +16,7 @@ import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConversionException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -123,6 +124,21 @@ public class ExceptionTranslator implements ProblemHandling, SecurityAdviceTrait
         return create(ex, problem, request);
     }
 
+    /**
+     * Handle ObjectOptimisticLockingFailureException - occurs when version mismatch detected.
+     * Returns 409 Conflict with user-friendly message instead of 500 Internal Server Error.
+     */
+    @ExceptionHandler
+    public ResponseEntity<Problem> handleOptimisticLockingFailure(ObjectOptimisticLockingFailureException ex, NativeWebRequest request) {
+        Problem problem = Problem.builder()
+            .withStatus(Status.CONFLICT)
+            .withTitle("Data was modified by another request")
+            .with(MESSAGE_KEY, "error.optimistic.locking")
+            .withDetail("Hệ thống đang bận xử lý, vui lòng thử lại sau ít giây")
+            .build();
+        return create(ex, problem, request);
+    }
+
     @ExceptionHandler
     public ResponseEntity<Problem> handleUserNotActivated(UserNotActivatedException ex, NativeWebRequest request) {
         Problem problem = Problem.builder()
@@ -165,7 +181,10 @@ public class ExceptionTranslator implements ProblemHandling, SecurityAdviceTrait
                     .withStatus(status)
                     .withDetail("Unable to convert http message")
                     .withCause(
-                        Optional.ofNullable(throwable.getCause()).filter(cause -> isCausalChainsEnabled()).map(this::toProblem).orElse(null)
+                        Optional.ofNullable(throwable.getCause())
+                            .filter(cause -> isCausalChainsEnabled())
+                            .map(this::toProblem)
+                            .orElse(null)
                     );
             }
             if (throwable instanceof DataAccessException) {
@@ -175,7 +194,10 @@ public class ExceptionTranslator implements ProblemHandling, SecurityAdviceTrait
                     .withStatus(status)
                     .withDetail("Failure during data access")
                     .withCause(
-                        Optional.ofNullable(throwable.getCause()).filter(cause -> isCausalChainsEnabled()).map(this::toProblem).orElse(null)
+                        Optional.ofNullable(throwable.getCause())
+                            .filter(cause -> isCausalChainsEnabled())
+                            .map(this::toProblem)
+                            .orElse(null)
                     );
             }
             if (containsPackageName(throwable.getMessage())) {
@@ -185,7 +207,10 @@ public class ExceptionTranslator implements ProblemHandling, SecurityAdviceTrait
                     .withStatus(status)
                     .withDetail("Unexpected runtime exception")
                     .withCause(
-                        Optional.ofNullable(throwable.getCause()).filter(cause -> isCausalChainsEnabled()).map(this::toProblem).orElse(null)
+                        Optional.ofNullable(throwable.getCause())
+                            .filter(cause -> isCausalChainsEnabled())
+                            .map(this::toProblem)
+                            .orElse(null)
                     );
             }
         }
@@ -196,7 +221,10 @@ public class ExceptionTranslator implements ProblemHandling, SecurityAdviceTrait
             .withStatus(status)
             .withDetail(throwable.getMessage())
             .withCause(
-                Optional.ofNullable(throwable.getCause()).filter(cause -> isCausalChainsEnabled()).map(this::toProblem).orElse(null)
+                Optional.ofNullable(throwable.getCause())
+                    .filter(cause -> isCausalChainsEnabled())
+                    .map(this::toProblem)
+                    .orElse(null)
             );
     }
 

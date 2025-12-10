@@ -56,6 +56,9 @@ public class BookUpload implements Serializable {
     @Column(name = "retry_count")
     private Integer retryCount = 0;
 
+    @Column(name = "use_ai")
+    private Boolean useAI = false;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "internalUser", "userVocabularies", "userGrammars" }, allowSetters = true)
     private AppUser uploadedBy;
@@ -181,6 +184,19 @@ public class BookUpload implements Serializable {
 
     public void setRetryCount(Integer retryCount) {
         this.retryCount = retryCount;
+    }
+
+    public Boolean getUseAI() {
+        return this.useAI;
+    }
+
+    public BookUpload useAI(Boolean useAI) {
+        this.setUseAI(useAI);
+        return this;
+    }
+
+    public void setUseAI(Boolean useAI) {
+        this.useAI = useAI;
     }
 
     public AppUser getUploadedBy() {
