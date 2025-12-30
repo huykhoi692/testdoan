@@ -245,7 +245,7 @@ public class StudySessionService {
             }
 
             // Check if AppUser exists
-            Long currentUserId = currentUserIdOpt.get();
+            Long currentUserId = currentUserIdOpt.orElseThrow();
             Optional<AppUser> appUserOpt = appUserRepository.findByInternalUserId(currentUserId);
             if (appUserOpt.isEmpty()) {
                 LOG.warn("AppUser not found for user ID {}, returning empty page", currentUserId);

@@ -36,8 +36,10 @@ const WritingExercise: React.FC = () => {
           chapterId: 1,
           skillType: 'WRITING',
           orderIndex: 1,
-          prompt:
-            'Viết một đoạn văn ngắn (50-80 từ) về cuộc gặp gỡ đầu tiên đáng nhớ của bạn. Sử dụng ít nhất 3 từ vựng đã học: 만남, 설레다, 인상',
+          writingTask: {
+            prompt:
+              'Viết một đoạn văn ngắn (50-80 từ) về cuộc gặp gỡ đầu tiên đáng nhớ của bạn. Sử dụng ít nhất 3 từ vựng đã học: 만남, 설레다, 인상',
+          },
           sampleAnswer:
             '작년 봄에 친구 소개로 새로운 사람을 만났어요. 첫 만남이었지만 정말 설렜어요. 그 사람의 첫 인상이 너무 좋았고 대화도 잘 통했어요. 지금은 제일 친한 친구가 되었어요.',
           minWords: 50,
@@ -190,7 +192,7 @@ const WritingExercise: React.FC = () => {
                   marginBottom: 0,
                 }}
               >
-                {exercise.prompt}
+                {exercise.writingTask?.prompt}
               </Paragraph>
             </div>
 

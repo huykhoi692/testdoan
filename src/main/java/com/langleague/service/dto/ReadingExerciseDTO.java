@@ -1,5 +1,6 @@
 package com.langleague.service.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -14,9 +15,8 @@ public class ReadingExerciseDTO implements Serializable {
 
     private Long id;
 
-    @NotBlank(message = "Passage is required")
-    @Size(max = 20000, message = "Passage cannot exceed 20000 characters")
-    private String passage;
+    @JsonIgnoreProperties(value = { "readingExercises", "chapter" }, allowSetters = true)
+    private ReadingPassageDTO readingPassage;
 
     @NotBlank(message = "Question is required")
     @Size(max = 5000, message = "Question cannot exceed 5000 characters")
@@ -28,8 +28,6 @@ public class ReadingExerciseDTO implements Serializable {
     @NotNull
     private Integer maxScore;
 
-    private ChapterDTO chapter;
-
     public Long getId() {
         return id;
     }
@@ -38,12 +36,12 @@ public class ReadingExerciseDTO implements Serializable {
         this.id = id;
     }
 
-    public String getPassage() {
-        return passage;
+    public ReadingPassageDTO getReadingPassage() {
+        return readingPassage;
     }
 
-    public void setPassage(String passage) {
-        this.passage = passage;
+    public void setReadingPassage(ReadingPassageDTO readingPassage) {
+        this.readingPassage = readingPassage;
     }
 
     public String getQuestion() {
@@ -68,14 +66,6 @@ public class ReadingExerciseDTO implements Serializable {
 
     public void setMaxScore(Integer maxScore) {
         this.maxScore = maxScore;
-    }
-
-    public ChapterDTO getChapter() {
-        return chapter;
-    }
-
-    public void setChapter(ChapterDTO chapter) {
-        this.chapter = chapter;
     }
 
     @Override
@@ -104,11 +94,10 @@ public class ReadingExerciseDTO implements Serializable {
     public String toString() {
         return "ReadingExerciseDTO{" +
             "id=" + getId() +
-            ", passage='" + getPassage() + "'" +
+            ", readingPassage=" + getReadingPassage() +
             ", question='" + getQuestion() + "'" +
             ", correctAnswer='" + getCorrectAnswer() + "'" +
             ", maxScore=" + getMaxScore() +
-            ", chapter=" + getChapter() +
             "}";
     }
 }

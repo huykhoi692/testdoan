@@ -46,23 +46,23 @@ public class Chapter implements Serializable {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "chapter")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "options", "exerciseResults", "chapter" }, allowSetters = true)
-    private Set<ListeningExercise> listeningExercises = new HashSet<>();
+    @JsonIgnoreProperties(value = { "listeningExercises", "chapter" }, allowSetters = true)
+    private Set<ListeningAudio> listeningAudios = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "chapter")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "exerciseResults", "chapter" }, allowSetters = true)
-    private Set<SpeakingExercise> speakingExercises = new HashSet<>();
+    @JsonIgnoreProperties(value = { "speakingExercises", "chapter" }, allowSetters = true)
+    private Set<SpeakingTopic> speakingTopics = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "chapter")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "options", "exerciseResults", "chapter" }, allowSetters = true)
-    private Set<ReadingExercise> readingExercises = new HashSet<>();
+    @JsonIgnoreProperties(value = { "readingExercises", "chapter" }, allowSetters = true)
+    private Set<ReadingPassage> readingPassages = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "chapter")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "exerciseResults", "chapter" }, allowSetters = true)
-    private Set<WritingExercise> writingExercises = new HashSet<>();
+    @JsonIgnoreProperties(value = { "writingExercises", "chapter" }, allowSetters = true)
+    private Set<WritingTask> writingTasks = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "chapter")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -176,127 +176,127 @@ public class Chapter implements Serializable {
         return this;
     }
 
-    public Set<ListeningExercise> getListeningExercises() {
-        return this.listeningExercises;
+    public Set<ListeningAudio> getListeningAudios() {
+        return this.listeningAudios;
     }
 
-    public void setListeningExercises(Set<ListeningExercise> listeningExercises) {
-        if (this.listeningExercises != null) {
-            this.listeningExercises.forEach(i -> i.setChapter(null));
+    public void setListeningAudios(Set<ListeningAudio> listeningAudios) {
+        if (this.listeningAudios != null) {
+            this.listeningAudios.forEach(i -> i.setChapter(null));
         }
-        if (listeningExercises != null) {
-            listeningExercises.forEach(i -> i.setChapter(this));
+        if (listeningAudios != null) {
+            listeningAudios.forEach(i -> i.setChapter(this));
         }
-        this.listeningExercises = listeningExercises;
+        this.listeningAudios = listeningAudios;
     }
 
-    public Chapter listeningExercises(Set<ListeningExercise> listeningExercises) {
-        this.setListeningExercises(listeningExercises);
+    public Chapter listeningAudios(Set<ListeningAudio> listeningAudios) {
+        this.setListeningAudios(listeningAudios);
         return this;
     }
 
-    public Chapter addListeningExercise(ListeningExercise listeningExercise) {
-        this.listeningExercises.add(listeningExercise);
-        listeningExercise.setChapter(this);
+    public Chapter addListeningAudio(ListeningAudio listeningAudio) {
+        this.listeningAudios.add(listeningAudio);
+        listeningAudio.setChapter(this);
         return this;
     }
 
-    public Chapter removeListeningExercise(ListeningExercise listeningExercise) {
-        this.listeningExercises.remove(listeningExercise);
-        listeningExercise.setChapter(null);
+    public Chapter removeListeningAudio(ListeningAudio listeningAudio) {
+        this.listeningAudios.remove(listeningAudio);
+        listeningAudio.setChapter(null);
         return this;
     }
 
-    public Set<SpeakingExercise> getSpeakingExercises() {
-        return this.speakingExercises;
+    public Set<SpeakingTopic> getSpeakingTopics() {
+        return this.speakingTopics;
     }
 
-    public void setSpeakingExercises(Set<SpeakingExercise> speakingExercises) {
-        if (this.speakingExercises != null) {
-            this.speakingExercises.forEach(i -> i.setChapter(null));
+    public void setSpeakingTopics(Set<SpeakingTopic> speakingTopics) {
+        if (this.speakingTopics != null) {
+            this.speakingTopics.forEach(i -> i.setChapter(null));
         }
-        if (speakingExercises != null) {
-            speakingExercises.forEach(i -> i.setChapter(this));
+        if (speakingTopics != null) {
+            speakingTopics.forEach(i -> i.setChapter(this));
         }
-        this.speakingExercises = speakingExercises;
+        this.speakingTopics = speakingTopics;
     }
 
-    public Chapter speakingExercises(Set<SpeakingExercise> speakingExercises) {
-        this.setSpeakingExercises(speakingExercises);
+    public Chapter speakingTopics(Set<SpeakingTopic> speakingTopics) {
+        this.setSpeakingTopics(speakingTopics);
         return this;
     }
 
-    public Chapter addSpeakingExercise(SpeakingExercise speakingExercise) {
-        this.speakingExercises.add(speakingExercise);
-        speakingExercise.setChapter(this);
+    public Chapter addSpeakingTopic(SpeakingTopic speakingTopic) {
+        this.speakingTopics.add(speakingTopic);
+        speakingTopic.setChapter(this);
         return this;
     }
 
-    public Chapter removeSpeakingExercise(SpeakingExercise speakingExercise) {
-        this.speakingExercises.remove(speakingExercise);
-        speakingExercise.setChapter(null);
+    public Chapter removeSpeakingTopic(SpeakingTopic speakingTopic) {
+        this.speakingTopics.remove(speakingTopic);
+        speakingTopic.setChapter(null);
         return this;
     }
 
-    public Set<ReadingExercise> getReadingExercises() {
-        return this.readingExercises;
+    public Set<ReadingPassage> getReadingPassages() {
+        return this.readingPassages;
     }
 
-    public void setReadingExercises(Set<ReadingExercise> readingExercises) {
-        if (this.readingExercises != null) {
-            this.readingExercises.forEach(i -> i.setChapter(null));
+    public void setReadingPassages(Set<ReadingPassage> readingPassages) {
+        if (this.readingPassages != null) {
+            this.readingPassages.forEach(i -> i.setChapter(null));
         }
-        if (readingExercises != null) {
-            readingExercises.forEach(i -> i.setChapter(this));
+        if (readingPassages != null) {
+            readingPassages.forEach(i -> i.setChapter(this));
         }
-        this.readingExercises = readingExercises;
+        this.readingPassages = readingPassages;
     }
 
-    public Chapter readingExercises(Set<ReadingExercise> readingExercises) {
-        this.setReadingExercises(readingExercises);
+    public Chapter readingPassages(Set<ReadingPassage> readingPassages) {
+        this.setReadingPassages(readingPassages);
         return this;
     }
 
-    public Chapter addReadingExercise(ReadingExercise readingExercise) {
-        this.readingExercises.add(readingExercise);
-        readingExercise.setChapter(this);
+    public Chapter addReadingPassage(ReadingPassage readingPassage) {
+        this.readingPassages.add(readingPassage);
+        readingPassage.setChapter(this);
         return this;
     }
 
-    public Chapter removeReadingExercise(ReadingExercise readingExercise) {
-        this.readingExercises.remove(readingExercise);
-        readingExercise.setChapter(null);
+    public Chapter removeReadingPassage(ReadingPassage readingPassage) {
+        this.readingPassages.remove(readingPassage);
+        readingPassage.setChapter(null);
         return this;
     }
 
-    public Set<WritingExercise> getWritingExercises() {
-        return this.writingExercises;
+    public Set<WritingTask> getWritingTasks() {
+        return this.writingTasks;
     }
 
-    public void setWritingExercises(Set<WritingExercise> writingExercises) {
-        if (this.writingExercises != null) {
-            this.writingExercises.forEach(i -> i.setChapter(null));
+    public void setWritingTasks(Set<WritingTask> writingTasks) {
+        if (this.writingTasks != null) {
+            this.writingTasks.forEach(i -> i.setChapter(null));
         }
-        if (writingExercises != null) {
-            writingExercises.forEach(i -> i.setChapter(this));
+        if (writingTasks != null) {
+            writingTasks.forEach(i -> i.setChapter(this));
         }
-        this.writingExercises = writingExercises;
+        this.writingTasks = writingTasks;
     }
 
-    public Chapter writingExercises(Set<WritingExercise> writingExercises) {
-        this.setWritingExercises(writingExercises);
+    public Chapter writingTasks(Set<WritingTask> writingTasks) {
+        this.setWritingTasks(writingTasks);
         return this;
     }
 
-    public Chapter addWritingExercise(WritingExercise writingExercise) {
-        this.writingExercises.add(writingExercise);
-        writingExercise.setChapter(this);
+    public Chapter addWritingTask(WritingTask writingTask) {
+        this.writingTasks.add(writingTask);
+        writingTask.setChapter(this);
         return this;
     }
 
-    public Chapter removeWritingExercise(WritingExercise writingExercise) {
-        this.writingExercises.remove(writingExercise);
-        writingExercise.setChapter(null);
+    public Chapter removeWritingTask(WritingTask writingTask) {
+        this.writingTasks.remove(writingTask);
+        writingTask.setChapter(null);
         return this;
     }
 

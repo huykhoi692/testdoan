@@ -369,7 +369,7 @@ const ChapterLearning: React.FC = () => {
                               </div>
                             }
                             title={`Bài nói ${index + 1}`}
-                            description={ex.prompt}
+                            description={ex.speakingTopic?.context}
                           />
                         </List.Item>
                       )}
@@ -469,7 +469,7 @@ const ChapterLearning: React.FC = () => {
                               </div>
                             }
                             title={`Bài viết ${index + 1}`}
-                            description={ex.prompt}
+                            description={ex.writingTask?.prompt}
                           />
                         </List.Item>
                       )}

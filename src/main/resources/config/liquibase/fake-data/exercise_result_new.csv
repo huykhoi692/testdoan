@@ -1,0 +1,12 @@
+id;exercise_type;score;user_answer;submitted_at;version;app_user_id;listening_exercise_id;speaking_exercise_id;reading_exercise_id;writing_exercise_id
+1;LISTENING;10;Rainy;2023-03-20T14:05:00Z;0;4;1;;;
+2;LISTENING;10;Coffee;2023-03-10T18:05:00Z;0;5;2;;;
+3;READING;10;Student;2023-03-18T11:05:00Z;0;6;;1;;
+4;READING;15;Traveling;2023-03-22T09:35:00Z;0;7;;;3;
+5;SPEAKING;18;/audio/speaking-answer-1.mp3;2023-03-15T20:05:00Z;0;8;;;1;
+6;WRITING;15;선물 고마워요!;2023-03-19T16:05:00Z;0;9;;;;2
+7;LISTENING;15;22 degrees;2023-03-21T17:05:00Z;0;10;5;;;
+8;SPEAKING;25;/audio/speaking-answer-2.mp3;2023-03-23T10:05:00Z;0;11;;;4;
+9;READING;10;Watched a movie;2023-03-20T12:05:00Z;0;12;;2;;
+10;WRITING;20;가족은 네 명입니다.;2023-03-22T18:05:00Z;0;13;;;;1
+

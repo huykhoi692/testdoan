@@ -200,7 +200,7 @@ public class UserChapterService {
 
         if (existingUserChapter.isPresent()) {
             // Update existing
-            UserChapter userChapter = existingUserChapter.get();
+            UserChapter userChapter = existingUserChapter.orElseThrow();
             userChapter.setIsFavorite(!Boolean.TRUE.equals(userChapter.getIsFavorite()));
             UserChapter saved = userChapterRepository.save(userChapter);
             return userChapterMapper.toDto(saved);

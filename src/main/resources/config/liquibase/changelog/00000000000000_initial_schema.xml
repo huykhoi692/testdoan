@@ -53,6 +53,10 @@
             <column name="locked_until" type="timestamp">
                 <constraints nullable="true"/>
             </column>
+            <!-- Soft-delete field -->
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
 
         <createTable tableName="jhi_authority">

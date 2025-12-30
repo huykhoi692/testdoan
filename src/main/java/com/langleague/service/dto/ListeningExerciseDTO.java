@@ -1,5 +1,6 @@
 package com.langleague.service.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -14,15 +15,11 @@ public class ListeningExerciseDTO implements Serializable {
 
     private Long id;
 
-    @NotNull
-    @Size(max = 512)
-    private String audioPath;
+    @JsonIgnoreProperties(value = { "listeningExercises", "chapter" }, allowSetters = true)
+    private ListeningAudioDTO listeningAudio;
 
     @Size(max = 512)
     private String imageUrl;
-
-    @Size(max = 10000, message = "Transcript cannot exceed 10000 characters")
-    private String transcript;
 
     @Size(max = 5000, message = "Question cannot exceed 5000 characters")
     private String question;
@@ -33,8 +30,6 @@ public class ListeningExerciseDTO implements Serializable {
     @NotNull
     private Integer maxScore;
 
-    private ChapterDTO chapter;
-
     public Long getId() {
         return id;
     }
@@ -43,12 +38,12 @@ public class ListeningExerciseDTO implements Serializable {
         this.id = id;
     }
 
-    public String getAudioPath() {
-        return audioPath;
+    public ListeningAudioDTO getListeningAudio() {
+        return listeningAudio;
     }
 
-    public void setAudioPath(String audioPath) {
-        this.audioPath = audioPath;
+    public void setListeningAudio(ListeningAudioDTO listeningAudio) {
+        this.listeningAudio = listeningAudio;
     }
 
     public String getImageUrl() {
@@ -57,14 +52,6 @@ public class ListeningExerciseDTO implements Serializable {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
-    }
-
-    public String getTranscript() {
-        return transcript;
-    }
-
-    public void setTranscript(String transcript) {
-        this.transcript = transcript;
     }
 
     public String getQuestion() {
@@ -89,14 +76,6 @@ public class ListeningExerciseDTO implements Serializable {
 
     public void setMaxScore(Integer maxScore) {
         this.maxScore = maxScore;
-    }
-
-    public ChapterDTO getChapter() {
-        return chapter;
-    }
-
-    public void setChapter(ChapterDTO chapter) {
-        this.chapter = chapter;
     }
 
     @Override
@@ -125,13 +104,11 @@ public class ListeningExerciseDTO implements Serializable {
     public String toString() {
         return "ListeningExerciseDTO{" +
             "id=" + getId() +
-            ", audioPath='" + getAudioPath() + "'" +
+            ", listeningAudio=" + getListeningAudio() +
             ", imageUrl='" + getImageUrl() + "'" +
-            ", transcript='" + getTranscript() + "'" +
             ", question='" + getQuestion() + "'" +
             ", correctAnswer='" + getCorrectAnswer() + "'" +
             ", maxScore=" + getMaxScore() +
-            ", chapter=" + getChapter() +
             "}";
     }
 }

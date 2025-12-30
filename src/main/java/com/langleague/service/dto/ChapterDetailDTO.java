@@ -28,13 +28,13 @@ public class ChapterDetailDTO implements Serializable {
 
     private Set<GrammarDTO> grammars = new HashSet<>();
 
-    private Set<ListeningExerciseDTO> listeningExercises = new HashSet<>();
+    private Set<ListeningAudioDTO> listeningAudios = new HashSet<>();
 
-    private Set<ReadingExerciseDTO> readingExercises = new HashSet<>();
+    private Set<ReadingPassageDTO> readingPassages = new HashSet<>();
 
-    private Set<WritingExerciseDTO> writingExercises = new HashSet<>();
+    private Set<WritingTaskDTO> writingTasks = new HashSet<>();
 
-    private Set<SpeakingExerciseDTO> speakingExercises = new HashSet<>();
+    private Set<SpeakingTopicDTO> speakingTopics = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -84,36 +84,36 @@ public class ChapterDetailDTO implements Serializable {
         this.grammars = grammars;
     }
 
-    public Set<ListeningExerciseDTO> getListeningExercises() {
-        return listeningExercises;
+    public Set<ListeningAudioDTO> getListeningAudios() {
+        return listeningAudios;
     }
 
-    public void setListeningExercises(Set<ListeningExerciseDTO> listeningExercises) {
-        this.listeningExercises = listeningExercises;
+    public void setListeningAudios(Set<ListeningAudioDTO> listeningAudios) {
+        this.listeningAudios = listeningAudios;
     }
 
-    public Set<ReadingExerciseDTO> getReadingExercises() {
-        return readingExercises;
+    public Set<ReadingPassageDTO> getReadingPassages() {
+        return readingPassages;
     }
 
-    public void setReadingExercises(Set<ReadingExerciseDTO> readingExercises) {
-        this.readingExercises = readingExercises;
+    public void setReadingPassages(Set<ReadingPassageDTO> readingPassages) {
+        this.readingPassages = readingPassages;
     }
 
-    public Set<WritingExerciseDTO> getWritingExercises() {
-        return writingExercises;
+    public Set<WritingTaskDTO> getWritingTasks() {
+        return writingTasks;
     }
 
-    public void setWritingExercises(Set<WritingExerciseDTO> writingExercises) {
-        this.writingExercises = writingExercises;
+    public void setWritingTasks(Set<WritingTaskDTO> writingTasks) {
+        this.writingTasks = writingTasks;
     }
 
-    public Set<SpeakingExerciseDTO> getSpeakingExercises() {
-        return speakingExercises;
+    public Set<SpeakingTopicDTO> getSpeakingTopics() {
+        return speakingTopics;
     }
 
-    public void setSpeakingExercises(Set<SpeakingExerciseDTO> speakingExercises) {
-        this.speakingExercises = speakingExercises;
+    public void setSpeakingTopics(Set<SpeakingTopicDTO> speakingTopics) {
+        this.speakingTopics = speakingTopics;
     }
 
     @Override
@@ -145,12 +145,12 @@ public class ChapterDetailDTO implements Serializable {
             ", title='" + getTitle() + "'" +
             ", orderIndex=" + getOrderIndex() +
             ", book=" + getBook() +
-            ", wordsCount=" + (words != null ? words.size() : 0) +
-            ", grammarsCount=" + (grammars != null ? grammars.size() : 0) +
-            ", listeningExercisesCount=" + (listeningExercises != null ? listeningExercises.size() : 0) +
-            ", readingExercisesCount=" + (readingExercises != null ? readingExercises.size() : 0) +
-            ", writingExercisesCount=" + (writingExercises != null ? writingExercises.size() : 0) +
-            ", speakingExercisesCount=" + (speakingExercises != null ? speakingExercises.size() : 0) +
+            ", words=" + getWords() +
+            ", grammars=" + getGrammars() +
+            ", listeningAudios=" + getListeningAudios() +
+            ", readingPassages=" + getReadingPassages() +
+            ", writingTasks=" + getWritingTasks() +
+            ", speakingTopics=" + getSpeakingTopics() +
             "}";
     }
 }

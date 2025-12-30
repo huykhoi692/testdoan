@@ -28,6 +28,11 @@ public class AppUserDTO implements Serializable {
 
     private Boolean dailyReminderEnabled = true;
 
+    // Gamification fields
+    private Integer level;
+
+    private Integer points;
+
     private UserDTO internalUser;
 
     public Long getId() {
@@ -70,6 +75,22 @@ public class AppUserDTO implements Serializable {
         this.dailyReminderEnabled = dailyReminderEnabled;
     }
 
+    public Integer getLevel() {
+        return level;
+    }
+
+    public void setLevel(Integer level) {
+        this.level = level;
+    }
+
+    public Integer getPoints() {
+        return points;
+    }
+
+    public void setPoints(Integer points) {
+        this.points = points;
+    }
+
     public UserDTO getInternalUser() {
         return internalUser;
     }
@@ -108,6 +129,8 @@ public class AppUserDTO implements Serializable {
             ", bio='" + getBio() + "'" +
             ", emailNotificationEnabled='" + getEmailNotificationEnabled() + "'" +
             ", dailyReminderEnabled='" + getDailyReminderEnabled() + "'" +
+            ", level=" + getLevel() +
+            ", points=" + getPoints() +
             ", internalUser=" + getInternalUser() +
             "}";
     }

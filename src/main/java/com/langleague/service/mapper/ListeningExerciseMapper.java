@@ -9,13 +9,13 @@ import org.mapstruct.*;
 /**
  * Mapper for the entity {@link ListeningExercise} and its DTO {@link ListeningExerciseDTO}.
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = { ListeningAudioMapper.class })
 public interface ListeningExerciseMapper extends EntityMapper<ListeningExerciseDTO, ListeningExercise> {
-    @Mapping(target = "chapter", source = "chapter", qualifiedByName = "chapterId")
+    @Mapping(target = "listeningAudio", source = "listeningAudio")
     ListeningExerciseDTO toDto(ListeningExercise s);
 
     @Override
-    @Mapping(target = "chapter", ignore = true)
+    @Mapping(target = "listeningAudio", ignore = true)
     @Mapping(target = "options", ignore = true)
     @Mapping(target = "removeOption", ignore = true)
     @Mapping(target = "exerciseResults", ignore = true)
@@ -24,15 +24,10 @@ public interface ListeningExerciseMapper extends EntityMapper<ListeningExerciseD
 
     @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "chapter", ignore = true)
+    @Mapping(target = "listeningAudio", ignore = true)
     @Mapping(target = "options", ignore = true)
     @Mapping(target = "removeOption", ignore = true)
     @Mapping(target = "exerciseResults", ignore = true)
     @Mapping(target = "removeExerciseResult", ignore = true)
     void partialUpdate(@MappingTarget ListeningExercise entity, ListeningExerciseDTO dto);
-
-    @Named("chapterId")
-    @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "id", source = "id")
-    ChapterDTO toDtoChapterId(Chapter chapter);
 }

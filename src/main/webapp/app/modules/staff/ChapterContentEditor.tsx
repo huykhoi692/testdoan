@@ -270,42 +270,42 @@ const ChapterContentEditor: React.FC = () => {
       setLoading(true);
 
       switch (type) {
-        case 'word':
+        case 'word': {
           const wordResult = await dispatch(deleteWord(id)).unwrap();
           console.log('Word deleted:', wordResult);
           message.success('Xóa từ vựng thành công');
           break;
-
-        case 'grammar':
+        }
+        case 'grammar': {
           const grammarResult = await dispatch(deleteGrammar(id)).unwrap();
           console.log('Grammar deleted:', grammarResult);
           message.success('Xóa ngữ pháp thành công');
           break;
-
-        case 'listening':
+        }
+        case 'listening': {
           const listeningResult = await dispatch(deleteListeningExercise(id)).unwrap();
           console.log('Listening exercise deleted:', listeningResult);
           message.success('Xóa bài nghe thành công');
           break;
-
-        case 'speaking':
+        }
+        case 'speaking': {
           const speakingResult = await dispatch(deleteSpeakingExercise(id)).unwrap();
           console.log('Speaking exercise deleted:', speakingResult);
           message.success('Xóa bài nói thành công');
           break;
-
-        case 'reading':
+        }
+        case 'reading': {
           const readingResult = await dispatch(deleteReadingExercise(id)).unwrap();
           console.log('Reading exercise deleted:', readingResult);
           message.success('Xóa bài đọc thành công');
           break;
-
-        case 'writing':
+        }
+        case 'writing': {
           const writingResult = await dispatch(deleteWritingExercise(id)).unwrap();
           console.log('Writing exercise deleted:', writingResult);
           message.success('Xóa bài viết thành công');
           break;
-
+        }
         default:
           throw new Error('Unknown type');
       }

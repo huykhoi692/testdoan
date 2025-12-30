@@ -25,18 +25,13 @@ public class ListeningExercise implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @NotNull
-    @Size(max = 512)
-    @Column(name = "audio_path", length = 512, nullable = false)
-    private String audioPath;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "listeningExercises" }, allowSetters = true)
+    private ListeningAudio listeningAudio;
 
     @Size(max = 512)
     @Column(name = "image_url", length = 512)
     private String imageUrl;
-
-    @Lob
-    @Column(name = "transcript")
-    private String transcript;
 
     @Lob
     @Column(name = "question", nullable = false)
@@ -63,22 +58,6 @@ public class ListeningExercise implements Serializable {
     )
     private Set<ExerciseResult> exerciseResults = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(
-        value = {
-            "words",
-            "grammars",
-            "listeningExercises",
-            "speakingExercises",
-            "readingExercises",
-            "writingExercises",
-            "chapterProgresses",
-            "book",
-        },
-        allowSetters = true
-    )
-    private Chapter chapter;
-
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Long getId() {
@@ -94,17 +73,17 @@ public class ListeningExercise implements Serializable {
         this.id = id;
     }
 
-    public String getAudioPath() {
-        return this.audioPath;
+    public ListeningAudio getListeningAudio() {
+        return this.listeningAudio;
     }
 
-    public ListeningExercise audioPath(String audioPath) {
-        this.setAudioPath(audioPath);
+    public ListeningExercise listeningAudio(ListeningAudio listeningAudio) {
+        this.setListeningAudio(listeningAudio);
         return this;
     }
 
-    public void setAudioPath(String audioPath) {
-        this.audioPath = audioPath;
+    public void setListeningAudio(ListeningAudio listeningAudio) {
+        this.listeningAudio = listeningAudio;
     }
 
     public String getImageUrl() {
@@ -118,19 +97,6 @@ public class ListeningExercise implements Serializable {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
-    }
-
-    public String getTranscript() {
-        return this.transcript;
-    }
-
-    public ListeningExercise transcript(String transcript) {
-        this.setTranscript(transcript);
-        return this;
-    }
-
-    public void setTranscript(String transcript) {
-        this.transcript = transcript;
     }
 
     public String getQuestion() {
@@ -234,19 +200,6 @@ public class ListeningExercise implements Serializable {
         return this;
     }
 
-    public Chapter getChapter() {
-        return this.chapter;
-    }
-
-    public void setChapter(Chapter chapter) {
-        this.chapter = chapter;
-    }
-
-    public ListeningExercise chapter(Chapter chapter) {
-        this.setChapter(chapter);
-        return this;
-    }
-
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -271,9 +224,7 @@ public class ListeningExercise implements Serializable {
     public String toString() {
         return "ListeningExercise{" +
             "id=" + getId() +
-            ", audioPath='" + getAudioPath() + "'" +
             ", imageUrl='" + getImageUrl() + "'" +
-            ", transcript='" + getTranscript() + "'" +
             ", question='" + getQuestion() + "'" +
             ", correctAnswer='" + getCorrectAnswer() + "'" +
             ", maxScore=" + getMaxScore() +

@@ -13,19 +13,19 @@ import org.mapstruct.*;
         BookMapper.class,
         WordMapper.class,
         GrammarMapper.class,
-        ListeningExerciseMapper.class,
-        ReadingExerciseMapper.class,
-        WritingExerciseMapper.class,
-        SpeakingExerciseMapper.class,
+        ListeningAudioMapper.class,
+        ReadingPassageMapper.class,
+        WritingTaskMapper.class,
+        SpeakingTopicMapper.class,
     }
 )
 public interface ChapterDetailMapper {
     @Mapping(target = "book", source = "book")
     @Mapping(target = "words", source = "words")
     @Mapping(target = "grammars", source = "grammars")
-    @Mapping(target = "listeningExercises", source = "listeningExercises")
-    @Mapping(target = "readingExercises", source = "readingExercises")
-    @Mapping(target = "writingExercises", source = "writingExercises")
-    @Mapping(target = "speakingExercises", source = "speakingExercises")
+    @Mapping(target = "listeningAudios", source = "listeningAudios")
+    @Mapping(target = "readingPassages", source = "readingPassages")
+    @Mapping(target = "writingTasks", source = "writingTasks")
+    @Mapping(target = "speakingTopics", source = "speakingTopics")
     ChapterDetailDTO toDto(Chapter chapter);
 }

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { Card, Row, Col, Typography, Button, Space, Spin, Tag } from 'antd';
 import { BookOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '../config/store';
-import { getBooks } from '../shared/reducers/book.reducer';
+import { getEntities as getBooks } from '../shared/services/book.service';
 
 const { Title, Text, Paragraph } = Typography;
 

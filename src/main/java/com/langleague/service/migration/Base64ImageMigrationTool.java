@@ -65,7 +65,7 @@ public class Base64ImageMigrationTool implements CommandLineRunner {
         }
 
         // Create avatars directory if not exists
-        Path avatarPath = Paths.get(baseStoragePath, AVATAR_FOLDER);
+        Path avatarPath = Path.of(baseStoragePath, AVATAR_FOLDER);
         if (!Files.exists(avatarPath)) {
             Files.createDirectories(avatarPath);
             LOG.info("Created directory: {}", avatarPath);
@@ -123,7 +123,7 @@ public class Base64ImageMigrationTool implements CommandLineRunner {
         String fileName = String.format("user_%d_%s.%s", user.getId(), UUID.randomUUID().toString().substring(0, 8), imageFormat);
 
         // Write file
-        Path filePath = Paths.get(baseStoragePath, AVATAR_FOLDER, fileName);
+        Path filePath = Path.of(baseStoragePath, AVATAR_FOLDER, fileName);
         Files.write(filePath, imageBytes);
 
         LOG.debug("Wrote file: {} ({} bytes)", filePath, imageBytes.length);

@@ -254,34 +254,38 @@ public class ExerciseResultService {
             case LISTENING:
                 return (
                         exerciseResult.getListeningExercise() != null &&
-                        exerciseResult.getListeningExercise().getChapter() != null &&
-                        exerciseResult.getListeningExercise().getChapter().getBook() != null
+                        exerciseResult.getListeningExercise().getListeningAudio() != null &&
+                        exerciseResult.getListeningExercise().getListeningAudio().getChapter() != null &&
+                        exerciseResult.getListeningExercise().getListeningAudio().getChapter().getBook() != null
                     )
-                    ? exerciseResult.getListeningExercise().getChapter().getBook().getId()
+                    ? exerciseResult.getListeningExercise().getListeningAudio().getChapter().getBook().getId()
                     : null;
             case SPEAKING:
                 return (
                         exerciseResult.getSpeakingExercise() != null &&
-                        exerciseResult.getSpeakingExercise().getChapter() != null &&
-                        exerciseResult.getSpeakingExercise().getChapter().getBook() != null
+                        exerciseResult.getSpeakingExercise().getSpeakingTopic() != null &&
+                        exerciseResult.getSpeakingExercise().getSpeakingTopic().getChapter() != null &&
+                        exerciseResult.getSpeakingExercise().getSpeakingTopic().getChapter().getBook() != null
                     )
-                    ? exerciseResult.getSpeakingExercise().getChapter().getBook().getId()
+                    ? exerciseResult.getSpeakingExercise().getSpeakingTopic().getChapter().getBook().getId()
                     : null;
             case READING:
                 return (
                         exerciseResult.getReadingExercise() != null &&
-                        exerciseResult.getReadingExercise().getChapter() != null &&
-                        exerciseResult.getReadingExercise().getChapter().getBook() != null
+                        exerciseResult.getReadingExercise().getReadingPassage() != null &&
+                        exerciseResult.getReadingExercise().getReadingPassage().getChapter() != null &&
+                        exerciseResult.getReadingExercise().getReadingPassage().getChapter().getBook() != null
                     )
-                    ? exerciseResult.getReadingExercise().getChapter().getBook().getId()
+                    ? exerciseResult.getReadingExercise().getReadingPassage().getChapter().getBook().getId()
                     : null;
             case WRITING:
                 return (
                         exerciseResult.getWritingExercise() != null &&
-                        exerciseResult.getWritingExercise().getChapter() != null &&
-                        exerciseResult.getWritingExercise().getChapter().getBook() != null
+                        exerciseResult.getWritingExercise().getWritingTask() != null &&
+                        exerciseResult.getWritingExercise().getWritingTask().getChapter() != null &&
+                        exerciseResult.getWritingExercise().getWritingTask().getChapter().getBook() != null
                     )
-                    ? exerciseResult.getWritingExercise().getChapter().getBook().getId()
+                    ? exerciseResult.getWritingExercise().getWritingTask().getChapter().getBook().getId()
                     : null;
             default:
                 return null;

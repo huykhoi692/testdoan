@@ -16,7 +16,7 @@ public interface AppUserMapper extends EntityMapper<AppUserDTO, AppUser> {
 
     @Override
     @Mapping(target = "internalUser", source = "internalUser", qualifiedByName = "userFromId")
-    @Mapping(target = "timezone", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "userVocabularies", ignore = true)
     @Mapping(target = "removeUserVocabulary", ignore = true)
     @Mapping(target = "userGrammars", ignore = true)
@@ -40,7 +40,7 @@ public interface AppUserMapper extends EntityMapper<AppUserDTO, AppUser> {
     @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "internalUser", ignore = true)
-    @Mapping(target = "timezone", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "userVocabularies", ignore = true)
     @Mapping(target = "removeUserVocabulary", ignore = true)
     @Mapping(target = "userGrammars", ignore = true)

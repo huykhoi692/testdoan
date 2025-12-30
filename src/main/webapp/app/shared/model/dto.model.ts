@@ -40,6 +40,10 @@ export interface ChapterDetailDTO extends ChapterDTO {
   totalWords?: number;
   totalGrammars?: number;
   totalExercises?: number;
+  listeningAudios?: ListeningAudioDTO[];
+  readingPassages?: ReadingPassageDTO[];
+  speakingTopics?: SpeakingTopicDTO[];
+  writingTasks?: WritingTaskDTO[];
 }
 
 // ==================== USER LIBRARY ====================
@@ -144,12 +148,46 @@ export interface GrammarExampleDTO {
   grammarId?: number;
 }
 
+// ==================== PARENT CONTENT ====================
+
+export interface ListeningAudioDTO {
+  id?: number;
+  audioUrl?: string;
+  transcript?: string;
+  chapterId?: number;
+  listeningExercises?: ListeningExerciseDTO[];
+}
+
+export interface ReadingPassageDTO {
+  id?: number;
+  content?: string;
+  title?: string;
+  chapterId?: number;
+  readingExercises?: ReadingExerciseDTO[];
+}
+
+export interface SpeakingTopicDTO {
+  id?: number;
+  context?: string;
+  imageUrl?: string;
+  chapterId?: number;
+  speakingExercises?: SpeakingExerciseDTO[];
+}
+
+export interface WritingTaskDTO {
+  id?: number;
+  prompt?: string;
+  imageUrl?: string;
+  chapterId?: number;
+  writingExercises?: WritingExerciseDTO[];
+}
+
 // ==================== EXERCISES ====================
 
 export interface ListeningExerciseDTO {
   id?: number;
   question: string;
-  audioUrl?: string;
+  listeningAudio?: ListeningAudioDTO;
   correctAnswer?: string;
   orderIndex?: number;
   chapterId?: number;
@@ -165,7 +203,7 @@ export interface ListeningOptionDTO {
 
 export interface ReadingExerciseDTO {
   id?: number;
-  passage: string;
+  readingPassage?: ReadingPassageDTO;
   question: string;
   correctAnswer?: string;
   orderIndex?: number;
@@ -182,7 +220,7 @@ export interface ReadingOptionDTO {
 
 export interface SpeakingExerciseDTO {
   id?: number;
-  prompt: string;
+  speakingTopic?: SpeakingTopicDTO;
   sampleAnswer?: string;
   orderIndex?: number;
   chapterId?: number;
@@ -190,7 +228,7 @@ export interface SpeakingExerciseDTO {
 
 export interface WritingExerciseDTO {
   id?: number;
-  prompt: string;
+  writingTask?: WritingTaskDTO;
   sampleAnswer?: string;
   orderIndex?: number;
   chapterId?: number;

@@ -25,9 +25,9 @@ public class SpeakingExercise implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Lob
-    @Column(name = "prompt", nullable = false)
-    private String prompt;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "speakingExercises" }, allowSetters = true)
+    private SpeakingTopic speakingTopic;
 
     @Size(max = 512)
     @Column(name = "sample_audio", length = 512)
@@ -45,22 +45,6 @@ public class SpeakingExercise implements Serializable {
     )
     private Set<ExerciseResult> exerciseResults = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(
-        value = {
-            "words",
-            "grammars",
-            "listeningExercises",
-            "speakingExercises",
-            "readingExercises",
-            "writingExercises",
-            "chapterProgresses",
-            "book",
-        },
-        allowSetters = true
-    )
-    private Chapter chapter;
-
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Long getId() {
@@ -76,17 +60,17 @@ public class SpeakingExercise implements Serializable {
         this.id = id;
     }
 
-    public String getPrompt() {
-        return this.prompt;
+    public SpeakingTopic getSpeakingTopic() {
+        return this.speakingTopic;
     }
 
-    public SpeakingExercise prompt(String prompt) {
-        this.setPrompt(prompt);
+    public SpeakingExercise speakingTopic(SpeakingTopic speakingTopic) {
+        this.setSpeakingTopic(speakingTopic);
         return this;
     }
 
-    public void setPrompt(String prompt) {
-        this.prompt = prompt;
+    public void setSpeakingTopic(SpeakingTopic speakingTopic) {
+        this.speakingTopic = speakingTopic;
     }
 
     public String getSampleAudio() {
@@ -146,19 +130,6 @@ public class SpeakingExercise implements Serializable {
         return this;
     }
 
-    public Chapter getChapter() {
-        return this.chapter;
-    }
-
-    public void setChapter(Chapter chapter) {
-        this.chapter = chapter;
-    }
-
-    public SpeakingExercise chapter(Chapter chapter) {
-        this.setChapter(chapter);
-        return this;
-    }
-
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -183,7 +154,6 @@ public class SpeakingExercise implements Serializable {
     public String toString() {
         return "SpeakingExercise{" +
             "id=" + getId() +
-            ", prompt='" + getPrompt() + "'" +
             ", sampleAudio='" + getSampleAudio() + "'" +
             ", maxScore=" + getMaxScore() +
             "}";

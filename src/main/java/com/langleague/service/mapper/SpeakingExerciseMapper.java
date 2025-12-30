@@ -9,26 +9,21 @@ import org.mapstruct.*;
 /**
  * Mapper for the entity {@link SpeakingExercise} and its DTO {@link SpeakingExerciseDTO}.
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = { SpeakingTopicMapper.class })
 public interface SpeakingExerciseMapper extends EntityMapper<SpeakingExerciseDTO, SpeakingExercise> {
-    @Mapping(target = "chapter", source = "chapter", qualifiedByName = "chapterId")
+    @Mapping(target = "speakingTopic", source = "speakingTopic")
     SpeakingExerciseDTO toDto(SpeakingExercise s);
 
     @Override
-    @Mapping(target = "chapter", ignore = true)
+    @Mapping(target = "speakingTopic", ignore = true)
     @Mapping(target = "exerciseResults", ignore = true)
     @Mapping(target = "removeExerciseResult", ignore = true)
     SpeakingExercise toEntity(SpeakingExerciseDTO dto);
 
     @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "chapter", ignore = true)
+    @Mapping(target = "speakingTopic", ignore = true)
     @Mapping(target = "exerciseResults", ignore = true)
     @Mapping(target = "removeExerciseResult", ignore = true)
     void partialUpdate(@MappingTarget SpeakingExercise entity, SpeakingExerciseDTO dto);
-
-    @Named("chapterId")
-    @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "id", source = "id")
-    ChapterDTO toDtoChapterId(Chapter chapter);
 }

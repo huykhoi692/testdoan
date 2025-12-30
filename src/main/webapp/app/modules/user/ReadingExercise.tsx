@@ -32,8 +32,10 @@ const ReadingExercise: React.FC = () => {
           chapterId: 1,
           skillType: 'READING',
           orderIndex: 1,
-          passage:
-            '김지영은 대학교에서 처음 그를 만났다. 그날 날씨가 정말 좋았고 캠퍼스의 벚꽃이 활짝 피어 있었다. 그는 도서관 앞에서 책을 읽고 있었고, 지영은 그의 집중하는 모습에 첫눈에 반했다.',
+          readingPassage: {
+            content:
+              '김지영은 대학교에서 처음 그를 만났다. 그날 날씨가 정말 좋았고 캠퍼스의 벚꽃이 활짝 피어 있었다. 그는 도서관 앞에서 책을 읽고 있었고, 지영은 그의 집중하는 모습에 첫눈에 반했다.',
+          },
           question: '김지영은 어디서 그를 처음 만났나요?',
           correctAnswer: 'A',
           maxScore: 10,
@@ -187,7 +189,7 @@ const ReadingExercise: React.FC = () => {
                 marginBottom: 0,
               }}
             >
-              {exercise.passage}
+              {exercise.readingPassage?.content}
             </Paragraph>
           </div>
 

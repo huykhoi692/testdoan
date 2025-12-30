@@ -69,8 +69,10 @@ public class LearningReportService {
                 Long booksCompleted = userBookRepository.countByAppUserIdAndLearningStatus(userId, LearningStatus.COMPLETED);
                 report.setTotalBooksCompleted(booksCompleted != null ? booksCompleted.intValue() : 0);
 
-                report.setTotalChaptersStarted((int) chapterProgressRepository.countByUserId(userId));
-                report.setTotalChaptersCompleted((int) chapterProgressRepository.countCompletedByUserId(userId));
+                Long chaptersStarted = chapterProgressRepository.countByUserId(userId);
+                report.setTotalChaptersStarted(chaptersStarted != null ? chaptersStarted.intValue() : 0);
+                Long chaptersCompleted = chapterProgressRepository.countCompletedByUserId(userId);
+                report.setTotalChaptersCompleted(chaptersCompleted != null ? chaptersCompleted.intValue() : 0);
 
                 // Calculate average completion percentage
                 Double avgPercent = chapterProgressRepository.getAverageProgressByUserId(userId);

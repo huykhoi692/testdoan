@@ -1,5 +1,6 @@
 package com.langleague.service.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -14,17 +15,14 @@ public class WritingExerciseDTO implements Serializable {
 
     private Long id;
 
-    @NotBlank(message = "Prompt is required")
-    @Size(max = 5000, message = "Prompt cannot exceed 5000 characters")
-    private String prompt;
-
     @Size(max = 10000, message = "Sample answer cannot exceed 10000 characters")
     private String sampleAnswer;
 
     @NotNull
     private Integer maxScore;
 
-    private ChapterDTO chapter;
+    @JsonIgnoreProperties(value = { "writingExercises", "chapter" }, allowSetters = true)
+    private WritingTaskDTO writingTask;
 
     public Long getId() {
         return id;
@@ -34,12 +32,12 @@ public class WritingExerciseDTO implements Serializable {
         this.id = id;
     }
 
-    public String getPrompt() {
-        return prompt;
+    public WritingTaskDTO getWritingTask() {
+        return writingTask;
     }
 
-    public void setPrompt(String prompt) {
-        this.prompt = prompt;
+    public void setWritingTask(WritingTaskDTO writingTask) {
+        this.writingTask = writingTask;
     }
 
     public String getSampleAnswer() {
@@ -56,14 +54,6 @@ public class WritingExerciseDTO implements Serializable {
 
     public void setMaxScore(Integer maxScore) {
         this.maxScore = maxScore;
-    }
-
-    public ChapterDTO getChapter() {
-        return chapter;
-    }
-
-    public void setChapter(ChapterDTO chapter) {
-        this.chapter = chapter;
     }
 
     @Override
@@ -92,10 +82,9 @@ public class WritingExerciseDTO implements Serializable {
     public String toString() {
         return "WritingExerciseDTO{" +
             "id=" + getId() +
-            ", prompt='" + getPrompt() + "'" +
+            ", writingTask=" + getWritingTask() +
             ", sampleAnswer='" + getSampleAnswer() + "'" +
             ", maxScore=" + getMaxScore() +
-            ", chapter=" + getChapter() +
             "}";
     }
 }

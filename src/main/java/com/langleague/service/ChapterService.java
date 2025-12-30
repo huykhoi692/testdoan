@@ -161,10 +161,10 @@ public class ChapterService {
             // Load each collection separately
             chapterRepository.findOneWithWords(id).ifPresent(c -> chapter.setWords(c.getWords()));
             chapterRepository.findOneWithGrammars(id).ifPresent(c -> chapter.setGrammars(c.getGrammars()));
-            chapterRepository.findOneWithListeningExercises(id).ifPresent(c -> chapter.setListeningExercises(c.getListeningExercises()));
-            chapterRepository.findOneWithReadingExercises(id).ifPresent(c -> chapter.setReadingExercises(c.getReadingExercises()));
-            chapterRepository.findOneWithWritingExercises(id).ifPresent(c -> chapter.setWritingExercises(c.getWritingExercises()));
-            chapterRepository.findOneWithSpeakingExercises(id).ifPresent(c -> chapter.setSpeakingExercises(c.getSpeakingExercises()));
+            chapterRepository.findOneWithListeningAudios(id).ifPresent(c -> chapter.setListeningAudios(c.getListeningAudios()));
+            chapterRepository.findOneWithReadingPassages(id).ifPresent(c -> chapter.setReadingPassages(c.getReadingPassages()));
+            chapterRepository.findOneWithWritingTasks(id).ifPresent(c -> chapter.setWritingTasks(c.getWritingTasks()));
+            chapterRepository.findOneWithSpeakingTopics(id).ifPresent(c -> chapter.setSpeakingTopics(c.getSpeakingTopics()));
 
             return Optional.of(chapterDetailMapper.toDto(chapter));
         }

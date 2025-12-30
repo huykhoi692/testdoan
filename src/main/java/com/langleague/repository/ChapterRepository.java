@@ -69,28 +69,28 @@ public interface ChapterRepository extends JpaRepository<Chapter, Long> {
     Optional<Chapter> findOneWithGrammars(@Param("id") Long id);
 
     /**
-     * OPTIMIZED: Fetch chapter with listening exercises only
+     * OPTIMIZED: Fetch chapter with listening audios only
      */
-    @Query("select chapter from Chapter chapter left join fetch chapter.listeningExercises where chapter.id = :id")
-    Optional<Chapter> findOneWithListeningExercises(@Param("id") Long id);
+    @Query("select chapter from Chapter chapter left join fetch chapter.listeningAudios where chapter.id = :id")
+    Optional<Chapter> findOneWithListeningAudios(@Param("id") Long id);
 
     /**
-     * OPTIMIZED: Fetch chapter with reading exercises only
+     * OPTIMIZED: Fetch chapter with reading passages only
      */
-    @Query("select chapter from Chapter chapter left join fetch chapter.readingExercises where chapter.id = :id")
-    Optional<Chapter> findOneWithReadingExercises(@Param("id") Long id);
+    @Query("select chapter from Chapter chapter left join fetch chapter.readingPassages where chapter.id = :id")
+    Optional<Chapter> findOneWithReadingPassages(@Param("id") Long id);
 
     /**
-     * OPTIMIZED: Fetch chapter with writing exercises only
+     * OPTIMIZED: Fetch chapter with writing tasks only
      */
-    @Query("select chapter from Chapter chapter left join fetch chapter.writingExercises where chapter.id = :id")
-    Optional<Chapter> findOneWithWritingExercises(@Param("id") Long id);
+    @Query("select chapter from Chapter chapter left join fetch chapter.writingTasks where chapter.id = :id")
+    Optional<Chapter> findOneWithWritingTasks(@Param("id") Long id);
 
     /**
-     * OPTIMIZED: Fetch chapter with speaking exercises only
+     * OPTIMIZED: Fetch chapter with speaking topics only
      */
-    @Query("select chapter from Chapter chapter left join fetch chapter.speakingExercises where chapter.id = :id")
-    Optional<Chapter> findOneWithSpeakingExercises(@Param("id") Long id);
+    @Query("select chapter from Chapter chapter left join fetch chapter.speakingTopics where chapter.id = :id")
+    Optional<Chapter> findOneWithSpeakingTopics(@Param("id") Long id);
 
     /**
      * DEPRECATED: This causes Cartesian product. Use separate queries instead.
@@ -99,13 +99,13 @@ public interface ChapterRepository extends JpaRepository<Chapter, Long> {
     @Deprecated
     @Query(
         "select chapter from Chapter chapter " +
-        "left join fetch chapter.words " +
-        "left join fetch chapter.grammars " +
-        "left join fetch chapter.listeningExercises " +
-        "left join fetch chapter.readingExercises " +
-        "left join fetch chapter.writingExercises " +
-        "left join fetch chapter.speakingExercises " +
-        "where chapter.id = :id"
+            "left join fetch chapter.words " +
+            "left join fetch chapter.grammars " +
+            "left join fetch chapter.listeningExercises " +
+            "left join fetch chapter.readingExercises " +
+            "left join fetch chapter.writingExercises " +
+            "left join fetch chapter.speakingExercises " +
+            "where chapter.id = :id"
     )
     Optional<Chapter> findOneWithEagerRelationships(@Param("id") Long id);
 }

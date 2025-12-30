@@ -1,60 +1,67 @@
 package com.langleague.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 /**
- * Thông tin mở rộng cho User (Profile)
+ * A AppUser.
  */
 @Entity
 @Table(name = "app_user")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@SQLDelete(sql = "UPDATE app_user SET deleted = true WHERE id = ?")
+@SQLRestriction("deleted = false")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class AppUser implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
-    @Size(max = 255)
-    @Column(name = "display_name", length = 255)
+    @Column(name = "display_name")
     private String displayName;
 
-    @Lob
-    @Column(name = "bio")
+    @Column(name = "bio", length = 2000)
     private String bio;
 
-    @Size(max = 50)
-    @Column(name = "timezone", length = 50)
-    private String timezone;
-
-    // Notification Settings
     @Column(name = "email_notification_enabled")
     private Boolean emailNotificationEnabled = true;
 
     @Column(name = "daily_reminder_enabled")
     private Boolean dailyReminderEnabled = true;
 
-    @Version
-    @Column(name = "version")
-    private Long version;
+    @Column(name = "level")
+    private Integer level;
 
+    @Column(name = "points")
+    private Integer points;
+
+    @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(unique = true)
+    @MapsId
+    @JoinColumn(name = "id")
     private User internalUser;
+
+    // --- Soft-delete field ---
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
+
+    // -------------------------
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "appUser")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "appUser", "word" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "appUser", "vocabulary" }, allowSetters = true)
     private Set<UserVocabulary> userVocabularies = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "appUser")
@@ -69,15 +76,12 @@ public class AppUser implements Serializable {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "appUser")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "appUser" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "appUser", "topic" }, allowSetters = true)
     private Set<Comment> comments = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "appUser")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(
-        value = { "appUser", "listeningExercise", "speakingExercise", "readingExercise", "writingExercise" },
-        allowSetters = true
-    )
+    @JsonIgnoreProperties(value = { "appUser", "exercise" }, allowSetters = true)
     private Set<ExerciseResult> exerciseResults = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "appUser")
@@ -97,7 +101,7 @@ public class AppUser implements Serializable {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "appUser")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "streakMilestones", "appUser" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "appUser" }, allowSetters = true)
     private Set<StudySession> studySessions = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -141,19 +145,6 @@ public class AppUser implements Serializable {
         this.bio = bio;
     }
 
-    public String getTimezone() {
-        return this.timezone;
-    }
-
-    public AppUser timezone(String timezone) {
-        this.setTimezone(timezone);
-        return this;
-    }
-
-    public void setTimezone(String timezone) {
-        this.timezone = timezone;
-    }
-
     public Boolean getEmailNotificationEnabled() {
         return this.emailNotificationEnabled;
     }
@@ -180,6 +171,32 @@ public class AppUser implements Serializable {
         this.dailyReminderEnabled = dailyReminderEnabled;
     }
 
+    public Integer getLevel() {
+        return this.level;
+    }
+
+    public AppUser level(Integer level) {
+        this.setLevel(level);
+        return this;
+    }
+
+    public void setLevel(Integer level) {
+        this.level = level;
+    }
+
+    public Integer getPoints() {
+        return this.points;
+    }
+
+    public AppUser points(Integer points) {
+        this.setPoints(points);
+        return this;
+    }
+
+    public void setPoints(Integer points) {
+        this.points = points;
+    }
+
     public User getInternalUser() {
         return this.internalUser;
     }
@@ -191,6 +208,14 @@ public class AppUser implements Serializable {
     public AppUser internalUser(User user) {
         this.setInternalUser(user);
         return this;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     public Set<UserVocabulary> getUserVocabularies() {
@@ -487,7 +512,6 @@ public class AppUser implements Serializable {
 
     @Override
     public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
     }
 
@@ -498,6 +522,10 @@ public class AppUser implements Serializable {
             "id=" + getId() +
             ", displayName='" + getDisplayName() + "'" +
             ", bio='" + getBio() + "'" +
+            ", emailNotificationEnabled=" + getEmailNotificationEnabled() +
+            ", dailyReminderEnabled=" + getDailyReminderEnabled() +
+            ", level=" + getLevel() +
+            ", points=" + getPoints() +
             "}";
     }
 }

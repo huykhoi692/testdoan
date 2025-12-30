@@ -27,11 +27,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
 
 /**
  * Test class for StudySessionService - Focus on overlap detection
  */
 @ExtendWith(MockitoExtension.class)
+@WithMockUser(username = "user")
 class StudySessionOverlapDetectionTest {
 
     @Mock

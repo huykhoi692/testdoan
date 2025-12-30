@@ -196,7 +196,9 @@ public class LearningStreakService {
 
     /**
      * Overloaded method for backward compatibility - defaults to UTC
+     * @deprecated Use {@link #recordStudyActivity(String, ZoneId)} with proper timezone instead
      */
+    @Deprecated(since = "1.0", forRemoval = true)
     public void recordStudyActivity(String userLogin) {
         recordStudyActivity(userLogin, ZoneId.of("UTC"));
     }

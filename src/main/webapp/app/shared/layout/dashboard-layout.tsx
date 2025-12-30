@@ -532,7 +532,7 @@ const DashboardLayout = () => {
         <Footer
           style={{
             textAlign: 'center',
-            background: isDark ? '#1a1f26' : GRADIENTS.primaryHorizontal,
+            background: isDark ? '#1a1f26' : GRADIENTS.primary,
             padding: '20px 50px',
             color: '#fff',
           }}

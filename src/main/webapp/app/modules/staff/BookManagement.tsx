@@ -130,7 +130,7 @@ const BookManagement: React.FC = () => {
           thumbnail: thumbnailUrl || selectedBook.thumbnail || null,
           isActive: values.isActive ?? true,
         };
-        await dispatch(updateBook({ id: selectedBook.id, book: bookData })).unwrap();
+        await dispatch(updateBook(bookData)).unwrap();
         message.success('Cập nhật sách thành công');
       } else {
         // Create new book
@@ -159,8 +159,8 @@ const BookManagement: React.FC = () => {
   const handleDelete = async (book: IBook) => {
     try {
       setLoading(true);
-      // Pass object with id to match service signature
-      await dispatch(deleteBook({ id: book.id, force: false })).unwrap();
+      // Pass just the id as deleteBook expects
+      await dispatch(deleteBook(book.id)).unwrap();
       message.success('Xóa sách thành công');
       // Refresh the list after successful deletion
       await fetchBooks();

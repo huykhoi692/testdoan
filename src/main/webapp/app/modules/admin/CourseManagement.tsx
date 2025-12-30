@@ -110,7 +110,7 @@ const CourseManagement: React.FC = () => {
       };
 
       if (isEditMode && selectedBook?.id) {
-        await dispatch(updateBook({ id: selectedBook.id, book: { ...selectedBook, ...bookData } })).unwrap();
+        await dispatch(updateBook({ ...selectedBook, ...bookData, id: selectedBook.id })).unwrap();
         message.success(t('admin.courseManagement.updateSuccess') || 'Updated successfully');
       } else {
         await dispatch(createBook(bookData as IBook)).unwrap();

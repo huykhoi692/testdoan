@@ -25,9 +25,9 @@ public class ReadingExercise implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Lob
-    @Column(name = "passage", nullable = false)
-    private String passage;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "readingExercises" }, allowSetters = true)
+    private ReadingPassage readingPassage;
 
     @Lob
     @Column(name = "question", nullable = false)
@@ -54,22 +54,6 @@ public class ReadingExercise implements Serializable {
     )
     private Set<ExerciseResult> exerciseResults = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(
-        value = {
-            "words",
-            "grammars",
-            "listeningExercises",
-            "speakingExercises",
-            "readingExercises",
-            "writingExercises",
-            "chapterProgresses",
-            "book",
-        },
-        allowSetters = true
-    )
-    private Chapter chapter;
-
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Long getId() {
@@ -85,17 +69,17 @@ public class ReadingExercise implements Serializable {
         this.id = id;
     }
 
-    public String getPassage() {
-        return this.passage;
+    public ReadingPassage getReadingPassage() {
+        return this.readingPassage;
     }
 
-    public ReadingExercise passage(String passage) {
-        this.setPassage(passage);
+    public ReadingExercise readingPassage(ReadingPassage readingPassage) {
+        this.setReadingPassage(readingPassage);
         return this;
     }
 
-    public void setPassage(String passage) {
-        this.passage = passage;
+    public void setReadingPassage(ReadingPassage readingPassage) {
+        this.readingPassage = readingPassage;
     }
 
     public String getQuestion() {
@@ -199,19 +183,6 @@ public class ReadingExercise implements Serializable {
         return this;
     }
 
-    public Chapter getChapter() {
-        return this.chapter;
-    }
-
-    public void setChapter(Chapter chapter) {
-        this.chapter = chapter;
-    }
-
-    public ReadingExercise chapter(Chapter chapter) {
-        this.setChapter(chapter);
-        return this;
-    }
-
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -236,7 +207,6 @@ public class ReadingExercise implements Serializable {
     public String toString() {
         return "ReadingExercise{" +
             "id=" + getId() +
-            ", passage='" + getPassage() + "'" +
             ", question='" + getQuestion() + "'" +
             ", correctAnswer='" + getCorrectAnswer() + "'" +
             ", maxScore=" + getMaxScore() +

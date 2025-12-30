@@ -47,11 +47,13 @@ const StaffChapterManagement: React.FC = () => {
 
     setLoading(true);
     try {
-      const [bookData, chaptersData] = await Promise.all([
+      const [bookResponse, chaptersData] = await Promise.all([
         dispatch(getBook(parseInt(bookId, 10))).unwrap(),
         dispatch(getChaptersByBookId(parseInt(bookId, 10))).unwrap(),
       ]);
-      setBook(bookData);
+      // Extract data from AxiosResponse if needed
+      const bookData = (bookResponse as any).data || bookResponse;
+      setBook(bookData as IBook);
       setChapters(Array.isArray(chaptersData) ? chaptersData : []);
     } catch (error: any) {
       message.error(t('error.loadFailed') || 'Failed to load data');

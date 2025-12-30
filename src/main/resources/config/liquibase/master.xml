@@ -81,9 +81,20 @@
     <include file="config/liquibase/changelog/20251205000003_entity_user_chapter.xml" relativeToChangelogFile="false"/>
 
     <!-- ========================================= -->
-    <!-- 9. PERFORMANCE INDEXES                    -->
+    <!-- 9. ENHANCEMENTS & FIXES                  -->
+    <!-- ========================================= -->
+    <include file="config/liquibase/changelog/20251210000003_add_achievement_rich_domain_fields.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251210000004_fix_user_image_storage.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251210000005_add_app_user_level_points.xml" relativeToChangelogFile="false"/>
+
+    <!-- ========================================= -->
+    <!-- 10. PERFORMANCE INDEXES                   -->
     <!-- ========================================= -->
     <include file="config/liquibase/changelog/20251210000002_add_performance_indexes_clean.xml" relativeToChangelogFile="false"/>
+    <!-- ========================================= -->
+    <!-- 11. SKILLS REFACTOR                       -->
+    <!-- ========================================= -->
+    <include file="config/liquibase/changelog/20251231_refactor_skills.xml" relativeToChangelogFile="false"/>
 
 </databaseChangeLog>
 

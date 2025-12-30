@@ -37,6 +37,10 @@ public class BookUploadService {
     private final ReadingExerciseRepository readingExerciseRepository;
     private final SpeakingExerciseRepository speakingExerciseRepository;
     private final WritingExerciseRepository writingExerciseRepository;
+    private final ReadingPassageRepository readingPassageRepository;
+    private final ListeningAudioRepository listeningAudioRepository;
+    private final SpeakingTopicRepository speakingTopicRepository;
+    private final WritingTaskRepository writingTaskRepository;
     private final FileStorageService fileStorageService;
     private final ChatbotService chatbotService;
     private final ObjectMapper objectMapper;
@@ -52,6 +56,10 @@ public class BookUploadService {
         ReadingExerciseRepository readingExerciseRepository,
         SpeakingExerciseRepository speakingExerciseRepository,
         WritingExerciseRepository writingExerciseRepository,
+        ReadingPassageRepository readingPassageRepository,
+        ListeningAudioRepository listeningAudioRepository,
+        SpeakingTopicRepository speakingTopicRepository,
+        WritingTaskRepository writingTaskRepository,
         FileStorageService fileStorageService,
         ChatbotService chatbotService,
         ObjectMapper objectMapper,
@@ -66,6 +74,10 @@ public class BookUploadService {
         this.readingExerciseRepository = readingExerciseRepository;
         this.speakingExerciseRepository = speakingExerciseRepository;
         this.writingExerciseRepository = writingExerciseRepository;
+        this.readingPassageRepository = readingPassageRepository;
+        this.listeningAudioRepository = listeningAudioRepository;
+        this.speakingTopicRepository = speakingTopicRepository;
+        this.writingTaskRepository = writingTaskRepository;
         this.fileStorageService = fileStorageService;
         this.chatbotService = chatbotService;
         this.objectMapper = objectMapper;
@@ -142,7 +154,7 @@ public class BookUploadService {
     /**
      * Create Book and Chapters from extraction DTO
      */
-    private Book createBookFromExtraction(BookExtractionDTO extractionDTO, BookUpload upload) {
+    public Book createBookFromExtraction(BookExtractionDTO extractionDTO, BookUpload upload) {
         LOG.info("Creating book from extraction: {} for upload ID: {}", extractionDTO.getTitle(), upload.getId());
 
         // Create Book
@@ -198,33 +210,50 @@ public class BookUploadService {
         try {
             switch (type) {
                 case "LISTENING":
+                    ListeningAudio listeningAudio = new ListeningAudio();
+                    listeningAudio.setAudioUrl(exerciseDTO.getContent()); // Using content as audio url
+                    listeningAudio.setChapter(chapter);
+                    listeningAudio = listeningAudioRepository.save(listeningAudio);
+
                     ListeningExercise listeningExercise = new ListeningExercise();
-                    listeningExercise.setAudioPath(exerciseDTO.getContent()); // Using content as audio path
+                    listeningExercise.setListeningAudio(listeningAudio);
                     listeningExercise.setQuestion(exerciseDTO.getTitle() != null ? exerciseDTO.getTitle() : "Listening exercise");
                     listeningExercise.setMaxScore(100);
-                    listeningExercise.setChapter(chapter);
                     listeningExerciseRepository.save(listeningExercise);
                     break;
                 case "READING":
+                    ReadingPassage readingPassage = new ReadingPassage();
+                    readingPassage.setContent(exerciseDTO.getContent());
+                    readingPassage.setTitle(exerciseDTO.getTitle());
+                    readingPassage.setChapter(chapter);
+                    readingPassage = readingPassageRepository.save(readingPassage);
+
                     ReadingExercise readingExercise = new ReadingExercise();
-                    readingExercise.setPassage(exerciseDTO.getContent());
+                    readingExercise.setReadingPassage(readingPassage);
                     readingExercise.setQuestion(exerciseDTO.getTitle() != null ? exerciseDTO.getTitle() : "Reading exercise");
                     readingExercise.setMaxScore(100);
-                    readingExercise.setChapter(chapter);
                     readingExerciseRepository.save(readingExercise);
                     break;
                 case "SPEAKING":
+                    SpeakingTopic speakingTopic = new SpeakingTopic();
+                    speakingTopic.setContext(exerciseDTO.getContent());
+                    speakingTopic.setChapter(chapter);
+                    speakingTopic = speakingTopicRepository.save(speakingTopic);
+
                     SpeakingExercise speakingExercise = new SpeakingExercise();
-                    speakingExercise.setPrompt(exerciseDTO.getContent());
+                    speakingExercise.setSpeakingTopic(speakingTopic);
                     speakingExercise.setMaxScore(100);
-                    speakingExercise.setChapter(chapter);
                     speakingExerciseRepository.save(speakingExercise);
                     break;
                 case "WRITING":
+                    WritingTask writingTask = new WritingTask();
+                    writingTask.setPrompt(exerciseDTO.getContent());
+                    writingTask.setChapter(chapter);
+                    writingTask = writingTaskRepository.save(writingTask);
+
                     WritingExercise writingExercise = new WritingExercise();
-                    writingExercise.setPrompt(exerciseDTO.getContent());
+                    writingExercise.setWritingTask(writingTask);
                     writingExercise.setMaxScore(100);
-                    writingExercise.setChapter(chapter);
                     writingExerciseRepository.save(writingExercise);
                     break;
                 default:

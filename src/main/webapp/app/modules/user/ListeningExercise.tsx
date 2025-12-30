@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, Button, Typography, Space, Radio, Row, Col, message, Spin, Alert, Image, Slider } from 'antd';
 import {
   CheckCircleOutlined,
@@ -16,6 +16,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Howl } from 'howler';
 import { useAppDispatch } from 'app/config/store';
 import { upsertChapterProgress } from 'app/shared/services/progress.service';
+import { saveExerciseResult } from 'app/shared/services/exercise-result.service';
 import { IListeningExercise } from 'app/shared/model/models';
 import { colors, spacing, borderRadius, shadows, typography, cardBaseStyle, pageContainerStyle } from 'app/shared/styles/design-system';
 
@@ -60,7 +61,9 @@ const ListeningExercise: React.FC = () => {
           chapterId: 1,
           skillType: 'LISTENING',
           orderIndex: 1,
-          audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+          listeningAudio: {
+            audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+          },
           imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
           question: 'Nghe đoạn hội thoại và chọn câu trả lời đúng: Họ gặp nhau ở đâu?',
           correctAnswer: 'B',
@@ -80,10 +83,10 @@ const ListeningExercise: React.FC = () => {
 
   // Initialize Howler when exercise is loaded
   useEffect(() => {
-    if (!exercise?.audioUrl) return;
+    if (!exercise?.listeningAudio?.audioUrl) return;
 
     const sound = new Howl({
-      src: [exercise.audioUrl],
+      src: [exercise.listeningAudio.audioUrl],
       html5: true,
       volume,
       rate: playbackRate,
@@ -133,7 +136,7 @@ const ListeningExercise: React.FC = () => {
         clearInterval(progressIntervalRef.current);
       }
     };
-  }, [exercise?.audioUrl, volume, playbackRate]);
+  }, [exercise?.listeningAudio?.audioUrl, volume, playbackRate]);
 
   const handlePlayPause = () => {
     if (!soundRef.current) return;
@@ -193,6 +196,18 @@ const ListeningExercise: React.FC = () => {
     const correct = selectedAnswer === exercise?.correctAnswer;
     setIsCorrect(correct);
     setIsSubmitted(true);
+
+    if (exercise) {
+      dispatch(
+        saveExerciseResult({
+          exerciseId: exercise.id,
+          exerciseType: 'LISTENING',
+          isCorrect: correct,
+          score: correct ? exercise.maxScore : 0,
+          userAnswer: selectedAnswer,
+        }),
+      );
+    }
 
     if (correct) {
       message.success('Chính xác! Bạn đã trả lời đúng! 🎉');

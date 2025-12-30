@@ -217,12 +217,16 @@ class BookServiceTest {
     void testSearchBooksWithEmptyKeyword() {
         // Given
         String keyword = "";
-        List<Book> books = List.of(book);
+        // Create a dummy book to ensure the list is not empty
+        Book dummyBook = new Book();
+        dummyBook.setId(1L);
+        dummyBook.setTitle("Test Book");
+        List<Book> books = List.of(dummyBook);
         Page<Book> bookPage = new PageImpl<>(books);
         Pageable pageable = PageRequest.of(0, 10);
 
         when(bookRepository.findAll(pageable)).thenReturn(bookPage);
-        when(bookMapper.toDto(book)).thenReturn(bookDTO);
+        when(bookMapper.toDto(dummyBook)).thenReturn(bookDTO);
 
         // When
         Page<BookDTO> result = bookService.searchBooks(keyword, pageable);

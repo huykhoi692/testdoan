@@ -1,5 +1,10 @@
 // DTOs matching backend exactly - follow JHipster convention
 
+import { IListeningAudio } from './listening-audio.model';
+import { IReadingPassage } from './reading-passage.model';
+import { ISpeakingTopic } from './speaking-topic.model';
+import { IWritingTask } from './writing-task.model';
+
 // User Role Enum
 export enum UserRole {
   ADMIN = 'ROLE_ADMIN',
@@ -94,7 +99,7 @@ export interface IExerciseBase {
 
 // ListeningExercise DTO
 export interface IListeningExercise extends IExerciseBase {
-  audioUrl: string;
+  listeningAudio?: IListeningAudio;
   imageUrl?: string;
   question: string;
   correctAnswer: string;
@@ -112,7 +117,7 @@ export interface IListeningOption {
 
 // SpeakingExercise DTO
 export interface ISpeakingExercise extends IExerciseBase {
-  prompt: string;
+  speakingTopic?: ISpeakingTopic;
   sampleAudio?: string;
   targetPhrase?: string;
   maxScore?: number;
@@ -120,7 +125,7 @@ export interface ISpeakingExercise extends IExerciseBase {
 
 // ReadingExercise DTO
 export interface IReadingExercise extends IExerciseBase {
-  passage: string;
+  readingPassage?: IReadingPassage;
   question: string;
   correctAnswer: string;
   maxScore?: number;
@@ -137,7 +142,7 @@ export interface IReadingOption {
 
 // WritingExercise DTO
 export interface IWritingExercise extends IExerciseBase {
-  prompt: string;
+  writingTask?: IWritingTask;
   sampleAnswer?: string;
   minWords?: number;
   maxScore?: number;

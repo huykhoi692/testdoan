@@ -1,5 +1,6 @@
 package com.langleague.service.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -14,17 +15,14 @@ public class SpeakingExerciseDTO implements Serializable {
 
     private Long id;
 
-    @NotBlank(message = "Prompt is required")
-    @Size(max = 5000, message = "Prompt cannot exceed 5000 characters")
-    private String prompt;
+    @JsonIgnoreProperties(value = { "speakingExercises", "chapter" }, allowSetters = true)
+    private SpeakingTopicDTO speakingTopic;
 
     @Size(max = 512)
     private String sampleAudio;
 
     @NotNull
     private Integer maxScore;
-
-    private ChapterDTO chapter;
 
     public Long getId() {
         return id;
@@ -34,12 +32,12 @@ public class SpeakingExerciseDTO implements Serializable {
         this.id = id;
     }
 
-    public String getPrompt() {
-        return prompt;
+    public SpeakingTopicDTO getSpeakingTopic() {
+        return speakingTopic;
     }
 
-    public void setPrompt(String prompt) {
-        this.prompt = prompt;
+    public void setSpeakingTopic(SpeakingTopicDTO speakingTopic) {
+        this.speakingTopic = speakingTopic;
     }
 
     public String getSampleAudio() {
@@ -56,14 +54,6 @@ public class SpeakingExerciseDTO implements Serializable {
 
     public void setMaxScore(Integer maxScore) {
         this.maxScore = maxScore;
-    }
-
-    public ChapterDTO getChapter() {
-        return chapter;
-    }
-
-    public void setChapter(ChapterDTO chapter) {
-        this.chapter = chapter;
     }
 
     @Override
@@ -92,10 +82,8 @@ public class SpeakingExerciseDTO implements Serializable {
     public String toString() {
         return "SpeakingExerciseDTO{" +
             "id=" + getId() +
-            ", prompt='" + getPrompt() + "'" +
             ", sampleAudio='" + getSampleAudio() + "'" +
             ", maxScore=" + getMaxScore() +
-            ", chapter=" + getChapter() +
             "}";
     }
 }

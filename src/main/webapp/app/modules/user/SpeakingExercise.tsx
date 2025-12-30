@@ -33,7 +33,9 @@ const SpeakingExercise: React.FC = () => {
           chapterId: 1,
           skillType: 'SPEAKING',
           orderIndex: 1,
-          prompt: 'Hãy giới thiệu về cuộc gặp đầu tiên của bạn với một người quan trọng. Sử dụng mẫu câu: 처음 만났을 때...',
+          speakingTopic: {
+            context: 'Hãy giới thiệu về cuộc gặp đầu tiên của bạn với một người quan trọng. Sử dụng mẫu câu: 처음 만났을 때...',
+          },
           sampleAudio: '/audio/chapter1-speaking1-sample.mp3',
           targetPhrase: '처음 만났을 때 정말 설렜어요',
           maxScore: 15,
@@ -185,7 +187,7 @@ const SpeakingExercise: React.FC = () => {
             Yêu cầu:
           </Title>
           <Paragraph style={{ fontSize: typography.fontSize.md, lineHeight: '1.8', color: colors.text.primary, marginBottom: spacing.md }}>
-            {exercise.prompt}
+            {exercise.speakingTopic?.context}
           </Paragraph>
 
           <Divider style={{ margin: `${spacing.md} 0` }} />

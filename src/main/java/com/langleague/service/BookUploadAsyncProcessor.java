@@ -68,7 +68,7 @@ public class BookUploadAsyncProcessor {
             bookUploadRepository.save(upload);
 
             // Create book and chapters using BookUploadService logic
-            // Note: You'll need to make createBookFromExtraction public or create a public wrapper
+            bookUploadService.createBookFromExtraction(extractionDTO, upload);
             LOG.info("Book extraction completed for upload ID: {}", uploadId);
 
             // Update upload record to completed

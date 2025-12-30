@@ -142,7 +142,9 @@ const MOCK_LISTENING_EXERCISES: IListeningExercise[] = [
     chapterId: 1,
     skillType: 'LISTENING',
     orderIndex: 1,
-    audioUrl: '/audio/chapter1-listening1.mp3',
+    listeningAudio: {
+      audioUrl: '/audio/chapter1-listening1.mp3',
+    },
     question: 'Nghe đoạn hội thoại và chọn câu trả lời đúng: Họ gặp nhau ở đâu?',
     correctAnswer: 'B',
     maxScore: 10,
@@ -152,7 +154,9 @@ const MOCK_LISTENING_EXERCISES: IListeningExercise[] = [
     chapterId: 1,
     skillType: 'LISTENING',
     orderIndex: 2,
-    audioUrl: '/audio/chapter1-listening2.mp3',
+    listeningAudio: {
+      audioUrl: '/audio/chapter1-listening2.mp3',
+    },
     question: 'Cô ấy cảm thấy thế nào khi gặp anh ấy lần đầu?',
     correctAnswer: 'A',
     maxScore: 10,
@@ -162,7 +166,9 @@ const MOCK_LISTENING_EXERCISES: IListeningExercise[] = [
     chapterId: 2,
     skillType: 'LISTENING',
     orderIndex: 1,
-    audioUrl: '/audio/chapter2-listening1.mp3',
+    listeningAudio: {
+      audioUrl: '/audio/chapter2-listening1.mp3',
+    },
     question: 'Vấn đề gì xảy ra ở công ty?',
     correctAnswer: 'C',
     maxScore: 10,
@@ -175,7 +181,9 @@ const MOCK_SPEAKING_EXERCISES: ISpeakingExercise[] = [
     chapterId: 1,
     skillType: 'SPEAKING',
     orderIndex: 1,
-    prompt: 'Hãy giới thiệu về cuộc gặp đầu tiên của bạn với một người quan trọng. Sử dụng mẫu câu: 처음 만났을 때...',
+    speakingTopic: {
+      context: 'Hãy giới thiệu về cuộc gặp đầu tiên của bạn với một người quan trọng. Sử dụng mẫu câu: 처음 만났을 때...',
+    },
     sampleAudio: '/audio/chapter1-speaking1-sample.mp3',
     targetPhrase: '처음 만났을 때 정말 설렜어요',
     maxScore: 15,
@@ -185,7 +193,9 @@ const MOCK_SPEAKING_EXERCISES: ISpeakingExercise[] = [
     chapterId: 1,
     skillType: 'SPEAKING',
     orderIndex: 2,
-    prompt: 'Mô tả ấn tượng đầu tiên của bạn về một người bạn mới. Dùng từ vựng: 인상, 설레다, 첫사랑',
+    speakingTopic: {
+      context: 'Mô tả ấn tượng đầu tiên của bạn về một người bạn mới. Dùng từ vựng: 인상, 설레다, 첫사랑',
+    },
     targetPhrase: '첫 인상이 정말 좋았어요',
     maxScore: 15,
   },
@@ -197,8 +207,10 @@ const MOCK_READING_EXERCISES: IReadingExercise[] = [
     chapterId: 1,
     skillType: 'READING',
     orderIndex: 1,
-    passage:
-      '김지영은 대학교에서 처음 그를 만났다. 그날 날씨가 정말 좋았고 캠퍼스의 벚꽃이 활짝 피어 있었다. 그는 도서관 앞에서 책을 읽고 있었고, 지영은 그의 집중하는 모습에 첫눈에 반했다.',
+    readingPassage: {
+      content:
+        '김지영은 대학교에서 처음 그를 만났다. 그날 날씨가 정말 좋았고 캠퍼스의 벚꽃이 활짝 피어 있었다. 그는 도서관 앞에서 책을 읽고 있었고, 지영은 그의 집중하는 모습에 첫눈에 반했다.',
+    },
     question: '김지영은 어디서 그를 처음 만났나요?',
     correctAnswer: 'A',
     maxScore: 10,
@@ -208,8 +220,10 @@ const MOCK_READING_EXERCISES: IReadingExercise[] = [
     chapterId: 1,
     skillType: 'READING',
     orderIndex: 2,
-    passage:
-      '첫 만남 이후로 지영은 매일 그 시간에 도서관에 갔다. 그와 이야기를 나누고 싶었지만 용기가 나지 않았다. 일주일이 지나서야 드디어 그에게 말을 걸었다.',
+    readingPassage: {
+      content:
+        '첫 만남 이후로 지영은 매일 그 시간에 도서관에 갔다. 그와 이야기를 나누고 싶었지만 용기가 나지 않았다. 일주일이 지나서야 드디어 그에게 말을 걸었다.',
+    },
     question: '지영이 그에게 말을 걸기까지 얼마나 걸렸나요?',
     correctAnswer: 'B',
     maxScore: 10,
@@ -219,7 +233,9 @@ const MOCK_READING_EXERCISES: IReadingExercise[] = [
     chapterId: 2,
     skillType: 'READING',
     orderIndex: 1,
-    passage: '회사 생활은 생각보다 힘들었다. 아침 일찍 출근해서 저녁 늦게까지 일해야 했다. 동료들은 친절했지만 업무 압박은 심했다.',
+    readingPassage: {
+      content: '회사 생활은 생각보다 힘들었다. 아침 일찍 출근해서 저녁 늦게까지 일해야 했다. 동료들은 친절했지만 업무 압박은 심했다.',
+    },
     question: '회사 생활에서 가장 힘든 점은 무엇인가요?',
     correctAnswer: 'C',
     maxScore: 10,
@@ -232,8 +248,10 @@ const MOCK_WRITING_EXERCISES: IWritingExercise[] = [
     chapterId: 1,
     skillType: 'WRITING',
     orderIndex: 1,
-    prompt:
-      'Viết một đoạn văn ngắn (50-80 từ) về cuộc gặp gỡ đầu tiên đáng nhớ của bạn. Sử dụng ít nhất 3 từ vựng đã học: 만남, 설레다, 인상',
+    writingTask: {
+      prompt:
+        'Viết một đoạn văn ngắn (50-80 từ) về cuộc gặp gỡ đầu tiên đáng nhớ của bạn. Sử dụng ít nhất 3 từ vựng đã học: 만남, 설레다, 인상',
+    },
     sampleAnswer:
       '작년 봄에 친구 소개로 새로운 사람을 만났어요. 첫 만남이었지만 정말 설렜어요. 그 사람의 첫 인상이 너무 좋았고 대화도 잘 통했어요. 지금은 제일 친한 친구가 되었어요.',
     minWords: 50,
@@ -244,7 +262,9 @@ const MOCK_WRITING_EXERCISES: IWritingExercise[] = [
     chapterId: 2,
     skillType: 'WRITING',
     orderIndex: 1,
-    prompt: 'Mô tả một ngày làm việc điển hình của bạn. Sử dụng ngữ pháp -았/었어요 và từ vựng về công việc (60-100 từ)',
+    writingTask: {
+      prompt: 'Mô tả một ngày làm việc điển hình của bạn. Sử dụng ngữ pháp -았/었어요 và từ vựng về công việc (60-100 từ)',
+    },
     sampleAnswer:
       '오늘 아침 8시에 회사에 출근했어요. 먼저 이메일을 확인하고 회의 준비를 했어요. 오전에는 팀 회의가 있었고 점심은 동료들과 함께 먹었어요. 오후에는 프로젝트 작업을 했어요. 저녁 6시에 퇴근했어요.',
     minWords: 60,
@@ -338,16 +358,40 @@ export const getChapterExercises = createAsyncThunk('chapter/fetch_exercises', a
 export const getChapterDetails = createAsyncThunk('chapter/fetch_details', async (id: number) => {
   if (USE_MOCK) {
     const chapter = MOCK_CHAPTERS.find(c => c.id === id) || MOCK_CHAPTERS[0];
+
+    // Helper to group exercises by parent
+    const listeningExercises = MOCK_LISTENING_EXERCISES.filter(e => e.chapterId === id);
+    const listeningAudios = listeningExercises.map(e => ({
+      ...e.listeningAudio,
+      listeningExercises: [e],
+    }));
+
+    const readingExercises = MOCK_READING_EXERCISES.filter(e => e.chapterId === id);
+    const readingPassages = readingExercises.map(e => ({
+      ...e.readingPassage,
+      readingExercises: [e],
+    }));
+
+    const speakingExercises = MOCK_SPEAKING_EXERCISES.filter(e => e.chapterId === id);
+    const speakingTopics = speakingExercises.map(e => ({
+      ...e.speakingTopic,
+      speakingExercises: [e],
+    }));
+
+    const writingExercises = MOCK_WRITING_EXERCISES.filter(e => e.chapterId === id);
+    const writingTasks = writingExercises.map(e => ({
+      ...e.writingTask,
+      writingExercises: [e],
+    }));
+
     return {
       ...chapter,
       words: MOCK_WORDS.filter(w => w.chapterId === id),
       grammars: MOCK_GRAMMARS.filter(g => g.chapterId === id),
-      exercises: {
-        listening: MOCK_LISTENING_EXERCISES.filter(e => e.chapterId === id),
-        speaking: MOCK_SPEAKING_EXERCISES.filter(e => e.chapterId === id),
-        reading: MOCK_READING_EXERCISES.filter(e => e.chapterId === id),
-        writing: MOCK_WRITING_EXERCISES.filter(e => e.chapterId === id),
-      },
+      listeningAudios,
+      readingPassages,
+      speakingTopics,
+      writingTasks,
     };
   }
   // Backend uses /detail not /details
