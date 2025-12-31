@@ -3,6 +3,7 @@ package com.langleague.repository;
 import com.langleague.domain.ListeningExercise;
 import java.util.List;
 import org.springframework.data.jpa.repository.*;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -17,7 +18,8 @@ public interface ListeningExerciseRepository extends JpaRepository<ListeningExer
      * @param chapterId the chapter ID
      * @return list of listening exercises
      */
-    List<ListeningExercise> findByChapterId(Long chapterId);
+    @Query("SELECT e FROM ListeningExercise e WHERE e.listeningAudio.chapter.id = :chapterId")
+    List<ListeningExercise> findByChapterId(@Param("chapterId") Long chapterId);
 
     /**
      * Count all listening exercises by chapter ID.
@@ -25,5 +27,6 @@ public interface ListeningExerciseRepository extends JpaRepository<ListeningExer
      * @param chapterId the chapter ID
      * @return count of listening exercises
      */
-    long countByChapter_Id(Long chapterId);
+    @Query("SELECT COUNT(e) FROM ListeningExercise e WHERE e.listeningAudio.chapter.id = :chapterId")
+    long countByChapter_Id(@Param("chapterId") Long chapterId);
 }

@@ -35,7 +35,8 @@ import {
 import type { ColumnsType } from 'antd/es/table';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppDispatch } from 'app/config/store';
-import { getChapter, getChapterWords, getChapterGrammars, getChapterExercises } from 'app/shared/services/chapter.service';
+import { getChapterWords, getChapterGrammars, getChapterExercises } from 'app/shared/services/chapter.service';
+import { getChapter } from 'app/shared/reducers/chapter.reducer';
 import { createWord, updateWord, deleteWord } from 'app/shared/services/word.service';
 import { createGrammar, updateGrammar, deleteGrammar } from 'app/shared/services/grammar.service';
 import {

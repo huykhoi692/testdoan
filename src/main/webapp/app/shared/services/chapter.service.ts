@@ -278,20 +278,13 @@ export const getChapters = createAsyncThunk('chapter/fetch_all', async () => {
 });
 
 export const getChaptersByBookId = createAsyncThunk('chapter/fetch_by_book', async (bookId: number) => {
-  if (USE_MOCK) {
-    return MOCK_CHAPTERS.filter(c => c.bookId === bookId);
-  }
   const response = await axios.get<IChapter[]>(`${API_URL}/book/${bookId}`);
   return response.data;
 });
 
-export const getChapter = createAsyncThunk('chapter/fetch_entity', async (id: number) => {
-  if (USE_MOCK) {
-    return MOCK_CHAPTERS.find(c => c.id === id) || MOCK_CHAPTERS[0];
-  }
-  const response = await axios.get<IChapter>(`${API_URL}/${id}`);
-  return response.data;
-});
+export const getChapter = (id: number) => {
+  return axios.get<IChapter>(`${API_URL}/${id}`);
+};
 
 export const createChapter = createAsyncThunk('chapter/create_entity', async (entity: IChapter) => {
   const response = await axios.post<IChapter>(API_URL, entity);
@@ -310,39 +303,22 @@ export const deleteChapter = createAsyncThunk('chapter/delete_entity', async (id
 
 // Get chapters by book - Matches GET /api/chapters/book/{bookId}
 export const getChaptersByBook = createAsyncThunk('chapter/fetch_by_book_id', async (bookId: number) => {
-  if (USE_MOCK) {
-    return MOCK_CHAPTERS.filter(c => c.bookId === bookId);
-  }
   const response = await axios.get<IChapter[]>(`${API_URL}/book/${bookId}`);
   return response.data;
 });
 
 // Get chapter content (words, grammars, exercises)
 export const getChapterWords = createAsyncThunk('chapter/fetch_words', async (chapterId: number) => {
-  if (USE_MOCK) {
-    return MOCK_WORDS.filter(w => w.chapterId === chapterId);
-  }
   const response = await axios.get<IWord[]>(`${API_URL}/${chapterId}/words`);
   return response.data;
 });
 
 export const getChapterGrammars = createAsyncThunk('chapter/fetch_grammars', async (chapterId: number) => {
-  if (USE_MOCK) {
-    return MOCK_GRAMMARS.filter(g => g.chapterId === chapterId);
-  }
   const response = await axios.get<IGrammar[]>(`${API_URL}/${chapterId}/grammars`);
   return response.data;
 });
 
 export const getChapterExercises = createAsyncThunk('chapter/fetch_exercises', async (chapterId: number) => {
-  if (USE_MOCK) {
-    return {
-      listening: MOCK_LISTENING_EXERCISES.filter(e => e.chapterId === chapterId),
-      speaking: MOCK_SPEAKING_EXERCISES.filter(e => e.chapterId === chapterId),
-      reading: MOCK_READING_EXERCISES.filter(e => e.chapterId === chapterId),
-      writing: MOCK_WRITING_EXERCISES.filter(e => e.chapterId === chapterId),
-    };
-  }
   const response = await axios.get<{
     listening: IListeningExercise[];
     speaking: ISpeakingExercise[];
@@ -356,44 +332,6 @@ export const getChapterExercises = createAsyncThunk('chapter/fetch_exercises', a
 
 // Get chapter with full details - Matches GET /api/chapters/{id}/detail
 export const getChapterDetails = createAsyncThunk('chapter/fetch_details', async (id: number) => {
-  if (USE_MOCK) {
-    const chapter = MOCK_CHAPTERS.find(c => c.id === id) || MOCK_CHAPTERS[0];
-
-    // Helper to group exercises by parent
-    const listeningExercises = MOCK_LISTENING_EXERCISES.filter(e => e.chapterId === id);
-    const listeningAudios = listeningExercises.map(e => ({
-      ...e.listeningAudio,
-      listeningExercises: [e],
-    }));
-
-    const readingExercises = MOCK_READING_EXERCISES.filter(e => e.chapterId === id);
-    const readingPassages = readingExercises.map(e => ({
-      ...e.readingPassage,
-      readingExercises: [e],
-    }));
-
-    const speakingExercises = MOCK_SPEAKING_EXERCISES.filter(e => e.chapterId === id);
-    const speakingTopics = speakingExercises.map(e => ({
-      ...e.speakingTopic,
-      speakingExercises: [e],
-    }));
-
-    const writingExercises = MOCK_WRITING_EXERCISES.filter(e => e.chapterId === id);
-    const writingTasks = writingExercises.map(e => ({
-      ...e.writingTask,
-      writingExercises: [e],
-    }));
-
-    return {
-      ...chapter,
-      words: MOCK_WORDS.filter(w => w.chapterId === id),
-      grammars: MOCK_GRAMMARS.filter(g => g.chapterId === id),
-      listeningAudios,
-      readingPassages,
-      speakingTopics,
-      writingTasks,
-    };
-  }
   // Backend uses /detail not /details
   const response = await axios.get<any>(`${API_URL}/${id}/detail`);
   return response.data;
@@ -401,10 +339,6 @@ export const getChapterDetails = createAsyncThunk('chapter/fetch_details', async
 
 // Search chapters - Matches GET /api/chapters/search?keyword=xxx
 export const searchChapters = createAsyncThunk('chapter/search', async (params: { keyword?: string; page?: number; size?: number }) => {
-  if (USE_MOCK) {
-    const keyword = params.keyword?.toLowerCase() || '';
-    return MOCK_CHAPTERS.filter(c => c.title.toLowerCase().includes(keyword) || c.description?.toLowerCase().includes(keyword));
-  }
   const response = await axios.get<IChapter[]>(`${API_URL}/search`, {
     params: {
       keyword: params.keyword,
@@ -417,22 +351,12 @@ export const searchChapters = createAsyncThunk('chapter/search', async (params: 
 
 // Count chapters in book - Matches GET /api/chapters/count/book/{bookId}
 export const countChaptersByBook = createAsyncThunk('chapter/count_by_book', async (bookId: number) => {
-  if (USE_MOCK) {
-    return MOCK_CHAPTERS.filter(c => c.bookId === bookId).length;
-  }
   const response = await axios.get<number>(`${API_URL}/count/book/${bookId}`);
   return response.data;
 });
 
 // Get next chapter - Matches GET /api/chapters/{id}/next
 export const getNextChapter = createAsyncThunk('chapter/fetch_next', async (id: number) => {
-  if (USE_MOCK) {
-    const current = MOCK_CHAPTERS.find(c => c.id === id);
-    if (!current) return null;
-    const bookChapters = MOCK_CHAPTERS.filter(c => c.bookId === current.bookId).sort((a, b) => a.orderIndex - b.orderIndex);
-    const currentIndex = bookChapters.findIndex(c => c.id === id);
-    return currentIndex >= 0 && currentIndex < bookChapters.length - 1 ? bookChapters[currentIndex + 1] : null;
-  }
   try {
     const response = await axios.get<IChapter>(`${API_URL}/${id}/next`);
     return response.data;
@@ -444,13 +368,6 @@ export const getNextChapter = createAsyncThunk('chapter/fetch_next', async (id: 
 
 // Get previous chapter - Matches GET /api/chapters/{id}/previous
 export const getPreviousChapter = createAsyncThunk('chapter/fetch_previous', async (id: number) => {
-  if (USE_MOCK) {
-    const current = MOCK_CHAPTERS.find(c => c.id === id);
-    if (!current) return null;
-    const bookChapters = MOCK_CHAPTERS.filter(c => c.bookId === current.bookId).sort((a, b) => a.orderIndex - b.orderIndex);
-    const currentIndex = bookChapters.findIndex(c => c.id === id);
-    return currentIndex > 0 ? bookChapters[currentIndex - 1] : null;
-  }
   try {
     const response = await axios.get<IChapter>(`${API_URL}/${id}/previous`);
     return response.data;

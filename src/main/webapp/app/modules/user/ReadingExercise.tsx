@@ -1,4 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Card, Button, Typography, Space, Radio, Row, Col, Alert, message, Spin, Divider } from 'antd';
 import { ReadOutlined, CheckCircleOutlined, CloseCircleOutlined, BookOutlined, LeftOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -23,24 +24,11 @@ const ReadingExercise: React.FC = () => {
   useEffect(() => {
     if (!exerciseId) return;
 
-    const fetchExercise = () => {
+    const fetchExercise = async () => {
       setLoading(true);
       try {
-        // Mock: Get reading exercise for demo
-        const mockExercise: IReadingExercise = {
-          id: parseInt(exerciseId, 10),
-          chapterId: 1,
-          skillType: 'READING',
-          orderIndex: 1,
-          readingPassage: {
-            content:
-              '김지영은 대학교에서 처음 그를 만났다. 그날 날씨가 정말 좋았고 캠퍼스의 벚꽃이 활짝 피어 있었다. 그는 도서관 앞에서 책을 읽고 있었고, 지영은 그의 집중하는 모습에 첫눈에 반했다.',
-          },
-          question: '김지영은 어디서 그를 처음 만났나요?',
-          correctAnswer: 'A',
-          maxScore: 10,
-        };
-        setExercise(mockExercise);
+        const response = await axios.get<IReadingExercise>(`/api/reading-exercises/${exerciseId}`);
+        setExercise(response.data);
       } catch (error) {
         console.error('Error fetching exercise:', error);
         message.error('Không thể tải bài tập');

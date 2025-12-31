@@ -47,10 +47,10 @@ public interface ExerciseResultRepository extends JpaRepository<ExerciseResult, 
         "SELECT er FROM ExerciseResult er " +
             "WHERE er.appUser.id = :appUserId " +
             "AND (" +
-            "   (er.exerciseType = 'LISTENING' AND er.listeningExercise.chapter.id = :chapterId) OR " +
-            "   (er.exerciseType = 'SPEAKING' AND er.speakingExercise.chapter.id = :chapterId) OR " +
-            "   (er.exerciseType = 'READING' AND er.readingExercise.chapter.id = :chapterId) OR " +
-            "   (er.exerciseType = 'WRITING' AND er.writingExercise.chapter.id = :chapterId)" +
+            "   (er.exerciseType = 'LISTENING' AND er.listeningExercise.listeningAudio.chapter.id = :chapterId) OR " +
+            "   (er.exerciseType = 'SPEAKING' AND er.speakingExercise.speakingTopic.chapter.id = :chapterId) OR " +
+            "   (er.exerciseType = 'READING' AND er.readingExercise.readingPassage.chapter.id = :chapterId) OR " +
+            "   (er.exerciseType = 'WRITING' AND er.writingExercise.writingTask.chapter.id = :chapterId)" +
             ")"
     )
     List<ExerciseResult> findByAppUserIdAndChapterId(@Param("appUserId") Long appUserId, @Param("chapterId") Long chapterId);
@@ -61,10 +61,10 @@ public interface ExerciseResultRepository extends JpaRepository<ExerciseResult, 
             "WHERE er.appUser.id = :appUserId " +
             "AND er.exerciseType = :exerciseType " +
             "AND (" +
-            "   (er.exerciseType = 'LISTENING' AND er.listeningExercise.chapter.id = :chapterId) OR " +
-            "   (er.exerciseType = 'SPEAKING' AND er.speakingExercise.chapter.id = :chapterId) OR " +
-            "   (er.exerciseType = 'READING' AND er.readingExercise.chapter.id = :chapterId) OR " +
-            "   (er.exerciseType = 'WRITING' AND er.writingExercise.chapter.id = :chapterId)" +
+            "   (er.exerciseType = 'LISTENING' AND er.listeningExercise.listeningAudio.chapter.id = :chapterId) OR " +
+            "   (er.exerciseType = 'SPEAKING' AND er.speakingExercise.speakingTopic.chapter.id = :chapterId) OR " +
+            "   (er.exerciseType = 'READING' AND er.readingExercise.readingPassage.chapter.id = :chapterId) OR " +
+            "   (er.exerciseType = 'WRITING' AND er.writingExercise.writingTask.chapter.id = :chapterId)" +
             ")"
     )
     List<ExerciseResult> findByAppUserIdAndChapterIdAndExerciseType(
@@ -78,10 +78,10 @@ public interface ExerciseResultRepository extends JpaRepository<ExerciseResult, 
         "SELECT COUNT(er) FROM ExerciseResult er " +
             "WHERE er.appUser.id = :appUserId " +
             "AND (" +
-            "   (er.exerciseType = 'LISTENING' AND er.listeningExercise.chapter.id = :chapterId) OR " +
-            "   (er.exerciseType = 'SPEAKING' AND er.speakingExercise.chapter.id = :chapterId) OR " +
-            "   (er.exerciseType = 'READING' AND er.readingExercise.chapter.id = :chapterId) OR " +
-            "   (er.exerciseType = 'WRITING' AND er.writingExercise.chapter.id = :chapterId)" +
+            "   (er.exerciseType = 'LISTENING' AND er.listeningExercise.listeningAudio.chapter.id = :chapterId) OR " +
+            "   (er.exerciseType = 'SPEAKING' AND er.speakingExercise.speakingTopic.chapter.id = :chapterId) OR " +
+            "   (er.exerciseType = 'READING' AND er.readingExercise.readingPassage.chapter.id = :chapterId) OR " +
+            "   (er.exerciseType = 'WRITING' AND er.writingExercise.writingTask.chapter.id = :chapterId)" +
             ")"
     )
     long countByAppUserIdAndChapterId(@Param("appUserId") Long appUserId, @Param("chapterId") Long chapterId);
@@ -91,10 +91,10 @@ public interface ExerciseResultRepository extends JpaRepository<ExerciseResult, 
         "SELECT AVG(er.score) FROM ExerciseResult er " +
             "WHERE er.appUser.id = :appUserId " +
             "AND (" +
-            "   (er.exerciseType = 'LISTENING' AND er.listeningExercise.chapter.id = :chapterId) OR " +
-            "   (er.exerciseType = 'SPEAKING' AND er.speakingExercise.chapter.id = :chapterId) OR " +
-            "   (er.exerciseType = 'READING' AND er.readingExercise.chapter.id = :chapterId) OR " +
-            "   (er.exerciseType = 'WRITING' AND er.writingExercise.chapter.id = :chapterId)" +
+            "   (er.exerciseType = 'LISTENING' AND er.listeningExercise.listeningAudio.chapter.id = :chapterId) OR " +
+            "   (er.exerciseType = 'SPEAKING' AND er.speakingExercise.speakingTopic.chapter.id = :chapterId) OR " +
+            "   (er.exerciseType = 'READING' AND er.readingExercise.readingPassage.chapter.id = :chapterId) OR " +
+            "   (er.exerciseType = 'WRITING' AND er.writingExercise.writingTask.chapter.id = :chapterId)" +
             ")"
     )
     Double getAverageScoreByAppUserIdAndChapterId(@Param("appUserId") Long appUserId, @Param("chapterId") Long chapterId);
@@ -104,10 +104,10 @@ public interface ExerciseResultRepository extends JpaRepository<ExerciseResult, 
         "SELECT er FROM ExerciseResult er " +
             "WHERE er.appUser.id = :appUserId " +
             "AND (" +
-            "   (er.exerciseType = 'LISTENING' AND er.listeningExercise.chapter.book.id = :bookId) OR " +
-            "   (er.exerciseType = 'SPEAKING' AND er.speakingExercise.chapter.book.id = :bookId) OR " +
-            "   (er.exerciseType = 'READING' AND er.readingExercise.chapter.book.id = :bookId) OR " +
-            "   (er.exerciseType = 'WRITING' AND er.writingExercise.chapter.book.id = :bookId)" +
+            "   (er.exerciseType = 'LISTENING' AND er.listeningExercise.listeningAudio.chapter.book.id = :bookId) OR " +
+            "   (er.exerciseType = 'SPEAKING' AND er.speakingExercise.speakingTopic.chapter.book.id = :bookId) OR " +
+            "   (er.exerciseType = 'READING' AND er.readingExercise.readingPassage.chapter.book.id = :bookId) OR " +
+            "   (er.exerciseType = 'WRITING' AND er.writingExercise.writingTask.chapter.book.id = :bookId)" +
             ")"
     )
     List<ExerciseResult> findByAppUserIdAndBookId(@Param("appUserId") Long appUserId, @Param("bookId") Long bookId);
@@ -118,10 +118,10 @@ public interface ExerciseResultRepository extends JpaRepository<ExerciseResult, 
             "WHERE er.appUser.id = :appUserId " +
             "AND er.score >= :minScore " +
             "AND (" +
-            "   (er.exerciseType = 'LISTENING' AND er.listeningExercise.chapter.book.id = :bookId) OR " +
-            "   (er.exerciseType = 'SPEAKING' AND er.speakingExercise.chapter.book.id = :bookId) OR " +
-            "   (er.exerciseType = 'READING' AND er.readingExercise.chapter.book.id = :bookId) OR " +
-            "   (er.exerciseType = 'WRITING' AND er.writingExercise.chapter.book.id = :bookId)" +
+            "   (er.exerciseType = 'LISTENING' AND er.listeningExercise.listeningAudio.chapter.book.id = :bookId) OR " +
+            "   (er.exerciseType = 'SPEAKING' AND er.speakingExercise.speakingTopic.chapter.book.id = :bookId) OR " +
+            "   (er.exerciseType = 'READING' AND er.readingExercise.readingPassage.chapter.book.id = :bookId) OR " +
+            "   (er.exerciseType = 'WRITING' AND er.writingExercise.writingTask.chapter.book.id = :bookId)" +
             ")"
     )
     long countCompletedExercisesByBookId(
@@ -135,10 +135,10 @@ public interface ExerciseResultRepository extends JpaRepository<ExerciseResult, 
         "SELECT AVG(er.score) FROM ExerciseResult er " +
             "WHERE er.appUser.id = :appUserId " +
             "AND (" +
-            "   (er.exerciseType = 'LISTENING' AND er.listeningExercise.chapter.book.id = :bookId) OR " +
-            "   (er.exerciseType = 'SPEAKING' AND er.speakingExercise.chapter.book.id = :bookId) OR " +
-            "   (er.exerciseType = 'READING' AND er.readingExercise.chapter.book.id = :bookId) OR " +
-            "   (er.exerciseType = 'WRITING' AND er.writingExercise.chapter.book.id = :bookId)" +
+            "   (er.exerciseType = 'LISTENING' AND er.listeningExercise.listeningAudio.chapter.book.id = :bookId) OR " +
+            "   (er.exerciseType = 'SPEAKING' AND er.speakingExercise.speakingTopic.chapter.book.id = :bookId) OR " +
+            "   (er.exerciseType = 'READING' AND er.readingExercise.readingPassage.chapter.book.id = :bookId) OR " +
+            "   (er.exerciseType = 'WRITING' AND er.writingExercise.writingTask.chapter.book.id = :bookId)" +
             ")"
     )
     Double getAverageScoreByAppUserIdAndBookId(@Param("appUserId") Long appUserId, @Param("bookId") Long bookId);

@@ -11,7 +11,8 @@ import {
 } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppDispatch } from 'app/config/store';
-import { getChapter, getChapterWords, getChapterGrammars, getChapterExercises } from 'app/shared/services/chapter.service';
+import { getChapterWords, getChapterGrammars, getChapterExercises } from 'app/shared/services/chapter.service';
+import { getChapter } from 'app/shared/reducers/chapter.reducer';
 import { getChapterProgress } from 'app/shared/services/progress.service';
 import {
   IChapter,

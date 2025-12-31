@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
 import { Card, Button, Typography, Space, Radio, Row, Col, message, Spin, Alert, Image, Slider } from 'antd';
 import {
   CheckCircleOutlined,
@@ -52,24 +53,11 @@ const ListeningExercise: React.FC = () => {
   useEffect(() => {
     if (!exerciseId) return;
 
-    const fetchExercise = () => {
+    const fetchExercise = async () => {
       setLoading(true);
       try {
-        // Mock: Get listening exercise with sample audio
-        const mockExercise: IListeningExercise = {
-          id: parseInt(exerciseId, 10),
-          chapterId: 1,
-          skillType: 'LISTENING',
-          orderIndex: 1,
-          listeningAudio: {
-            audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-          },
-          imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
-          question: 'Nghe đoạn hội thoại và chọn câu trả lời đúng: Họ gặp nhau ở đâu?',
-          correctAnswer: 'B',
-          maxScore: 10,
-        };
-        setExercise(mockExercise);
+        const response = await axios.get<IListeningExercise>(`/api/listening-exercises/${exerciseId}`);
+        setExercise(response.data);
       } catch (error) {
         console.error('Error fetching exercise:', error);
         message.error('Không thể tải bài tập');

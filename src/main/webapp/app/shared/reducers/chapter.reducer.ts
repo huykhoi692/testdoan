@@ -1,6 +1,18 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { IChapter } from '../model/models';
-import { getChapters, getChaptersByBookId, getChapter, createChapter, updateChapter, deleteChapter } from '../services/chapter.service';
+import {
+  getChapters,
+  getChaptersByBookId,
+  getChapter as getChapterApi,
+  createChapter,
+  updateChapter,
+  deleteChapter,
+} from '../services/chapter.service';
+
+export const getChapter = createAsyncThunk('chapter/fetch_entity', async (id: number) => {
+  const response = await getChapterApi(id);
+  return response.data;
+});
 
 export interface ChapterState {
   loading: boolean;
@@ -119,4 +131,4 @@ export const ChapterSlice = createSlice({
 
 export const { resetChapter } = ChapterSlice.actions;
 export default ChapterSlice.reducer;
-export { getChapters, getChaptersByBookId, getChapter, createChapter, updateChapter, deleteChapter };
+export { getChapters, getChaptersByBookId, createChapter, updateChapter, deleteChapter };

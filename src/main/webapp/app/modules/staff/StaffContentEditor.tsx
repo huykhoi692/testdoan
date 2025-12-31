@@ -32,7 +32,7 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useAppDispatch } from 'app/config/store';
-import { getChapter } from 'app/shared/services/chapter.service';
+import { getChapter } from 'app/shared/reducers/chapter.reducer';
 import { getWordsByChapter, createWord, updateWord, deleteWord } from 'app/shared/services/word.service';
 import { getGrammarsByChapter, createGrammar, updateGrammar, deleteGrammar } from 'app/shared/services/grammar.service';
 import {

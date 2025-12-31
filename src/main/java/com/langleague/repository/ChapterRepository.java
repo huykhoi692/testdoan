@@ -101,10 +101,10 @@ public interface ChapterRepository extends JpaRepository<Chapter, Long> {
         "select chapter from Chapter chapter " +
             "left join fetch chapter.words " +
             "left join fetch chapter.grammars " +
-            "left join fetch chapter.listeningExercises " +
-            "left join fetch chapter.readingExercises " +
-            "left join fetch chapter.writingExercises " +
-            "left join fetch chapter.speakingExercises " +
+            "left join fetch chapter.listeningAudios " +
+            "left join fetch chapter.readingPassages " +
+            "left join fetch chapter.writingTasks " +
+            "left join fetch chapter.speakingTopics " +
             "where chapter.id = :id"
     )
     Optional<Chapter> findOneWithEagerRelationships(@Param("id") Long id);

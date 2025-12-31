@@ -1,4 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Card, Button, Typography, Space, Row, Col, Alert, message, Spin, Tag, Divider } from 'antd';
 import { AudioOutlined, CheckCircleOutlined, LeftOutlined, PlayCircleOutlined, SoundOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -24,23 +25,11 @@ const SpeakingExercise: React.FC = () => {
   useEffect(() => {
     if (!exerciseId) return;
 
-    const fetchExercise = () => {
+    const fetchExercise = async () => {
       setLoading(true);
       try {
-        // Mock: Get speaking exercise for demo
-        const mockExercise: ISpeakingExercise = {
-          id: parseInt(exerciseId, 10),
-          chapterId: 1,
-          skillType: 'SPEAKING',
-          orderIndex: 1,
-          speakingTopic: {
-            context: 'Hãy giới thiệu về cuộc gặp đầu tiên của bạn với một người quan trọng. Sử dụng mẫu câu: 처음 만났을 때...',
-          },
-          sampleAudio: '/audio/chapter1-speaking1-sample.mp3',
-          targetPhrase: '처음 만났을 때 정말 설렜어요',
-          maxScore: 15,
-        };
-        setExercise(mockExercise);
+        const response = await axios.get<ISpeakingExercise>(`/api/speaking-exercises/${exerciseId}`);
+        setExercise(response.data);
       } catch (error) {
         console.error('Error fetching exercise:', error);
         message.error('Không thể tải bài tập');

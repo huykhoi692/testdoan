@@ -1,12 +1,22 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { ILesson } from '../model/models';
 // Backend only uses chapters - lesson.service.ts has been removed
-import { getChapters, getChaptersByBookId, getChapter, createChapter, updateChapter, deleteChapter } from '../services/chapter.service';
+import {
+  getChapters,
+  getChaptersByBookId,
+  getChapter as getChapterApi,
+  createChapter,
+  updateChapter,
+  deleteChapter,
+} from '../services/chapter.service';
 
 // Create aliases for backward compatibility with existing code
 export const getLessons = getChapters;
 export const getLessonsByChapterId = getChaptersByBookId;
-export const getLesson = getChapter;
+export const getLesson = createAsyncThunk('lesson/fetch_entity', async (id: number) => {
+  const response = await getChapterApi(id);
+  return response.data;
+});
 export const createLesson = createChapter;
 export const updateLesson = updateChapter;
 export const deleteLesson = deleteChapter;
