@@ -6,6 +6,8 @@ import {
   getChapterProgress,
   updateChapterProgress,
   getChapterProgressesByBook,
+  enrollBook,
+  markChapterAsCompleted,
 } from '../services/progress.service';
 import { IBookProgress, IChapterProgress } from '../model/models';
 
@@ -69,6 +71,33 @@ export const ProgressSlice = createSlice({
       })
       .addCase(getChapterProgressesByBook.fulfilled, (state, action) => {
         state.chapterProgresses = action.payload;
+      })
+      // Enroll Book
+      .addCase(enrollBook.pending, state => {
+        state.loading = true;
+      })
+      .addCase(enrollBook.fulfilled, (state, action) => {
+        state.loading = false;
+        state.bookProgress = action.payload;
+      })
+      .addCase(enrollBook.rejected, (state, action) => {
+        state.loading = false;
+        state.errorMessage = action.error.message || 'Failed to enroll in book';
+      })
+      // Mark Chapter Completed
+      .addCase(markChapterAsCompleted.fulfilled, (state, action) => {
+        // Update in list if exists
+        const index = state.chapterProgresses.findIndex(cp => cp.chapterId === action.payload.chapterId);
+        if (index !== -1) {
+          state.chapterProgresses[index] = {
+            ...state.chapterProgresses[index],
+            isCompleted: true,
+            progressPercentage: 100,
+            completedDate: action.payload.completedDate,
+          };
+        } else {
+          state.chapterProgresses.push(action.payload);
+        }
       });
   },
 });

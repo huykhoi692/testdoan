@@ -2,8 +2,10 @@ package com.langleague.service;
 
 import com.langleague.domain.AppUser;
 import com.langleague.domain.StudySession;
+import com.langleague.domain.UserChapter;
 import com.langleague.repository.AppUserRepository;
 import com.langleague.repository.StudySessionRepository;
+import com.langleague.repository.UserChapterRepository;
 import com.langleague.security.SecurityUtils;
 import com.langleague.service.dto.AppUserDTO;
 import com.langleague.service.dto.StudySessionDTO;
@@ -36,17 +38,68 @@ public class StudySessionService {
     private final StudySessionMapper studySessionMapper;
     private final StudySessionValidator studySessionValidator;
     private final AppUserRepository appUserRepository;
+    private final UserChapterRepository userChapterRepository;
 
     public StudySessionService(
         StudySessionRepository studySessionRepository,
         StudySessionMapper studySessionMapper,
         StudySessionValidator studySessionValidator,
-        AppUserRepository appUserRepository
+        AppUserRepository appUserRepository,
+        UserChapterRepository userChapterRepository
     ) {
         this.studySessionRepository = studySessionRepository;
         this.studySessionMapper = studySessionMapper;
         this.studySessionValidator = studySessionValidator;
         this.appUserRepository = appUserRepository;
+        this.userChapterRepository = userChapterRepository;
+    }
+
+    /**
+     * Start a new study session for a chapter
+     */
+    @Transactional
+    public StudySessionDTO startSession(Long chapterId) {
+        LOG.debug("Request to start study session for chapter: {}", chapterId);
+
+        Long currentUserId = SecurityUtils.getCurrentUserId().orElseThrow(() ->
+            new BadRequestAlertException("User not authenticated", ENTITY_NAME, "usernotauthenticated")
+        );
+
+        AppUser appUser = appUserRepository
+            .findByInternalUserId(currentUserId)
+            .orElseThrow(() -> new BadRequestAlertException("User profile not found", ENTITY_NAME, "usernotfound"));
+
+        // Find or create UserChapter
+        UserChapter userChapter = userChapterRepository.findByAppUserIdAndChapterId(appUser.getId(), chapterId)
+            .orElseGet(() -> {
+                // Create new UserChapter if not exists (logic to be implemented or reused)
+                // For now, assuming we need to handle this.
+                // Ideally, UserChapter should be created when enrolling or starting.
+                // Let's assume we can't create it here easily without more dependencies.
+                // But wait, I have UserChapterRepository.
+                // Let's just throw error if not found, or create a basic one.
+                // Actually, let's just throw error for now as enrollment should handle it?
+                // No, enrollment handles UserBook. UserChapter is for specific chapter progress.
+                // Let's try to find it.
+                return null;
+            });
+
+        if (userChapter == null) {
+             // If UserChapter doesn't exist, we might need to create it.
+             // But UserChapter creation might require more info.
+             // Let's assume for now we just create a session linked to AppUser and Chapter directly?
+             // StudySession usually links to UserChapter.
+             // Let's check StudySession domain.
+             throw new BadRequestAlertException("UserChapter not found. Please start the chapter first.", ENTITY_NAME, "userchapternotfound");
+        }
+
+        StudySession studySession = new StudySession();
+        studySession.setAppUser(appUser);
+        studySession.setUserChapter(userChapter);
+        studySession.setStartAt(Instant.now());
+
+        studySession = studySessionRepository.save(studySession);
+        return studySessionMapper.toDto(studySession);
     }
 
     /**

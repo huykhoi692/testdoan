@@ -57,6 +57,10 @@ public class StudySession implements Serializable {
     )
     private AppUser appUser;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "appUser", "chapter" }, allowSetters = true)
+    private UserChapter userChapter;
+
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Long getId() {
@@ -150,8 +154,16 @@ public class StudySession implements Serializable {
         this.appUser = appUser;
     }
 
-    public StudySession appUser(AppUser appUser) {
-        this.setAppUser(appUser);
+    public UserChapter getUserChapter() {
+        return this.userChapter;
+    }
+
+    public void setUserChapter(UserChapter userChapter) {
+        this.userChapter = userChapter;
+    }
+
+    public StudySession userChapter(UserChapter userChapter) {
+        this.setUserChapter(userChapter);
         return this;
     }
 

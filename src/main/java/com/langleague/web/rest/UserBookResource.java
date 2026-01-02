@@ -89,6 +89,27 @@ public class UserBookResource {
     }
 
     /**
+     * POST /api/user/my-books/enroll/:bookId : Enroll in a book
+     *
+     * @param bookId the ID of the book to enroll in
+     * @return the ResponseEntity with status 200 (OK) and the enrolled book
+     */
+    @PostMapping("/enroll/{bookId}")
+    public ResponseEntity<UserBookDTO> enrollBook(@PathVariable Long bookId) {
+        LOG.debug("REST request to enroll in book: {}", bookId);
+
+        try {
+            UserBookDTO result = userBookService.enrollBook(bookId);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            LOG.error("Error enrolling in book: {}", e.getMessage());
+            return ResponseEntity.badRequest()
+                .headers(HeaderUtil.createFailureAlert(applicationName, true, ENTITY_NAME, "enrollfailed", e.getMessage()))
+                .build();
+        }
+    }
+
+    /**
      * POST /api/user/my-books/:bookId : Save a book to library
      *
      * @param bookId the ID of the book to save

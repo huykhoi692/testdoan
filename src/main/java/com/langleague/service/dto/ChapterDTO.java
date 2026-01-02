@@ -21,7 +21,9 @@ public class ChapterDTO implements Serializable {
     @NotNull
     private Integer orderIndex;
 
-    private BookDTO book;
+    private Long bookId;
+
+    private String bookTitle;
 
     public Long getId() {
         return id;
@@ -47,12 +49,20 @@ public class ChapterDTO implements Serializable {
         this.orderIndex = orderIndex;
     }
 
-    public BookDTO getBook() {
-        return book;
+    public Long getBookId() {
+        return bookId;
     }
 
-    public void setBook(BookDTO book) {
-        this.book = book;
+    public void setBookId(Long bookId) {
+        this.bookId = bookId;
+    }
+
+    public String getBookTitle() {
+        return bookTitle;
+    }
+
+    public void setBookTitle(String bookTitle) {
+        this.bookTitle = bookTitle;
     }
 
     @Override
@@ -83,7 +93,8 @@ public class ChapterDTO implements Serializable {
             "id=" + getId() +
             ", title='" + getTitle() + "'" +
             ", orderIndex=" + getOrderIndex() +
-            ", book=" + getBook() +
+            ", bookId=" + getBookId() +
+            ", bookTitle='" + getBookTitle() + "'" +
             "}";
     }
 }

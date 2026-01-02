@@ -8,8 +8,11 @@ import bookReviewReducer from './book-review.reducer';
 import commentReducer from './comment.reducer';
 import achievementReducer from './achievement.reducer';
 import favoriteReducer from './favorite.reducer';
+import userBookReducer from './user-book.reducer';
+import authentication from '../auth/auth.reducer';
 
 const rootReducer = combineReducers({
+  authentication,
   locale: localeReducer,
   theme: themeReducer,
   book: bookReducer,
@@ -19,6 +22,7 @@ const rootReducer = combineReducers({
   comment: commentReducer,
   achievement: achievementReducer,
   favorite: favoriteReducer,
+  userBook: userBookReducer,
 });
 
 export default rootReducer;

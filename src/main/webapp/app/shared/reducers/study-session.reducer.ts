@@ -29,8 +29,8 @@ const initialState: StudySessionState = {
 
 export const startStudySession = createAsyncThunk(
   'studySession/start',
-  async (lessonId: number) => {
-    const response = await axios.post('api/study-sessions/start', lessonId);
+  async (chapterId: number) => {
+    const response = await axios.post('api/study-sessions/start', { chapterId });
     return response.data;
   },
   { serializeError: serializeAxiosError },
@@ -59,7 +59,10 @@ export const getMyStudySessions = createAsyncThunk(
   async ({ page, size, sort }: { page?: number; size?: number; sort?: string } = {}) => {
     const requestUrl = `api/study-sessions/my${sort ? `?page=${page}&size=${size}&sort=${sort}` : ''}`;
     const response = await axios.get(requestUrl);
-    return response.data;
+    return {
+      content: response.data,
+      totalElements: response.headers['x-total-count'],
+    };
   },
   { serializeError: serializeAxiosError },
 );

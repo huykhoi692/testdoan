@@ -3,24 +3,24 @@ import { useParams } from 'react-router-dom';
 import { Button, Progress } from 'reactstrap';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { startStudySession, updateProgress, completeStudySession } from 'app/shared/reducers/study-session.reducer';
-import { getLesson } from 'app/shared/reducers/lesson.reducer';
+import { getChapter } from 'app/shared/reducers/chapter.reducer';
 
 export const StudySessionPage = () => {
   const dispatch = useAppDispatch();
-  const { lessonId } = useParams<{ lessonId: string }>();
+  const { chapterId } = useParams<{ chapterId: string }>();
   const currentSession = useAppSelector(state => state.studySession.currentSession);
-  const lesson = useAppSelector(state => state.lesson.lesson);
+  const chapter = useAppSelector(state => state.chapter.entity);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    if (lessonId) {
-      dispatch(getLesson(parseInt(lessonId, 10)));
+    if (chapterId) {
+      dispatch(getChapter(parseInt(chapterId, 10)));
     }
-  }, [lessonId]);
+  }, [chapterId]);
 
   const handleStartSession = () => {
-    if (lessonId) {
-      dispatch(startStudySession(parseInt(lessonId, 10)));
+    if (chapterId) {
+      dispatch(startStudySession(parseInt(chapterId, 10)));
     }
   };
 
@@ -48,7 +48,7 @@ export const StudySessionPage = () => {
 
   return (
     <div className="study-session-container">
-      <h2>{lesson?.title}</h2>
+      <h2>{chapter?.title}</h2>
       <div className="study-progress">
         <Progress value={progress}>{progress}%</Progress>
       </div>
@@ -70,7 +70,7 @@ export const StudySessionPage = () => {
         )}
       </div>
 
-      {lesson?.description && <div className="lesson-content mt-4">{lesson.description}</div>}
+      {chapter?.description && <div className="lesson-content mt-4">{chapter.description}</div>}
     </div>
   );
 };

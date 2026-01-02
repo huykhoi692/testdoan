@@ -23,6 +23,11 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
+import com.langleague.repository.UserChapterRepository;
+import com.langleague.domain.UserChapter;
+import com.langleague.domain.AppUser;
+import com.langleague.repository.AppUserRepository;
+import com.langleague.security.SecurityUtils;
 
 /**
  * REST controller for managing {@link com.langleague.domain.StudySession}.
@@ -43,9 +48,20 @@ public class StudySessionResource {
 
     private final StudySessionRepository studySessionRepository;
 
-    public StudySessionResource(StudySessionService studySessionService, StudySessionRepository studySessionRepository) {
+    private final UserChapterRepository userChapterRepository;
+
+    private final AppUserRepository appUserRepository;
+
+    public StudySessionResource(
+        StudySessionService studySessionService,
+        StudySessionRepository studySessionRepository,
+        UserChapterRepository userChapterRepository,
+        AppUserRepository appUserRepository
+    ) {
         this.studySessionService = studySessionService;
         this.studySessionRepository = studySessionRepository;
+        this.userChapterRepository = userChapterRepository;
+        this.appUserRepository = appUserRepository;
     }
 
     /**
@@ -183,5 +199,30 @@ public class StudySessionResource {
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    /**
+     * POST /api/study-sessions/start : Start a new study session
+     *
+     * @param request the start session request
+     * @return the ResponseEntity with status 201 (Created) and the new studySessionDTO
+     */
+    @PostMapping("/start")
+    public ResponseEntity<StudySessionDTO> startSession(@RequestBody StartSessionRequest request) {
+        LOG.debug("REST request to start study session for chapter: {}", request.getChapterId());
+        StudySessionDTO result = studySessionService.startSession(request.getChapterId());
+        return ResponseEntity.ok(result);
+    }
+
+    public static class StartSessionRequest {
+        private Long chapterId;
+
+        public Long getChapterId() {
+            return chapterId;
+        }
+
+        public void setChapterId(Long chapterId) {
+            this.chapterId = chapterId;
+        }
     }
 }

@@ -284,21 +284,21 @@ public class MailService {
     }
 
     /**
-     * Send new lesson available notification
+     * Send new chapter available notification
      */
     @Async
-    public void sendNewLessonNotification(User user, String lessonTitle, String bookTitle) {
+    public void sendNewChapterNotification(User user, String chapterTitle, String bookTitle) {
         if (user.getEmail() == null) {
             return;
         }
         Locale locale = Locale.forLanguageTag(user.getLangKey());
         Context context = new Context(locale);
         context.setVariable(USER, user);
-        context.setVariable("lessonTitle", lessonTitle);
+        context.setVariable("chapterTitle", chapterTitle);
         context.setVariable("bookTitle", bookTitle);
         context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
 
-        String content = templateEngine.process("mail/newLessonEmail", context);
+        String content = templateEngine.process("mail/newChapterEmail", context);
         String subject = messageSource.getMessage("email.new.lesson.title", null, locale);
         sendEmailSync(user.getEmail(), subject, content, false, true);
         LOG.debug("Sent new lesson notification to '{}'", user.getEmail());

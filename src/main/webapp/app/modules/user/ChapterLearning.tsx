@@ -13,7 +13,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAppDispatch } from 'app/config/store';
 import { getChapterWords, getChapterGrammars, getChapterExercises } from 'app/shared/services/chapter.service';
 import { getChapter } from 'app/shared/reducers/chapter.reducer';
-import { getChapterProgress } from 'app/shared/services/progress.service';
+import { getChapterProgress, markChapterAsCompleted } from 'app/shared/services/progress.service';
 import {
   IChapter,
   IWord,
@@ -46,6 +46,7 @@ const ChapterLearning: React.FC = () => {
   const [progress, setProgress] = useState<IChapterProgress | null>(null);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('vocabulary');
+  const [completing, setCompleting] = useState(false);
 
   useEffect(() => {
     if (!chapterId) return;
@@ -94,75 +95,61 @@ const ChapterLearning: React.FC = () => {
     return Math.round((completed / total) * 100);
   };
 
+  const handleCompleteChapter = async () => {
+    if (!chapterId) return;
+    try {
+      setCompleting(true);
+      await dispatch(markChapterAsCompleted(parseInt(chapterId, 10))).unwrap();
+      message.success('Chúc mừng! Bạn đã hoàn thành chương này.');
+      // Refresh progress
+      const progressData = await dispatch(getChapterProgress(parseInt(chapterId, 10))).unwrap();
+      setProgress(progressData);
+      // Navigate back to book details after short delay
+      setTimeout(() => {
+        if (chapter?.bookId) {
+          navigate(`/dashboard/books/${chapter.bookId}`);
+        }
+      }, 1500);
+    } catch (error) {
+      message.error('Không thể đánh dấu hoàn thành chương');
+    } finally {
+      setCompleting(false);
+    }
+  };
+
   return (
     <div style={{ padding: '24px', maxWidth: 1400, margin: '0 auto' }}>
       <Spin spinning={loading}>
         {chapter && (
           <>
-            {/* Chapter Header */}
-            <Card variant="borderless" style={{ marginBottom: 24, borderRadius: 12 }}>
+            <Card style={{ marginBottom: 24 }}>
               <Row justify="space-between" align="middle">
                 <Col>
-                  <Space direction="vertical" size={8}>
-                    <Button type="link" onClick={() => navigate(-1)} style={{ padding: 0 }}>
-                      ← Quay lại
-                    </Button>
-                    <Title level={3} style={{ margin: 0 }}>
-                      {chapter.title}
-                    </Title>
-                    {chapter.description && <Text type="secondary">{chapter.description}</Text>}
-                  </Space>
+                  <Title level={2}>{chapter.title}</Title>
+                  <Text type="secondary">{chapter.description}</Text>
                 </Col>
                 <Col>
-                  <Space direction="vertical" size={8} align="end">
-                    <Text strong>Tiến độ học tập</Text>
-                    <Progress
-                      type="circle"
-                      percent={calculateProgress()}
-                      size={80}
-                      strokeColor={{
-                        '0%': '#108ee9',
-                        '100%': '#87d068',
-                      }}
-                    />
+                  <Space>
+                    <Button onClick={() => navigate(-1)}>Quay lại</Button>
+                    {!progress?.isCompleted && (
+                      <Button type="primary" icon={<CheckCircleOutlined />} loading={completing} onClick={handleCompleteChapter}>
+                        Hoàn thành chương
+                      </Button>
+                    )}
+                    {progress?.isCompleted && (
+                      <Tag color="success" icon={<CheckCircleOutlined />}>
+                        Đã hoàn thành
+                      </Tag>
+                    )}
                   </Space>
                 </Col>
               </Row>
-
-              {progress && (
-                <Row gutter={16} style={{ marginTop: 24 }}>
-                  <Col span={8}>
-                    <Card size="small" variant="borderless" style={{ backgroundColor: '#f6ffed' }}>
-                      <Statistic
-                        title="Từ vựng đã học"
-                        value={progress.wordsLearned || 0}
-                        suffix={`/ ${chapter.totalWords || words.length}`}
-                        prefix={<BookOutlined />}
-                      />
-                    </Card>
-                  </Col>
-                  <Col span={8}>
-                    <Card size="small" variant="borderless" style={{ backgroundColor: '#e6f7ff' }}>
-                      <Statistic
-                        title="Ngữ pháp đã học"
-                        value={progress.grammarsLearned || 0}
-                        suffix={`/ ${chapter.totalGrammars || grammars.length}`}
-                        prefix={<FileTextOutlined />}
-                      />
-                    </Card>
-                  </Col>
-                  <Col span={8}>
-                    <Card size="small" variant="borderless" style={{ backgroundColor: '#fff7e6' }}>
-                      <Statistic
-                        title="Bài tập hoàn thành"
-                        value={progress.exercisesCompleted || 0}
-                        suffix={`/ ${chapter.totalExercises || 0}`}
-                        prefix={<CheckCircleOutlined />}
-                      />
-                    </Card>
-                  </Col>
-                </Row>
-              )}
+              <Row style={{ marginTop: 16 }}>
+                <Col span={24}>
+                  <Text strong>Tiến độ học tập:</Text>
+                  <Progress percent={progress?.progressPercentage || 0} />
+                </Col>
+              </Row>
             </Card>
 
             {/* Content Tabs */}
@@ -296,7 +283,7 @@ const ChapterLearning: React.FC = () => {
                         <List.Item
                           key={ex.id}
                           actions={[
-                            <Button key="do" type="primary" onClick={() => navigate(`/dashboard/exercises/listening/${ex.id}`)}>
+                            <Button key="do" type="primary" onClick={() => navigate(`/dashboard/exercise/listening/${ex.id}`)}>
                               Làm bài
                             </Button>,
                           ]}
@@ -346,7 +333,7 @@ const ChapterLearning: React.FC = () => {
                         <List.Item
                           key={ex.id}
                           actions={[
-                            <Button key="do" type="primary" onClick={() => navigate(`/dashboard/exercises/speaking/${ex.id}`)}>
+                            <Button key="do" type="primary" onClick={() => navigate(`/dashboard/exercise/speaking/${ex.id}`)}>
                               Làm bài
                             </Button>,
                           ]}
@@ -396,7 +383,7 @@ const ChapterLearning: React.FC = () => {
                         <List.Item
                           key={ex.id}
                           actions={[
-                            <Button key="do" type="primary" onClick={() => navigate(`/dashboard/exercises/reading/${ex.id}`)}>
+                            <Button key="do" type="primary" onClick={() => navigate(`/dashboard/exercise/reading/${ex.id}`)}>
                               Làm bài
                             </Button>,
                           ]}
@@ -446,7 +433,7 @@ const ChapterLearning: React.FC = () => {
                         <List.Item
                           key={ex.id}
                           actions={[
-                            <Button key="do" type="primary" onClick={() => navigate(`/dashboard/exercises/writing/${ex.id}`)}>
+                            <Button key="do" type="primary" onClick={() => navigate(`/dashboard/exercise/writing/${ex.id}`)}>
                               Làm bài
                             </Button>,
                           ]}

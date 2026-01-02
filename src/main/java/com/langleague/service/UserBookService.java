@@ -14,6 +14,7 @@ import com.langleague.service.mapper.UserBookMapper;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -110,6 +111,42 @@ public class UserBookService {
             .orElseThrow(() -> new RuntimeException("AppUser not found"));
 
         return userBookRepository.findByUserIdAndStatus(appUser.getId(), status).stream().map(userBookMapper::toDto).toList();
+    }
+
+    /**
+     * Enroll in a book (Idempotent)
+     */
+    public UserBookDTO enrollBook(Long bookId) throws Exception {
+        LOG.debug("Request to enroll in book: {}", bookId);
+
+        String userLogin = SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new RuntimeException("Current user not found"));
+
+        AppUser appUser = appUserRepository
+            .findByInternalUser_Login(userLogin)
+            .orElseThrow(() -> new RuntimeException("AppUser not found"));
+
+        // Check if already saved
+        Optional<UserBook> existingUserBook = userBookRepository.findByAppUserIdAndBookId(appUser.getId(), bookId);
+        if (existingUserBook.isPresent()) {
+            return userBookMapper.toDto(existingUserBook.get());
+        }
+
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new Exception("Book not found"));
+
+        // Create UserBook
+        UserBook userBook = new UserBook();
+        userBook.setAppUser(appUser);
+        userBook.setBook(book);
+        userBook.setSavedAt(Instant.now());
+        userBook.setLearningStatus(LearningStatus.IN_PROGRESS);
+        userBook.setProgressPercentage(0.0);
+        userBook.setIsFavorite(false);
+
+        userBook = userBookRepository.save(userBook);
+
+        LOG.info("Book {} enrolled for user {}", bookId, userLogin);
+
+        return userBookMapper.toDto(userBook);
     }
 
     /**

@@ -64,16 +64,16 @@ const Dashboard = () => {
       try {
         const bookProgresses = await dispatch(getMyBooks()).unwrap();
         if (Array.isArray(bookProgresses) && bookProgresses.length > 0) {
-          const incompleteBook = bookProgresses.find((p: any) => (p.percent || 0) < 100);
+          const incompleteBook = bookProgresses.find((p: any) => (p.progressPercentage || 0) < 100);
           if (incompleteBook) {
             setCurrentBook({
               id: incompleteBook.bookId,
               title: incompleteBook.bookTitle || 'Book #' + incompleteBook.bookId,
-              progress: Math.round(incompleteBook.percent || 0),
+              progress: Math.round(incompleteBook.progressPercentage || 0),
               thumbnail: incompleteBook.bookThumbnail,
               level: 'INTERMEDIATE',
               chaptersTotal: 12,
-              chaptersCompleted: Math.round(((incompleteBook.percent || 0) * 12) / 100),
+              chaptersCompleted: Math.round(((incompleteBook.progressPercentage || 0) * 12) / 100),
             });
           }
 
@@ -81,7 +81,7 @@ const Dashboard = () => {
           const booksData = bookProgresses.slice(0, 6).map((progress: any, idx: number) => ({
             id: progress.bookId,
             title: progress.bookTitle || 'Book #' + progress.bookId,
-            progress: Math.round(progress.percent || 0),
+            progress: Math.round(progress.progressPercentage || 0),
             thumbnail: progress.bookThumbnail,
             level: ['BEGINNER', 'INTERMEDIATE', 'ADVANCED'][idx % 3],
             color: ['#667eea', '#e85b8a', '#f6c344', '#4caf50', '#9c27b0', '#ff9800'][idx % 6],

@@ -47,7 +47,7 @@
     "welcome": "Xin chào {{name}}, {{greeting}}!",
     "subtitle": "Sẵn sàng bắt đầu học hôm nay?",
     "streak": "{{count}} ngày liên tiếp! Tiếp tục phát huy!",
-    "newLessons": "Bạn có <b>{{count}}</b> bài học mới chờ bạn",
+    "newChapters": "Bạn có <b>{{count}}</b> chương mới chờ bạn",
     "stats": {
       "wordLearned": "Từ đã học",
       "wordsLearned": "Từ đã học",

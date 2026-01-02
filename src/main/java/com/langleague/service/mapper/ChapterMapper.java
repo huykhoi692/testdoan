@@ -11,11 +11,12 @@ import org.mapstruct.*;
  */
 @Mapper(componentModel = "spring")
 public interface ChapterMapper extends EntityMapper<ChapterDTO, Chapter> {
-    @Mapping(target = "book", source = "book", qualifiedByName = "bookId")
+    @Mapping(target = "bookId", source = "book.id")
+    @Mapping(target = "bookTitle", source = "book.title")
     ChapterDTO toDto(Chapter s);
 
     @Override
-    @Mapping(target = "book", ignore = true)
+    @Mapping(target = "book", source = "bookId")
     @Mapping(target = "words", ignore = true)
     @Mapping(target = "removeWord", ignore = true)
     @Mapping(target = "grammars", ignore = true)
@@ -55,4 +56,13 @@ public interface ChapterMapper extends EntityMapper<ChapterDTO, Chapter> {
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
     BookDTO toDtoBookId(Book book);
+
+    default Book bookFromId(Long id) {
+        if (id == null) {
+            return null;
+        }
+        Book book = new Book();
+        book.setId(id);
+        return book;
+    }
 }

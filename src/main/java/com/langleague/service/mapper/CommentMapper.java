@@ -14,6 +14,8 @@ public interface CommentMapper extends EntityMapper<CommentDTO, Comment> {
     @Mapping(target = "appUser", source = "appUser", qualifiedByName = "appUserId")
     // Lesson mapping removed
     // @Mapping(target = "lesson", source = "lesson", qualifiedByName = "lessonId")
+    @Mapping(target = "chapter.bookId", ignore = true)
+    @Mapping(target = "chapter.bookTitle", ignore = true)
     CommentDTO toDto(Comment s);
 
     @Override

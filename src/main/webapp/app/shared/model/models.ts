@@ -39,7 +39,7 @@ export interface IChapter {
   id?: number;
   title: string;
   orderIndex: number;
-  bookId: number;
+  bookId?: number;
   bookTitle?: string;
   description?: string;
   pageStart?: number;
@@ -166,6 +166,8 @@ export interface IBookProgress {
   id?: number;
   userId?: number;
   bookId?: number;
+  bookTitle?: string;
+  bookThumbnail?: string;
   currentPage?: number;
   totalPages?: number;
   progressPercentage?: number;
@@ -285,18 +287,6 @@ export interface IUser {
 }
 
 // Legacy interfaces for backward compatibility (deprecated - will be removed)
-export interface ILesson {
-  id?: number;
-  chapterId?: number;
-  title?: string;
-  content?: string;
-  orderIndex?: number;
-  chapterTitle?: string;
-  thumbnail?: string;
-  description?: string;
-  level?: string;
-  estimatedMinutes?: number;
-}
 
 export interface IUserProgress {
   id?: number;

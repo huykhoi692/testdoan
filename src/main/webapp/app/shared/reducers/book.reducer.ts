@@ -28,7 +28,7 @@ export const BookSlice = createSlice({
     builder
       .addCase(getEntity.fulfilled, (state, action) => {
         state.loading = false;
-        state.entity = action.payload.data;
+        state.entity = action.payload;
       })
       .addCase(deleteEntity.fulfilled, state => {
         state.updating = false;
@@ -36,20 +36,20 @@ export const BookSlice = createSlice({
         state.entity = {};
       })
       .addMatcher(isFulfilled(getEntities), (state, action) => {
-        const { data, headers } = action.payload;
+        const { data, totalCount } = action.payload;
 
         return {
           ...state,
           loading: false,
           entities: data,
-          totalItems: parseInt(headers['x-total-count'], 10),
+          totalItems: parseInt(totalCount, 10),
         };
       })
       .addMatcher(isFulfilled(createEntity, updateEntity, partialUpdateEntity), (state, action) => {
         state.updating = false;
         state.loading = false;
         state.updateSuccess = true;
-        state.entity = action.payload.data;
+        state.entity = action.payload;
       })
       .addMatcher(isPending(getEntities, getEntity), state => {
         state.errorMessage = null;

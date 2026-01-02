@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Row, Col, Typography, Button, Space, Progress, Tag, List, Spin, Empty, Statistic, message, Avatar } from 'antd';
-import { ReadOutlined, CheckCircleOutlined, FileTextOutlined, ArrowRightOutlined, TrophyOutlined } from '@ant-design/icons';
+import {
+  ReadOutlined,
+  CheckCircleOutlined,
+  FileTextOutlined,
+  ArrowRightOutlined,
+  TrophyOutlined,
+  PlayCircleOutlined,
+} from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppDispatch } from 'app/config/store';
 import { getBook, getBookChapters } from 'app/shared/services/book.service';
-import { getBookProgress, getChapterProgressesByBook } from 'app/shared/services/progress.service';
+import { getBookProgress, getChapterProgressesByBook, enrollBook } from 'app/shared/services/progress.service';
 import { IBook, IChapter, IBookProgress, IChapterProgress } from 'app/shared/model/models';
 import * as ds from 'app/shared/styles/design-system';
 
@@ -21,6 +28,7 @@ const BookDetail: React.FC = () => {
   const [chapterProgresses, setChapterProgresses] = useState<IChapterProgress[]>([]);
   const [loading, setLoading] = useState(false);
   const [chaptersError, setChaptersError] = useState(false);
+  const [enrolling, setEnrolling] = useState(false);
 
   useEffect(() => {
     if (!bookId) return;
@@ -37,7 +45,7 @@ const BookDetail: React.FC = () => {
         try {
           const chaptersResponse = await dispatch(getBookChapters(parseInt(bookId, 10))).unwrap();
           // Handle both axios response and direct array
-          const responseData = (chaptersResponse as any)?.data || chaptersResponse;
+          const responseData = chaptersResponse?.data || chaptersResponse;
           const chaptersArray = Array.isArray(responseData) ? responseData : [];
           if (chaptersArray.length === 0) setChaptersError(true);
           setChapters(chaptersArray);
@@ -68,6 +76,22 @@ const BookDetail: React.FC = () => {
 
   const completedChapters = chapterProgresses.filter(cp => cp.isCompleted).length;
   const overallProgress = chapters.length > 0 ? (completedChapters / chapters.length) * 100 : 0;
+
+  const handleStartLearning = async () => {
+    if (!bookId) return;
+    try {
+      setEnrolling(true);
+      await dispatch(enrollBook(parseInt(bookId, 10))).unwrap();
+      message.success('Đã đăng ký học sách này thành công!');
+      // Refresh progress
+      const progressData = await dispatch(getBookProgress(parseInt(bookId, 10))).unwrap();
+      setBookProgress(progressData);
+    } catch (error) {
+      message.error('Không thể đăng ký học sách này');
+    } finally {
+      setEnrolling(false);
+    }
+  };
 
   return (
     <div style={{ ...ds.pageContainerStyle, padding: ds.spacing.lg }}>
@@ -112,6 +136,40 @@ const BookDetail: React.FC = () => {
 
                     <Paragraph style={{ color: ds.colors.text.secondary }}>{book.description || 'Không có mô tả'}</Paragraph>
 
+                    {!bookProgress ? (
+                      <Button
+                        type="primary"
+                        size="large"
+                        icon={<PlayCircleOutlined />}
+                        loading={enrolling}
+                        onClick={handleStartLearning}
+                        style={{ marginTop: ds.spacing.md, width: '200px' }}
+                      >
+                        Bắt đầu học ngay
+                      </Button>
+                    ) : (
+                      <Button
+                        type="primary"
+                        size="large"
+                        icon={<ArrowRightOutlined />}
+                        onClick={() => {
+                          // Find first uncompleted chapter or first chapter
+                          const nextChapter =
+                            chapters.find(c => {
+                              const p = getChapterProgress(c.id);
+                              return !p || !p.isCompleted;
+                            }) || chapters[0];
+
+                          if (nextChapter) {
+                            navigate(`/dashboard/books/${bookId}/chapter/${nextChapter.id}`);
+                          }
+                        }}
+                        style={{ marginTop: ds.spacing.md, width: '200px' }}
+                      >
+                        Tiếp tục học
+                      </Button>
+                    )}
+
                     <Row gutter={16}>
                       {[
                         // Using an array to easily map over stats
@@ -155,6 +213,10 @@ const BookDetail: React.FC = () => {
                   renderItem={(chapter, index) => {
                     const progress = getChapterProgress(chapter.id);
                     const isCompleted = progress?.isCompleted || false;
+                    const isLocked = !bookProgress && index > 0; // Lock chapters if not enrolled (except first one maybe? or all?)
+                    // Actually requirement doesn't say lock, but "Start Learning" is needed.
+                    // Let's keep it simple: if not enrolled, clicking chapter triggers enrollment or warning?
+                    // For now, just let them click, but maybe show "Start" button.
 
                     return (
                       <List.Item
@@ -165,11 +227,30 @@ const BookDetail: React.FC = () => {
                           background: isCompleted ? 'var(--bg-tertiary)' : 'var(--bg-secondary)',
                           border: `1px solid ${isCompleted ? ds.colors.primary.light : ds.colors.border.light}`,
                           cursor: 'pointer',
+                          opacity: !bookProgress ? 0.7 : 1,
                         }}
-                        onClick={() => navigate(`/dashboard/books/${bookId}/chapter/${chapter.id}`)}
+                        onClick={() => {
+                          if (!bookProgress) {
+                            handleStartLearning();
+                          } else {
+                            navigate(`/dashboard/books/${bookId}/chapter/${chapter.id}`);
+                          }
+                        }}
                         actions={[
-                          <Button key="action-button" type="primary" icon={<ArrowRightOutlined />} onClick={e => e.stopPropagation()}>
-                            {isCompleted ? 'Ôn tập' : progress ? 'Tiếp tục' : 'Bắt đầu'}
+                          <Button
+                            key="action-button"
+                            type={!bookProgress ? 'default' : 'primary'}
+                            icon={!bookProgress ? <PlayCircleOutlined /> : <ArrowRightOutlined />}
+                            onClick={e => {
+                              e.stopPropagation();
+                              if (!bookProgress) {
+                                handleStartLearning();
+                              } else {
+                                navigate(`/dashboard/books/${bookId}/chapter/${chapter.id}`);
+                              }
+                            }}
+                          >
+                            {isCompleted ? 'Ôn tập' : !bookProgress ? 'Bắt đầu học' : progress ? 'Tiếp tục' : 'Bắt đầu'}
                           </Button>,
                         ]}
                       >

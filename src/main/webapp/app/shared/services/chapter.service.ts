@@ -274,7 +274,10 @@ const MOCK_WRITING_EXERCISES: IWritingExercise[] = [
 
 export const getChapters = createAsyncThunk('chapter/fetch_all', async () => {
   const response = await axios.get<IChapter[]>(API_URL);
-  return response.data;
+  return {
+    data: response.data,
+    totalCount: response.headers['x-total-count'],
+  };
 });
 
 export const getChaptersByBookId = createAsyncThunk('chapter/fetch_by_book', async (bookId: number) => {

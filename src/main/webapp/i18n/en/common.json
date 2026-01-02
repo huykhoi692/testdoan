@@ -47,7 +47,7 @@
     "welcome": "Hi {{name}}, {{greeting}}!",
     "subtitle": "Ready to start learning today?",
     "streak": "{{count}} days streak! Keep it up!",
-    "newLessons": "You have <b>{{count}}</b> new lessons waiting for you",
+    "newChapters": "You have <b>{{count}}</b> new chapters waiting for you",
     "stats": {
       "wordLearned": "Word Learned",
       "wordsLearned": "Words Learned",

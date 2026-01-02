@@ -30,12 +30,12 @@ import tech.jhipster.web.util.ResponseUtil;
 
 /**
  * REST controller for managing {@link com.langleague.domain.Chapter}.
- * Use case 16: View assigned lessons
- * Use case 17: View lesson details
- * Use case 18: Search lessons
- * Use case 43: Create lesson (Staff/Admin)
+ * Use case 16: View assigned chapters
+ * Use case 17: View chapter details
+ * Use case 18: Search chapters
+ * Use case 43: Create chapter (Staff/Admin)
  */
-@Tag(name = "Chapters", description = "Lesson/Chapter management")
+@Tag(name = "Chapters", description = "Chapter management")
 @RestController
 @RequestMapping("/api/chapters")
 public class ChapterResource {
@@ -58,7 +58,7 @@ public class ChapterResource {
 
     /**
      * {@code POST  /chapters} : Create a new chapter.
-     * Use case 43: Create lesson (Staff/Admin only)
+     * Use case 43: Create chapter (Staff/Admin only)
      *
      * @param chapterDTO the chapterDTO to create.
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new chapterDTO, or with status {@code 400 (Bad Request)} if the chapter has already an ID.
@@ -73,8 +73,8 @@ public class ChapterResource {
         }
 
         // Validate that order index is not duplicated for the same book
-        if (chapterDTO.getBook() != null && chapterDTO.getOrderIndex() != null) {
-            if (chapterService.existsByBookIdAndOrderIndex(chapterDTO.getBook().getId(), chapterDTO.getOrderIndex())) {
+        if (chapterDTO.getBookId() != null && chapterDTO.getOrderIndex() != null) {
+            if (chapterService.existsByBookIdAndOrderIndex(chapterDTO.getBookId(), chapterDTO.getOrderIndex())) {
                 throw new BadRequestAlertException(
                     "A chapter with this order index already exists for this book",
                     ENTITY_NAME,
@@ -91,7 +91,7 @@ public class ChapterResource {
 
     /**
      * {@code PUT  /chapters/:id} : Updates an existing chapter.
-     * Use case 43: Create lesson (Staff/Admin only)
+     * Use case 43: Create chapter (Staff/Admin only)
      *
      * @param id the id of the chapterDTO to save.
      * @param chapterDTO the chapterDTO to update.
@@ -126,7 +126,7 @@ public class ChapterResource {
 
     /**
      * {@code PATCH  /chapters/:id} : Partial updates given fields of an existing chapter, field will ignore if it is null
-     * Use case 43: Create lesson (Staff/Admin only)
+     * Use case 43: Create chapter (Staff/Admin only)
      *
      * @param id the id of the chapterDTO to save.
      * @param chapterDTO the chapterDTO to update.
@@ -193,7 +193,7 @@ public class ChapterResource {
 
     /**
      * {@code DELETE  /chapters/:id} : delete the "id" chapter.
-     * Use case 43: Create lesson (Staff/Admin only)
+     * Use case 43: Create chapter (Staff/Admin only)
      *
      * @param id the id of the chapterDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
@@ -210,7 +210,7 @@ public class ChapterResource {
 
     /**
      * {@code GET  /chapters/book/:bookId} : get all chapters for a specific book.
-     * Use case 16: View assigned lessons
+     * Use case 16: View assigned chapters
      *
      * @param bookId the id of the book.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of chapters in body.
@@ -225,7 +225,7 @@ public class ChapterResource {
 
     /**
      * {@code GET  /chapters/:id/details} : get chapter with all details (exercises, words, grammar).
-     * Use case 17: View lesson details
+     * Use case 17: View chapter details
      *
      * @param id the id of the chapter.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the chapterDetailDTO with details, or with status {@code 404 (Not Found)}.
@@ -260,7 +260,7 @@ public class ChapterResource {
 
     /**
      * {@code GET  /chapters/search} : search chapters by keyword.
-     * Use case 18: Search lessons
+     * Use case 18: Search chapters
      *
      * @param keyword the search keyword.
      * @param pageable the pagination information.
@@ -294,7 +294,7 @@ public class ChapterResource {
 
     /**
      * {@code PUT  /chapters/reorder} : Reorder chapters for a book.
-     * Use case 43: Create lesson (Staff/Admin only)
+     * Use case 43: Create chapter (Staff/Admin only)
      *
      * @param chapterDTOs the list of chapters with updated order indices.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated chapters.

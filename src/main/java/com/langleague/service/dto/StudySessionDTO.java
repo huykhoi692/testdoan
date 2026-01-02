@@ -29,6 +29,8 @@ public class StudySessionDTO implements Serializable {
 
     private AppUserDTO appUser;
 
+    private Long userChapterId;
+
     public Long getId() {
         return id;
     }
@@ -67,6 +69,14 @@ public class StudySessionDTO implements Serializable {
 
     public void setAppUser(AppUserDTO appUser) {
         this.appUser = appUser;
+    }
+
+    public Long getUserChapterId() {
+        return userChapterId;
+    }
+
+    public void setUserChapterId(Long userChapterId) {
+        this.userChapterId = userChapterId;
     }
 
     @Override

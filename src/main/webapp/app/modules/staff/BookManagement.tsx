@@ -57,14 +57,20 @@ const BookManagement: React.FC = () => {
   const [thumbnailUrl, setThumbnailUrl] = useState<string>('');
   const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
   const [form] = Form.useForm();
 
   // Fetch books
-  const fetchBooks = async () => {
+  const fetchBooks = async (page = 1, size = 10) => {
     setLoading(true);
     try {
-      const result = await dispatch(getBooks({})).unwrap();
-      setBooks(Array.isArray(result) ? result : []);
+      const result = await dispatch(getBooks({ page: page - 1, size, sort: 'id,desc' })).unwrap();
+      setBooks(result.data || []);
+      setPagination({
+        current: page,
+        pageSize: size,
+        total: parseInt(result.totalCount, 10) || 0,
+      });
     } catch (error) {
       message.error('Không thể tải danh sách sách');
     } finally {
@@ -73,7 +79,7 @@ const BookManagement: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchBooks();
+    fetchBooks(pagination.current, pagination.pageSize);
   }, []);
 
   // (Upload removed) no uploadProps needed
@@ -179,7 +185,7 @@ const BookManagement: React.FC = () => {
       setLoading(true);
       await dispatch(processBookWithAI(book.id)).unwrap();
       message.success('Đã gửi yêu cầu xử lý lại với AI');
-      fetchBooks();
+      fetchBooks(pagination.current, pagination.pageSize);
     } catch (error) {
       message.error('Không thể xử lý lại sách');
     } finally {
@@ -401,7 +407,12 @@ const BookManagement: React.FC = () => {
           </Col>
           <Col>
             <Space>
-              <Button icon={<ReloadOutlined />} onClick={fetchBooks} size="large" style={{ borderRadius: 8 }}>
+              <Button
+                icon={<ReloadOutlined />}
+                onClick={() => fetchBooks(pagination.current, pagination.pageSize)}
+                size="large"
+                style={{ borderRadius: 8 }}
+              >
                 Làm mới
               </Button>
               <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => showModal()} style={{ borderRadius: 8 }}>
@@ -459,9 +470,11 @@ const BookManagement: React.FC = () => {
           rowKey="id"
           rowSelection={rowSelection}
           pagination={{
+            ...pagination,
             showSizeChanger: true,
             showTotal: total => `Tổng ${total} sách`,
           }}
+          onChange={newPagination => fetchBooks(newPagination.current, newPagination.pageSize)}
           scroll={{ x: 1200 }}
           sticky={{ offsetHeader: 0 }}
         />

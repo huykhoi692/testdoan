@@ -8,13 +8,13 @@ import studySession from '../shared/reducers/study-session.reducer';
 import chapter from '../shared/reducers/chapter.reducer';
 import book from '../shared/reducers/book.reducer';
 import progress from '../shared/reducers/progress.reducer';
-import lesson from '../shared/reducers/lesson.reducer';
 import locale from '../shared/reducers/locale.reducer';
 import theme from '../shared/reducers/theme.reducer';
 import bookReview from '../shared/reducers/book-review.reducer';
 import comment from '../shared/reducers/comment.reducer';
 import achievement from '../shared/reducers/achievement.reducer';
 import favorite from '../shared/reducers/favorite.reducer';
+import userBook from '../shared/reducers/user-book.reducer';
 
 const store = configureStore({
   reducer: {
@@ -23,13 +23,13 @@ const store = configureStore({
     chapter,
     book,
     progress,
-    lesson,
     locale,
     theme,
     bookReview,
     comment,
     achievement,
     favorite,
+    userBook,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

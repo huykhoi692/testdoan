@@ -9,8 +9,8 @@ export interface IDashboardStats {
   quizzesCompleted: number;
   courseProgress: number;
   languagesStudying: number;
-  totalLessons: number;
-  completedLessons: number;
+  totalChapters: number;
+  completedChapters: number;
   currentStreak: number;
   longestStreak: number;
 }
@@ -33,8 +33,8 @@ export const getDashboardStats = async (): Promise<IDashboardStats> => {
       quizzesCompleted: exercisesCountRes.data || 0,
       courseProgress: Math.round(report.averageProgress || 0),
       languagesStudying: 1,
-      totalLessons: report.totalChaptersStarted || 0,
-      completedLessons: report.totalChaptersCompleted || 0,
+      totalChapters: report.totalChaptersStarted || 0,
+      completedChapters: report.totalChaptersCompleted || 0,
       currentStreak: currentStreakRes.data || 0,
       longestStreak: longestStreakRes.data || 0,
     };
@@ -48,8 +48,8 @@ export const getDashboardStats = async (): Promise<IDashboardStats> => {
       quizzesCompleted: 0,
       courseProgress: 0,
       languagesStudying: 1,
-      totalLessons: 0,
-      completedLessons: 0,
+      totalChapters: 0,
+      completedChapters: 0,
       currentStreak: 0,
       longestStreak: 0,
     };

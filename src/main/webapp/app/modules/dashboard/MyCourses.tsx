@@ -80,7 +80,7 @@ const MyCourses: React.FC = () => {
 
   const handleCourseClick = (courseId: string) => {
     // Navigate to course chapters
-    navigate(`/dashboard/courses/${courseId}/chapters`);
+    navigate(`/dashboard/books/${courseId}`);
   };
 
   const filteredCourses = courses.filter(

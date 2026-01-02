@@ -51,7 +51,7 @@ export const ChapterSlice = createSlice({
       })
       .addCase(getChapters.fulfilled, (state, action) => {
         state.loading = false;
-        state.entities = action.payload;
+        state.entities = action.payload.data;
       })
       .addCase(getChapters.rejected, (state, action) => {
         state.loading = false;
@@ -130,5 +130,8 @@ export const ChapterSlice = createSlice({
 });
 
 export const { resetChapter } = ChapterSlice.actions;
-export default ChapterSlice.reducer;
+
+// Re-export async thunks
 export { getChapters, getChaptersByBookId, createChapter, updateChapter, deleteChapter };
+
+export default ChapterSlice.reducer;

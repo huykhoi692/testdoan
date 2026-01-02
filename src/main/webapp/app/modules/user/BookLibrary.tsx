@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Pagination, Card, Row, Col, Typography, Input, Select, Tag, Space, Empty, Skeleton } from 'antd';
+import { Pagination, Card, Row, Col, Typography, Input, Select, Tag, Space, Empty, Skeleton, Button } from 'antd';
 import { BookOutlined, SearchOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntities } from 'app/shared/reducers/book.reducer';
+import { getUserBooks, enrollUserBook } from 'app/shared/reducers/user-book.reducer';
 import { IBook } from 'app/shared/model/book.model';
 import { useTranslation } from 'react-i18next';
 import { overridePaginationStateWithQueryParams } from 'app/shared/util/entity-utils';
@@ -23,13 +24,24 @@ const BookLibrary: React.FC = () => {
   const loading = useAppSelector(state => state.book.loading);
   const totalItems = useAppSelector(state => state.book.totalItems);
 
+  const userBookList = useAppSelector(state => state.userBook.entities);
+  const updatingUserBook = useAppSelector(state => state.userBook.updating);
+
   const [pagination, setPagination] = useState(overridePaginationStateWithQueryParams({ page: 1, size: ITEMS_PER_PAGE, sort: 'id,asc' }));
 
   useEffect(() => {
     dispatch(getEntities({ page: pagination.page - 1, size: pagination.size, sort: pagination.sort }));
+    dispatch(getUserBooks());
   }, [pagination.page, pagination.size, pagination.sort]);
 
   const handlePagination = (page, pageSize) => setPagination({ ...pagination, page, size: pageSize });
+
+  const handleEnroll = (e, bookId) => {
+    e.stopPropagation();
+    dispatch(enrollUserBook(bookId));
+  };
+
+  const isEnrolled = (bookId: number) => userBookList.some(ub => ub.bookId === bookId);
 
   return (
     <div style={{ ...ds.pageContainerStyle, padding: ds.spacing.lg }}>
@@ -73,43 +85,59 @@ const BookLibrary: React.FC = () => {
         </Card>
       ) : (
         <Row gutter={[ds.layout.cardGutter.desktop, ds.layout.cardGutter.desktop]}>
-          {bookList.map(book => (
-            <Col xs={24} sm={12} md={8} lg={6} key={book.id}>
-              <Card
-                hoverable
-                onClick={() => navigate(`/user/books/${book.id}`)}
-                style={{ ...ds.cardBaseStyle, overflow: 'hidden', height: '100%' }}
-                cover={
-                  <div
-                    style={{
-                      height: 280,
-                      backgroundImage: `url(${book.thumbnail || ''})`,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                      position: 'relative',
-                    }}
-                  >
-                    {book.level && (
-                      <Tag
-                        color={ds.getLevelColor(book.level)}
-                        style={{ position: 'absolute', top: ds.spacing.md, right: ds.spacing.md, borderRadius: ds.borderRadius.sm }}
-                      >
-                        {ds.getLevelText(book.level)}
-                      </Tag>
-                    )}
-                  </div>
-                }
-              >
-                <Card.Meta
-                  title={<span style={{ color: ds.colors.text.primary }}>{book.title}</span>}
-                  description={<span style={{ color: ds.colors.text.secondary }}>{book.author}</span>}
-                />
-              </Card>
-            </Col>
-          ))}
+          {bookList.map(book => {
+            const enrolled = isEnrolled(book.id);
+            return (
+              <Col xs={24} sm={12} md={8} lg={6} key={book.id}>
+                <Card
+                  hoverable
+                  style={{ ...ds.cardBaseStyle, overflow: 'hidden', height: '100%' }}
+                  cover={
+                    <div
+                      style={{
+                        height: 280,
+                        backgroundImage: `url(${book.thumbnail && !book.thumbnail.includes('via.placeholder.com') ? book.thumbnail : '/content/images/logo-jhipster.png'})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        position: 'relative',
+                      }}
+                    >
+                      {book.level && (
+                        <Tag
+                          color={ds.getLevelColor(book.level)}
+                          style={{ position: 'absolute', top: ds.spacing.md, right: ds.spacing.md, borderRadius: ds.borderRadius.sm }}
+                        >
+                          {ds.getLevelText(book.level)}
+                        </Tag>
+                      )}
+                    </div>
+                  }
+                  actions={[
+                    enrolled ? (
+                      <Button type="primary" block onClick={() => navigate(`/dashboard/books/${book.id}/chapters`)}>
+                        Continue Learning
+                      </Button>
+                    ) : (
+                      <Button type="default" block loading={updatingUserBook} onClick={e => handleEnroll(e, book.id)}>
+                        Start Learning
+                      </Button>
+                    ),
+                  ]}
+                >
+                  <Card.Meta
+                    title={<span style={{ fontSize: ds.typography.fontSize.lg, fontWeight: 600 }}>{book.title}</span>}
+                    description={
+                      <Paragraph ellipsis={{ rows: 2 }} style={{ marginBottom: 0 }}>
+                        {book.description}
+                      </Paragraph>
+                    }
+                  />
+                </Card>
+              </Col>
+            );
+          })}
         </Row>
       )}
-
       {totalItems > 0 && (
         <div style={{ textAlign: 'center', marginTop: ds.spacing.xl }}>
           <Pagination current={pagination.page} pageSize={pagination.size} total={totalItems} onChange={handlePagination} showSizeChanger />

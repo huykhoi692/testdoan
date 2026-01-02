@@ -2,8 +2,9 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import DashboardLayout from './shared/layout/dashboard-layout';
 import PrivateRoute from './shared/auth/PrivateRoute';
-import BookUploadManager from 'app/modules/staff/BookUploadManager';
-import ChapterStepperEditor from 'app/modules/staff/ChapterStepperEditor';
+const BookUploadManager = React.lazy(() => import('./modules/staff/BookUploadManager'));
+const ChapterStepperEditor = React.lazy(() => import('./modules/staff/ChapterStepperEditor'));
+import ChapterList from 'app/components/ChapterList';
 
 // ==================== PUBLIC PAGES ====================
 const Home = React.lazy(() => import('./modules/home/home'));
@@ -15,13 +16,12 @@ const ContactUs = React.lazy(() => import('./modules/home/contact-us'));
 const Dashboard = React.lazy(() => import('./modules/dashboard/dashboard'));
 const MyProfile = React.lazy(() => import('./modules/dashboard/MyProfile'));
 const MyCourses = React.lazy(() => import('./modules/dashboard/MyCourses'));
-const BookLessons = React.lazy(() => import('./modules/dashboard/BookLessons'));
+const BookChapters = React.lazy(() => import('./modules/dashboard/BookChapters'));
 const ChapterExercise = React.lazy(() => import('./modules/dashboard/ChapterExercise'));
 const Settings = React.lazy(() => import('./modules/dashboard/Settings'));
 const Flashcard = React.lazy(() => import('./modules/dashboard/Flashcard'));
 const AddToFlashcard = React.lazy(() => import('./modules/dashboard/AddToFlashcard'));
 const VocabularyList = React.lazy(() => import('./modules/courses/vocabulary-list'));
-const ReadingLesson = React.lazy(() => import('./modules/courses/reading-lesson'));
 
 // User learning pages
 const BookLibrary = React.lazy(() => import('./modules/user/BookLibrary'));
@@ -39,6 +39,9 @@ const Achievements = React.lazy(() => import('./modules/user/Achievements'));
 const LearningReports = React.lazy(() => import('./modules/user/LearningReports'));
 const ExerciseAnalytics = React.lazy(() => import('./modules/user/ExerciseAnalytics'));
 const FavoritesPage = React.lazy(() => import('./modules/user/FavoritesPage'));
+const StudySessionPage = React.lazy(() =>
+  import('./entities/study-session/study-session').then(module => ({ default: module.StudySessionPage })),
+);
 
 // ==================== ADMIN PAGES ====================
 const AdminOverview = React.lazy(() => import('./modules/admin/AdminOverview'));
@@ -83,15 +86,16 @@ const AppRoutes = () => {
 
         {/* Courses & Learning */}
         <Route path="courses" element={<MyCourses />} />
-        <Route path="courses/:courseId/chapters" element={<BookLessons />} />
+        <Route path="courses/:courseId/chapters" element={<BookChapters />} />
         <Route path="courses/chapter/:id" element={<ChapterExercise />} />
         <Route path="vocabulary" element={<VocabularyList />} />
-        <Route path="lesson/:id" element={<ReadingLesson />} />
 
         {/* Book Library */}
         <Route path="books" element={<BookLibrary />} />
+        <Route path="books/:bookId/chapters" element={<ChapterList />} />
         <Route path="books/:bookId" element={<BookDetail />} />
         <Route path="books/:bookId/chapter/:chapterId" element={<ChapterLearning />} />
+        <Route path="chapters/:chapterId/study" element={<StudySessionPage />} />
 
         {/* My Books & Chapters */}
         <Route path="my-books" element={<MyBooks />} />

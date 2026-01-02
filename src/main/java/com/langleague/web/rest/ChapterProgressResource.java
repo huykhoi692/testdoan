@@ -5,6 +5,7 @@ import com.langleague.service.ChapterProgressService;
 import com.langleague.service.dto.ChapterProgressDTO;
 import com.langleague.service.dto.MyChapterDTO;
 import com.langleague.web.rest.errors.BadRequestAlertException;
+import com.langleague.security.SecurityUtils;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.net.URI;
@@ -198,6 +199,7 @@ public class ChapterProgressResource {
         chapterProgressService.markAsCompleted(chapterId, userLogin);
         return ResponseEntity.ok().build();
     }
+
 
     /**
      * {@code PUT  /chapter-progresses/chapter/:chapterId/progress} : Update progress for a chapter.

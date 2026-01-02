@@ -50,7 +50,7 @@ public interface UserChapterRepository extends JpaRepository<UserChapter, Long> 
     /**
      * Count user's saved chapters
      */
-    long countByAppUser_InternalUser_Login(String userLogin);
+    Long countByAppUser_InternalUser_Login(String userLogin);
 
     /**
      * Count by status
@@ -66,4 +66,9 @@ public interface UserChapterRepository extends JpaRepository<UserChapter, Long> 
      * Delete by user and chapter
      */
     void deleteByAppUser_InternalUser_LoginAndChapter_Id(String userLogin, Long chapterId);
+
+    /**
+     * Find by AppUser ID and Chapter ID
+     */
+    Optional<UserChapter> findByAppUserIdAndChapterId(Long appUserId, Long chapterId);
 }

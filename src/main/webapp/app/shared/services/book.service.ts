@@ -8,42 +8,45 @@ const API_URL = '/api/books';
 // Action to get all books with pagination
 export const getEntities = createAsyncThunk('book/fetch_entity_list', async ({ page, size, sort }: IPaginationBaseState) => {
   const requestUrl = `${API_URL}${sort ? `?page=${page}&size=${size}&sort=${sort}` : ''}`;
-  return axios.get<IBook[]>(requestUrl);
+  const response = await axios.get<IBook[]>(requestUrl);
+  // Return only serializable data
+  return { data: response.data, totalCount: response.headers['x-total-count'] };
 });
 
 // Get a single book by ID
 export const getEntity = createAsyncThunk('book/fetch_entity', async (id: string | number) => {
   const requestUrl = `${API_URL}/${id}`;
-  return axios.get<IBook>(requestUrl);
+  const response = await axios.get<IBook>(requestUrl);
+  return response.data;
 });
 
 // Create a new book
 export const createEntity = createAsyncThunk('book/create_entity', async (entity: IBook, thunkAPI) => {
-  const result = await axios.post<IBook>(API_URL, entity);
+  const response = await axios.post<IBook>(API_URL, entity);
   thunkAPI.dispatch(getEntities({})); // Refetch list after creation
-  return result;
+  return response.data;
 });
 
 // Update an existing book
 export const updateEntity = createAsyncThunk('book/update_entity', async (entity: IBook, thunkAPI) => {
-  const result = await axios.put<IBook>(`${API_URL}/${entity.id}`, entity);
+  const response = await axios.put<IBook>(`${API_URL}/${entity.id}`, entity);
   thunkAPI.dispatch(getEntities({})); // Refetch list after update
-  return result;
+  return response.data;
 });
 
 // Partially update a book
 export const partialUpdateEntity = createAsyncThunk('book/partial_update_entity', async (entity: IBook, thunkAPI) => {
-  const result = await axios.patch<IBook>(`${API_URL}/${entity.id}`, entity);
+  const response = await axios.patch<IBook>(`${API_URL}/${entity.id}`, entity);
   thunkAPI.dispatch(getEntities({})); // Refetch list after partial update
-  return result;
+  return response.data;
 });
 
 // Delete a book
 export const deleteEntity = createAsyncThunk('book/delete_entity', async (id: string | number, thunkAPI) => {
   const requestUrl = `${API_URL}/${id}`;
-  const result = await axios.delete<IBook>(requestUrl);
+  const response = await axios.delete<IBook>(requestUrl);
   thunkAPI.dispatch(getEntities({})); // Refetch list after deletion
-  return result;
+  return response.data;
 });
 
 // Alias functions for backward compatibility
@@ -56,11 +59,13 @@ export const deleteBook = deleteEntity;
 // Get chapters for a specific book
 export const getBookChapters = createAsyncThunk('book/fetch_chapters', async (bookId: string | number) => {
   const requestUrl = `/api/books/${bookId}/chapters`;
-  return axios.get(requestUrl);
+  const response = await axios.get(requestUrl);
+  return response.data;
 });
 
 // Process book with AI
 export const processBookWithAI = createAsyncThunk('book/process_with_ai', async (bookId: string | number) => {
   const requestUrl = `/api/books/${bookId}/process-ai`;
-  return axios.post(requestUrl);
+  const response = await axios.post(requestUrl);
+  return response.data;
 });
