@@ -1,6 +1,7 @@
 package com.langleague.service;
 
 import com.langleague.domain.AppUser;
+import com.langleague.domain.Book;
 import com.langleague.domain.Chapter;
 import com.langleague.domain.UserChapter;
 import com.langleague.domain.enumeration.LearningStatus;
@@ -40,18 +41,22 @@ public class UserChapterService {
 
     private final ChapterRepository chapterRepository;
 
+    private final UserBookService userBookService;
+
     public UserChapterService(
         UserChapterRepository userChapterRepository,
         UserChapterMapper userChapterMapper,
         ChapterProgressRepository chapterProgressRepository,
         AppUserRepository appUserRepository,
-        ChapterRepository chapterRepository
+        ChapterRepository chapterRepository,
+        UserBookService userBookService
     ) {
         this.userChapterRepository = userChapterRepository;
         this.userChapterMapper = userChapterMapper;
         this.chapterProgressRepository = chapterProgressRepository;
         this.appUserRepository = appUserRepository;
         this.chapterRepository = chapterRepository;
+        this.userBookService = userBookService;
     }
 
     /**
@@ -332,5 +337,60 @@ public class UserChapterService {
         }
 
         return dto;
+    }
+
+    /**
+     * Enroll in a chapter (Start Learning).
+     *
+     * @param chapterId the chapter ID
+     * @param userLogin the user login
+     * @return the persisted entity
+     */
+    public UserChapterDTO enrollChapter(Long chapterId, String userLogin) {
+        LOG.debug("Request to enroll in chapter {} for user {}", chapterId, userLogin);
+
+        AppUser appUser = appUserRepository
+            .findByInternalUser_Login(userLogin)
+            .orElseThrow(() -> new RuntimeException("AppUser not found"));
+
+        // Check if already enrolled/saved
+        Optional<UserChapter> existingUserChapter = userChapterRepository.findByAppUser_InternalUser_LoginAndChapter_Id(
+            userLogin,
+            chapterId
+        );
+
+        if (existingUserChapter.isPresent()) {
+            UserChapter userChapter = existingUserChapter.get();
+            // If status is NOT_STARTED, update to IN_PROGRESS
+            if (userChapter.getLearningStatus() == LearningStatus.NOT_STARTED) {
+                userChapter.setLearningStatus(LearningStatus.IN_PROGRESS);
+                userChapter.setLastAccessedAt(Instant.now());
+                userChapter = userChapterRepository.save(userChapter);
+            }
+            return enrichWithProgress(userChapter);
+        }
+
+        Chapter chapter = chapterRepository.findById(chapterId).orElseThrow(() -> new RuntimeException("Chapter not found"));
+
+        // Auto-Enroll Book (Cascade)
+        if (chapter.getBook() != null) {
+            try {
+                userBookService.enrollBook(chapter.getBook().getId());
+            } catch (Exception e) {
+                LOG.error("Failed to auto-enroll in book: {}", e.getMessage());
+            }
+        }
+
+        // Create new UserChapter
+        UserChapter newUserChapter = new UserChapter();
+        newUserChapter.setAppUser(appUser);
+        newUserChapter.setChapter(chapter);
+        newUserChapter.setLearningStatus(LearningStatus.IN_PROGRESS);
+        newUserChapter.setSavedAt(Instant.now());
+        newUserChapter.setLastAccessedAt(Instant.now());
+        newUserChapter.setIsFavorite(false);
+
+        UserChapter saved = userChapterRepository.save(newUserChapter);
+        return enrichWithProgress(saved);
     }
 }

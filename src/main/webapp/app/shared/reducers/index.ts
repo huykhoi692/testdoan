@@ -9,6 +9,7 @@ import commentReducer from './comment.reducer';
 import achievementReducer from './achievement.reducer';
 import favoriteReducer from './favorite.reducer';
 import userBookReducer from './user-book.reducer';
+import userChapterReducer from './user-chapter.reducer';
 import authentication from '../auth/auth.reducer';
 
 const rootReducer = combineReducers({
@@ -23,6 +24,7 @@ const rootReducer = combineReducers({
   achievement: achievementReducer,
   favorite: favoriteReducer,
   userBook: userBookReducer,
+  userChapter: userChapterReducer,
 });
 
 export default rootReducer;

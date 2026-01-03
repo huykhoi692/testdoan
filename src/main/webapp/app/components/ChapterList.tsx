@@ -6,6 +6,8 @@ import { CheckCircleOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '../config/store';
 import { getChapters, getChaptersByBookId } from '../shared/reducers/chapter.reducer';
 import { getChapterProgressesByBook } from '../shared/services/progress.service';
+import { getMyChapters, enrollChapter } from '../shared/reducers/user-chapter.reducer';
+import { unwrapResult } from '@reduxjs/toolkit';
 
 const { Title, Text } = Typography;
 
@@ -21,10 +23,12 @@ const ChapterList: React.FC<ChapterListProps> = ({ bookId }) => {
   const chapters = useAppSelector(state => state.chapter.entities);
   const loading = useAppSelector(state => state.chapter.loading);
   const chapterProgresses = useAppSelector(state => state.progress.chapterProgresses);
+  const userChapters = useAppSelector(state => state.userChapter.entities);
 
   const effectiveBookId = bookId || (paramBookId ? parseInt(paramBookId, 10) : undefined);
 
   useEffect(() => {
+    dispatch(getMyChapters());
     if (effectiveBookId) {
       dispatch(getChaptersByBookId(effectiveBookId));
       dispatch(getChapterProgressesByBook(effectiveBookId));
@@ -32,6 +36,17 @@ const ChapterList: React.FC<ChapterListProps> = ({ bookId }) => {
       dispatch(getChapters());
     }
   }, [effectiveBookId, dispatch]);
+
+  const handleStartLearning = (chapterId: number) => {
+    dispatch(enrollChapter(chapterId))
+      .then(unwrapResult)
+      .then(() => {
+        navigate(`/learning/${effectiveBookId}/chapter/${chapterId}`);
+      })
+      .catch(err => {
+        console.error('Failed to enroll:', err);
+      });
+  };
 
   if (loading || !chapters) {
     return (
@@ -59,6 +74,7 @@ const ChapterList: React.FC<ChapterListProps> = ({ bookId }) => {
         {chapters.map(chapter => {
           const progress = chapterProgresses.find(cp => cp.chapterId === chapter.id);
           const isCompleted = progress?.isCompleted;
+          const isEnrolled = userChapters.some(uc => uc.chapterId === chapter.id || uc.chapter?.id === chapter.id);
 
           return (
             <Col xs={24} sm={12} md={8} key={chapter.id}>
@@ -72,11 +88,20 @@ const ChapterList: React.FC<ChapterListProps> = ({ bookId }) => {
                   </div>
                   <Text type="secondary">Chapter {chapter.orderIndex}</Text>
                   {chapter.bookTitle && <Text type="secondary">Book: {chapter.bookTitle}</Text>}
-                  <Link to={`/dashboard/chapters/${chapter.id}/study`}>
-                    <Button type={isCompleted ? 'default' : 'primary'} block>
-                      {isCompleted ? 'Review' : 'Start Learning'}
+
+                  {isEnrolled ? (
+                    <Button
+                      type={isCompleted ? 'default' : 'primary'}
+                      block
+                      onClick={() => navigate(`/learning/${effectiveBookId}/chapter/${chapter.id}`)}
+                    >
+                      {isCompleted ? 'Review' : 'Continue'}
                     </Button>
-                  </Link>
+                  ) : (
+                    <Button type="primary" block onClick={() => handleStartLearning(chapter.id)}>
+                      Start Learning
+                    </Button>
+                  )}
                 </Space>
               </Card>
             </Col>

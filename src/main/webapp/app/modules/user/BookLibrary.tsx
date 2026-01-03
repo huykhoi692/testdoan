@@ -3,6 +3,7 @@ import { Pagination, Card, Row, Col, Typography, Input, Select, Tag, Space, Empt
 import { BookOutlined, SearchOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
+import { unwrapResult } from '@reduxjs/toolkit';
 import { getEntities } from 'app/shared/reducers/book.reducer';
 import { getUserBooks, enrollUserBook } from 'app/shared/reducers/user-book.reducer';
 import { IBook } from 'app/shared/model/book.model';
@@ -38,7 +39,11 @@ const BookLibrary: React.FC = () => {
 
   const handleEnroll = (e, bookId) => {
     e.stopPropagation();
-    dispatch(enrollUserBook(bookId));
+    dispatch(enrollUserBook(bookId))
+      .then(unwrapResult)
+      .then(() => {
+        navigate(`/dashboard/my-books/${bookId}/chapters`);
+      });
   };
 
   const isEnrolled = (bookId: number) => userBookList.some(ub => ub.bookId === bookId);

@@ -37,12 +37,10 @@ import {
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'app/shared/utils/useTranslation';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
+import { getMyChapters as getMyChaptersAction } from 'app/shared/reducers/user-chapter.reducer';
+import { LearningStatus } from 'app/shared/model/dto.model';
 import {
-  getMyChapters,
-  getMyInProgressChapters,
-  getMyCompletedChapters,
-  getSavedChapters,
-  getFavoriteChapters,
   saveChapter,
   removeChapter,
   toggleFavorite,
@@ -57,9 +55,13 @@ const { TabPane } = Tabs;
 
 const MyChapters: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const { t } = useTranslation(['staff', 'user', 'common']);
-  const [chapters, setChapters] = useState<(MyChapterDTO | UserChapterDTO)[]>([]);
-  const [loading, setLoading] = useState(false);
+
+  const chaptersList = useAppSelector(state => state.userChapter.entities);
+  const loading = useAppSelector(state => state.userChapter.loading);
+
+  const [chapters, setChapters] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState('all');
   const [notesModalVisible, setNotesModalVisible] = useState(false);
   const [tagsModalVisible, setTagsModalVisible] = useState(false);
@@ -68,59 +70,42 @@ const MyChapters: React.FC = () => {
   const [tagsInput, setTagsInput] = useState('');
 
   useEffect(() => {
-    loadChapters('all');
+    dispatch(getMyChaptersAction());
   }, []);
 
-  const loadChapters = async (tab: string) => {
-    try {
-      setLoading(true);
-      let response;
-
-      switch (tab) {
-        case 'all': {
-          // Merge learned and saved chapters
-          const learnedRes = await Promise.all([getMyChapters(), getSavedChapters()]);
-          const [learned, saved] = learnedRes;
-          const combined: any[] = [...learned.data, ...saved.data];
-          const uniqueMap = new Map();
-          combined.forEach((ch: any) => {
-            const key = ch.chapterId || ch.chapter?.id;
-            if (!uniqueMap.has(key) || ch.isFavorite) {
-              uniqueMap.set(key, ch);
-            }
-          });
-          setChapters(Array.from(uniqueMap.values()));
-          setLoading(false);
-          return;
-        }
-        case 'learning':
-          response = await getMyInProgressChapters();
-          break;
-        case 'completed':
-          response = await getMyCompletedChapters();
-          break;
-        case 'saved':
-          response = await getSavedChapters();
-          break;
-        case 'favorites':
-          response = await getFavoriteChapters();
-          break;
-        default:
-          response = await getMyChapters();
-      }
-
-      setChapters(response.data);
-    } catch (error) {
-      console.error('Failed to load chapters:', error);
-      message.error('Không thể tải danh sách chapters');
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    if (chaptersList) {
+      filterChapters(activeTab);
     }
+  }, [chaptersList, activeTab]);
+
+  const filterChapters = (tab: string) => {
+    let filtered = [...chaptersList];
+    switch (tab) {
+      case 'learning':
+        filtered = chaptersList.filter(c => c.learningStatus === LearningStatus.IN_PROGRESS);
+        break;
+      case 'completed':
+        filtered = chaptersList.filter(c => c.learningStatus === LearningStatus.COMPLETED); // Assuming status enum
+        break;
+      case 'saved':
+        filtered = [...chaptersList]; // All are saved/enrolled
+        break;
+      case 'favorites':
+        filtered = chaptersList.filter(c => c.isFavorite);
+        break;
+      default:
+        filtered = [...chaptersList];
+    }
+    setChapters(filtered);
   };
 
   const handleTabChange = (key: string) => {
     setActiveTab(key);
-    loadChapters(key);
+  };
+
+  const loadChapters = (tab: string) => {
+    dispatch(getMyChaptersAction());
   };
 
   const handleSaveChapter = async (chapterId: number) => {
@@ -150,7 +135,7 @@ const MyChapters: React.FC = () => {
           await removeChapter(chapterId);
           message.success('Đã xóa chapter khỏi thư viện');
           // Force reload to update UI
-          await loadChapters(activeTab);
+          loadChapters(activeTab);
         } catch (error: any) {
           console.error('❌ Error removing chapter:', error);
           message.error(error.response?.data?.message || 'Không thể xóa chapter');
@@ -166,7 +151,7 @@ const MyChapters: React.FC = () => {
       console.log('✅ Toggle favorite response:', response);
       message.success('Đã cập nhật yêu thích');
       // Force reload to update UI
-      await loadChapters(activeTab);
+      loadChapters(activeTab);
     } catch (error: any) {
       console.error('❌ Error toggling favorite:', error);
       console.error('Error details:', {
@@ -222,8 +207,8 @@ const MyChapters: React.FC = () => {
     const bookId = chapter.bookId || chapter.book?.id || 0;
 
     if (chapterId && bookId) {
-      // Navigate to correct route: /dashboard/books/:bookId/chapter/:chapterId
-      navigate(`/dashboard/books/${bookId}/chapter/${chapterId}`);
+      // Navigate to correct route: /learning/:bookId/chapter/:chapterId
+      navigate(`/learning/${bookId}/chapter/${chapterId}`);
     } else {
       message.error('Không thể tìm thấy thông tin chapter');
     }
@@ -390,7 +375,7 @@ const MyChapters: React.FC = () => {
               style={{ padding: '48px 0' }}
             >
               {activeTab === 'all' && (
-                <Button type="primary" onClick={() => navigate('/books')}>
+                <Button type="primary" onClick={() => navigate('/dashboard/books')}>
                   Khám phá sách
                 </Button>
               )}
@@ -442,7 +427,7 @@ const MyChapters: React.FC = () => {
                         </Tooltip>
                       ),
                       <Button key="continue" type="primary" icon={<RightOutlined />} onClick={() => handleContinueLearning(chapter)}>
-                        {completed ? 'Xem lại' : progressPercent > 0 ? 'Tiếp tục học' : 'Bắt đầu học'}
+                        {completed ? 'Review' : 'Continue Learning'}
                       </Button>,
                       <Button key="view" type="link" onClick={() => handleViewBook(bookId)}>
                         Xem sách

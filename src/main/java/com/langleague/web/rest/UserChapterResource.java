@@ -85,6 +85,22 @@ public class UserChapterResource {
     }
 
     /**
+     * POST /api/user/saved-chapters/enroll/:chapterId : Enroll in a chapter
+     *
+     * @param chapterId the ID of the chapter to enroll
+     * @return the ResponseEntity with status 200 (OK) and the enrolled chapter
+     */
+    @PostMapping("/enroll/{chapterId}")
+    public ResponseEntity<UserChapterDTO> enrollChapter(@PathVariable Long chapterId) {
+        LOG.debug("REST request to enroll in chapter: {}", chapterId);
+        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin()
+            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
+
+        UserChapterDTO result = userChapterService.enrollChapter(chapterId, userLogin);
+        return ResponseEntity.ok(result);
+    }
+
+    /**
      * POST /api/user/saved-chapters/:chapterId : Save a chapter to library
      *
      * @param chapterId the ID of the chapter to save

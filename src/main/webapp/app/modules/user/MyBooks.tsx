@@ -137,7 +137,7 @@ const MyBooks: React.FC = () => {
         <Empty
           description={
             <span>
-              No books found. <a onClick={() => navigate('/book-library')}>Browse Library</a>
+              No books found. <a onClick={() => navigate('/dashboard/books')}>Browse Library</a>
             </span>
           }
         />

@@ -99,6 +99,8 @@ const AppRoutes = () => {
 
         {/* My Books & Chapters */}
         <Route path="my-books" element={<MyBooks />} />
+        <Route path="my-books/:bookId/chapters" element={<ChapterList />} />
+        <Route path="learning/:bookId/chapter/:chapterId" element={<ChapterLearning />} />
         <Route path="my-chapters" element={<MyChapters />} />
 
         {/* Exercises */}

@@ -15,6 +15,7 @@ import comment from '../shared/reducers/comment.reducer';
 import achievement from '../shared/reducers/achievement.reducer';
 import favorite from '../shared/reducers/favorite.reducer';
 import userBook from '../shared/reducers/user-book.reducer';
+import userChapter from '../shared/reducers/user-chapter.reducer';
 
 const store = configureStore({
   reducer: {
@@ -30,6 +31,7 @@ const store = configureStore({
     achievement,
     favorite,
     userBook,
+    userChapter,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
