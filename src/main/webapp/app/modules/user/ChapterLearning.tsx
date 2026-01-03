@@ -1,5 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { Card, Tabs, Typography, Row, Col, Button, Space, Tag, Spin, Empty, Collapse, List, Progress, message, Statistic } from 'antd';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Card, Tabs, Typography, Row, Col, Button, Space, Tag, Spin, Empty, Progress, message, Breadcrumb, Collapse, List } from 'antd';
 import {
   ReadOutlined,
   SoundOutlined,
@@ -8,29 +9,47 @@ import {
   BookOutlined,
   AudioOutlined,
   FormOutlined,
+  ArrowLeftOutlined,
+  RightOutlined,
+  LeftOutlined,
+  HomeOutlined,
 } from '@ant-design/icons';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useAppDispatch } from 'app/config/store';
-import { getChapterWords, getChapterGrammars, getChapterExercises } from 'app/shared/services/chapter.service';
+
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getChapter } from 'app/shared/reducers/chapter.reducer';
+import {
+  getChapterWords,
+  getChapterGrammars,
+  getChapterExercises,
+  getNextChapter,
+  getPreviousChapter,
+} from 'app/shared/services/chapter.service';
 import { getChapterProgress, markChapterAsCompleted } from 'app/shared/services/progress.service';
+import { startStudySession } from 'app/shared/reducers/study-session.reducer';
+
 import {
   IChapter,
+  IChapterProgress,
   IWord,
   IGrammar,
   IListeningExercise,
   ISpeakingExercise,
   IReadingExercise,
   IWritingExercise,
-  IChapterProgress,
-} from 'app/shared/model/models';
+} from 'app/shared/model';
+
+import ReadingExercise from './ReadingExercise';
+import ListeningExercise from './ListeningExercise';
+import SpeakingExercise from './SpeakingExercise';
+import WritingExercise from './WritingExercise';
+import ChapterDiscussion from './ChapterDiscussion';
 
 const { Title, Text, Paragraph } = Typography;
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
 
 const ChapterLearning: React.FC = () => {
-  const { chapterId } = useParams<{ chapterId: string }>();
+  const { bookId, chapterId } = useParams<{ bookId: string; chapterId: string }>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
@@ -47,6 +66,8 @@ const ChapterLearning: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('vocabulary');
   const [completing, setCompleting] = useState(false);
+  const [nextChapterId, setNextChapterId] = useState<number | null>(null);
+  const [prevChapterId, setPrevChapterId] = useState<number | null>(null);
 
   useEffect(() => {
     if (!chapterId) return;
@@ -54,23 +75,46 @@ const ChapterLearning: React.FC = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const chapterData = await dispatch(getChapter(parseInt(chapterId, 10))).unwrap();
+        const cId = parseInt(chapterId, 10);
+
+        // 1. Get Chapter Details
+        const chapterData = await dispatch(getChapter(cId)).unwrap();
         setChapter(chapterData);
 
-        const wordsData = await dispatch(getChapterWords(parseInt(chapterId, 10))).unwrap();
+        // 2. Start Session
+        dispatch(startStudySession(cId));
+
+        // 3. Get Content
+        const wordsData = await dispatch(getChapterWords(cId)).unwrap();
         setWords(wordsData);
 
-        const grammarsData = await dispatch(getChapterGrammars(parseInt(chapterId, 10))).unwrap();
+        const grammarsData = await dispatch(getChapterGrammars(cId)).unwrap();
         setGrammars(grammarsData);
 
-        const exercisesData = await dispatch(getChapterExercises(parseInt(chapterId, 10))).unwrap();
+        const exercisesData = await dispatch(getChapterExercises(cId)).unwrap();
         setExercises(exercisesData);
 
+        // 4. Get Progress
         try {
-          const progressData = await dispatch(getChapterProgress(parseInt(chapterId, 10))).unwrap();
+          const progressData = await dispatch(getChapterProgress(cId)).unwrap();
           setProgress(progressData);
         } catch {
-          // No progress yet
+          // Ignore if no progress found
+        }
+
+        // 5. Get Next/Prev Chapters
+        try {
+          const next = await dispatch(getNextChapter(cId)).unwrap();
+          if (next) setNextChapterId(next.id);
+        } catch {
+          /* ignore */
+        }
+
+        try {
+          const prev = await dispatch(getPreviousChapter(cId)).unwrap();
+          if (prev) setPrevChapterId(prev.id);
+        } catch {
+          /* ignore */
         }
       } catch (error) {
         console.error('Error fetching chapter data:', error);
@@ -87,29 +131,28 @@ const ChapterLearning: React.FC = () => {
     setActiveTab(key);
   };
 
-  const calculateProgress = () => {
-    if (!progress) return 0;
-    const total = (chapter?.totalWords || 0) + (chapter?.totalGrammars || 0) + (chapter?.totalExercises || 0);
-    if (total === 0) return 0;
-    const completed = (progress.wordsLearned || 0) + (progress.grammarsLearned || 0) + (progress.exercisesCompleted || 0);
-    return Math.round((completed / total) * 100);
-  };
-
   const handleCompleteChapter = async () => {
     if (!chapterId) return;
     try {
       setCompleting(true);
-      await dispatch(markChapterAsCompleted(parseInt(chapterId, 10))).unwrap();
+      const cId = parseInt(chapterId, 10);
+      await dispatch(markChapterAsCompleted(cId)).unwrap();
       message.success('Chúc mừng! Bạn đã hoàn thành chương này.');
+
       // Refresh progress
-      const progressData = await dispatch(getChapterProgress(parseInt(chapterId, 10))).unwrap();
+      const progressData = await dispatch(getChapterProgress(cId)).unwrap();
       setProgress(progressData);
-      // Navigate back to book details after short delay
-      setTimeout(() => {
-        if (chapter?.bookId) {
-          navigate(`/dashboard/books/${chapter.bookId}`);
-        }
-      }, 1500);
+
+      // Navigate to next chapter if available, else back to book
+      if (nextChapterId) {
+        setTimeout(() => {
+          navigate(`/dashboard/books/${bookId}/chapters/${nextChapterId}`);
+        }, 1500);
+      } else {
+        setTimeout(() => {
+          navigate(`/dashboard/books/${bookId}`);
+        }, 1500);
+      }
     } catch (error) {
       message.error('Không thể đánh dấu hoàn thành chương');
     } finally {
@@ -117,8 +160,29 @@ const ChapterLearning: React.FC = () => {
     }
   };
 
+  const handleNavigateChapter = (targetId: number | null) => {
+    if (targetId) {
+      navigate(`/dashboard/books/${bookId}/chapters/${targetId}`);
+    }
+  };
+
   return (
     <div style={{ padding: '24px', maxWidth: 1400, margin: '0 auto' }}>
+      <Breadcrumb style={{ marginBottom: 16 }}>
+        <Breadcrumb.Item>
+          <Link to="/dashboard">
+            <HomeOutlined />
+          </Link>
+        </Breadcrumb.Item>
+        <Breadcrumb.Item>
+          <Link to="/dashboard/books">Thư viện</Link>
+        </Breadcrumb.Item>
+        <Breadcrumb.Item>
+          <Link to={`/dashboard/books/${bookId}`}>Chi tiết sách</Link>
+        </Breadcrumb.Item>
+        <Breadcrumb.Item>Học tập</Breadcrumb.Item>
+      </Breadcrumb>
+
       <Spin spinning={loading}>
         {chapter && (
           <>
@@ -130,14 +194,15 @@ const ChapterLearning: React.FC = () => {
                 </Col>
                 <Col>
                   <Space>
-                    <Button onClick={() => navigate(-1)}>Quay lại</Button>
-                    {!progress?.isCompleted && (
+                    <Button icon={<ArrowLeftOutlined />} onClick={() => navigate(`/dashboard/books/${bookId}`)}>
+                      Quay lại sách
+                    </Button>
+                    {!progress?.completed ? (
                       <Button type="primary" icon={<CheckCircleOutlined />} loading={completing} onClick={handleCompleteChapter}>
                         Hoàn thành chương
                       </Button>
-                    )}
-                    {progress?.isCompleted && (
-                      <Tag color="success" icon={<CheckCircleOutlined />}>
+                    ) : (
+                      <Tag color="success" icon={<CheckCircleOutlined />} style={{ padding: '6px 12px', fontSize: '14px' }}>
                         Đã hoàn thành
                       </Tag>
                     )}
@@ -147,7 +212,7 @@ const ChapterLearning: React.FC = () => {
               <Row style={{ marginTop: 16 }}>
                 <Col span={24}>
                   <Text strong>Tiến độ học tập:</Text>
-                  <Progress percent={progress?.progressPercentage || 0} />
+                  <Progress percent={progress?.percent || 0} />
                 </Col>
               </Row>
             </Card>
@@ -204,6 +269,11 @@ const ChapterLearning: React.FC = () => {
                                 </Tag>
                               )}
                               {word.meaning && <Text>{word.meaning}</Text>}
+                              {word.exampleSentence && (
+                                <div style={{ marginTop: 8, fontSize: 12, color: '#666', fontStyle: 'italic' }}>
+                                  "{word.exampleSentence}"
+                                </div>
+                              )}
                             </Space>
                           </Card>
                         </Col>
@@ -257,6 +327,25 @@ const ChapterLearning: React.FC = () => {
                                 <Paragraph style={{ marginTop: 8 }}>{grammar.explanation}</Paragraph>
                               </div>
                             )}
+                            {grammar.examples && grammar.examples.length > 0 && (
+                              <div>
+                                <Text strong>Ví dụ:</Text>
+                                <List
+                                  size="small"
+                                  dataSource={grammar.examples}
+                                  renderItem={item => (
+                                    <List.Item>
+                                      <Space direction="vertical" size={0}>
+                                        <Text>{item.sentence}</Text>
+                                        <Text type="secondary" style={{ fontSize: 12 }}>
+                                          {item.translation}
+                                        </Text>
+                                      </Space>
+                                    </List.Item>
+                                  )}
+                                />
+                              </div>
+                            )}
                           </Space>
                         </Panel>
                       ))}
@@ -278,37 +367,11 @@ const ChapterLearning: React.FC = () => {
                     <Empty description="Chưa có bài tập nghe" />
                   ) : (
                     <List
+                      grid={{ gutter: 16, column: 1 }}
                       dataSource={exercises.listening}
-                      renderItem={(ex, index) => (
-                        <List.Item
-                          key={ex.id}
-                          actions={[
-                            <Button key="do" type="primary" onClick={() => navigate(`/dashboard/exercise/listening/${ex.id}`)}>
-                              Làm bài
-                            </Button>,
-                          ]}
-                        >
-                          <List.Item.Meta
-                            avatar={
-                              <div
-                                style={{
-                                  width: 40,
-                                  height: 40,
-                                  borderRadius: '50%',
-                                  backgroundColor: '#1890ff',
-                                  color: 'white',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  fontWeight: 'bold',
-                                }}
-                              >
-                                {index + 1}
-                              </div>
-                            }
-                            title={`Bài nghe ${index + 1}`}
-                            description={ex.question}
-                          />
+                      renderItem={ex => (
+                        <List.Item>
+                          <ListeningExercise exercise={ex} />
                         </List.Item>
                       )}
                     />
@@ -328,37 +391,11 @@ const ChapterLearning: React.FC = () => {
                     <Empty description="Chưa có bài tập nói" />
                   ) : (
                     <List
+                      grid={{ gutter: 16, column: 1 }}
                       dataSource={exercises.speaking}
-                      renderItem={(ex, index) => (
-                        <List.Item
-                          key={ex.id}
-                          actions={[
-                            <Button key="do" type="primary" onClick={() => navigate(`/dashboard/exercise/speaking/${ex.id}`)}>
-                              Làm bài
-                            </Button>,
-                          ]}
-                        >
-                          <List.Item.Meta
-                            avatar={
-                              <div
-                                style={{
-                                  width: 40,
-                                  height: 40,
-                                  borderRadius: '50%',
-                                  backgroundColor: '#52c41a',
-                                  color: 'white',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  fontWeight: 'bold',
-                                }}
-                              >
-                                {index + 1}
-                              </div>
-                            }
-                            title={`Bài nói ${index + 1}`}
-                            description={ex.speakingTopic?.context}
-                          />
+                      renderItem={ex => (
+                        <List.Item>
+                          <SpeakingExercise exercise={ex} />
                         </List.Item>
                       )}
                     />
@@ -378,37 +415,11 @@ const ChapterLearning: React.FC = () => {
                     <Empty description="Chưa có bài tập đọc" />
                   ) : (
                     <List
+                      grid={{ gutter: 16, column: 1 }}
                       dataSource={exercises.reading}
-                      renderItem={(ex, index) => (
-                        <List.Item
-                          key={ex.id}
-                          actions={[
-                            <Button key="do" type="primary" onClick={() => navigate(`/dashboard/exercise/reading/${ex.id}`)}>
-                              Làm bài
-                            </Button>,
-                          ]}
-                        >
-                          <List.Item.Meta
-                            avatar={
-                              <div
-                                style={{
-                                  width: 40,
-                                  height: 40,
-                                  borderRadius: '50%',
-                                  backgroundColor: '#faad14',
-                                  color: 'white',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  fontWeight: 'bold',
-                                }}
-                              >
-                                {index + 1}
-                              </div>
-                            }
-                            title={`Bài đọc ${index + 1}`}
-                            description={ex.question}
-                          />
+                      renderItem={ex => (
+                        <List.Item>
+                          <ReadingExercise exercise={ex} />
                         </List.Item>
                       )}
                     />
@@ -428,44 +439,49 @@ const ChapterLearning: React.FC = () => {
                     <Empty description="Chưa có bài tập viết" />
                   ) : (
                     <List
+                      grid={{ gutter: 16, column: 1 }}
                       dataSource={exercises.writing}
-                      renderItem={(ex, index) => (
-                        <List.Item
-                          key={ex.id}
-                          actions={[
-                            <Button key="do" type="primary" onClick={() => navigate(`/dashboard/exercise/writing/${ex.id}`)}>
-                              Làm bài
-                            </Button>,
-                          ]}
-                        >
-                          <List.Item.Meta
-                            avatar={
-                              <div
-                                style={{
-                                  width: 40,
-                                  height: 40,
-                                  borderRadius: '50%',
-                                  backgroundColor: '#eb2f96',
-                                  color: 'white',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  fontWeight: 'bold',
-                                }}
-                              >
-                                {index + 1}
-                              </div>
-                            }
-                            title={`Bài viết ${index + 1}`}
-                            description={ex.writingTask?.prompt}
-                          />
+                      renderItem={ex => (
+                        <List.Item>
+                          <WritingExercise exercise={ex} />
                         </List.Item>
                       )}
                     />
                   )}
                 </TabPane>
+
+                <TabPane
+                  tab={
+                    <span>
+                      <FormOutlined />
+                      Thảo luận
+                    </span>
+                  }
+                  key="discussion"
+                >
+                  <ChapterDiscussion chapterId={parseInt(chapterId || '0', 10)} />
+                </TabPane>
               </Tabs>
             </Card>
+
+            {/* Footer Navigation */}
+            <Row justify="space-between" style={{ marginTop: 24 }}>
+              <Col>
+                <Button icon={<LeftOutlined />} disabled={!prevChapterId} onClick={() => handleNavigateChapter(prevChapterId)}>
+                  Chương trước
+                </Button>
+              </Col>
+              <Col>
+                <Button
+                  type="primary"
+                  icon={<RightOutlined />}
+                  disabled={!nextChapterId}
+                  onClick={() => handleNavigateChapter(nextChapterId)}
+                >
+                  Chương tiếp theo
+                </Button>
+              </Col>
+            </Row>
           </>
         )}
       </Spin>

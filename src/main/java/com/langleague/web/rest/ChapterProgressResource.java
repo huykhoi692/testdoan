@@ -5,7 +5,6 @@ import com.langleague.service.ChapterProgressService;
 import com.langleague.service.dto.ChapterProgressDTO;
 import com.langleague.service.dto.MyChapterDTO;
 import com.langleague.web.rest.errors.BadRequestAlertException;
-import com.langleague.security.SecurityUtils;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.net.URI;
@@ -53,10 +52,6 @@ public class ChapterProgressResource {
 
     /**
      * {@code POST  /chapter-progresses} : Create a new chapterProgress.
-     *
-     * @param chapterProgressDTO the chapterProgressDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new chapterProgressDTO, or with status {@code 400 (Bad Request)} if the chapterProgress has already an ID.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
     public ResponseEntity<ChapterProgressDTO> createChapterProgress(@Valid @RequestBody ChapterProgressDTO chapterProgressDTO)
@@ -73,13 +68,6 @@ public class ChapterProgressResource {
 
     /**
      * {@code PUT  /chapter-progresses/:id} : Updates an existing chapterProgress.
-     *
-     * @param id the id of the chapterProgressDTO to save.
-     * @param chapterProgressDTO the chapterProgressDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated chapterProgressDTO,
-     * or with status {@code 400 (Bad Request)} if the chapterProgressDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the chapterProgressDTO couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
     public ResponseEntity<ChapterProgressDTO> updateChapterProgress(
@@ -105,15 +93,7 @@ public class ChapterProgressResource {
     }
 
     /**
-     * {@code PATCH  /chapter-progresses/:id} : Partial updates given fields of an existing chapterProgress, field will ignore if it is null
-     *
-     * @param id the id of the chapterProgressDTO to save.
-     * @param chapterProgressDTO the chapterProgressDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated chapterProgressDTO,
-     * or with status {@code 400 (Bad Request)} if the chapterProgressDTO is not valid,
-     * or with status {@code 404 (Not Found)} if the chapterProgressDTO is not found,
-     * or with status {@code 500 (Internal Server Error)} if the chapterProgressDTO couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     * {@code PATCH  /chapter-progresses/:id} : Partial updates given fields of an existing chapterProgress.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<ChapterProgressDTO> partialUpdateChapterProgress(
@@ -142,9 +122,6 @@ public class ChapterProgressResource {
 
     /**
      * {@code GET  /chapter-progresses} : get all the chapterProgresses.
-     *
-     * @param pageable the pagination information.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of chapterProgresses in body.
      */
     @GetMapping("")
     public ResponseEntity<List<ChapterProgressDTO>> getAllChapterProgresses(
@@ -158,9 +135,6 @@ public class ChapterProgressResource {
 
     /**
      * {@code GET  /chapter-progresses/:id} : get the "id" chapterProgress.
-     *
-     * @param id the id of the chapterProgressDTO to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the chapterProgressDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
     public ResponseEntity<ChapterProgressDTO> getChapterProgress(@PathVariable("id") Long id) {
@@ -171,9 +145,6 @@ public class ChapterProgressResource {
 
     /**
      * {@code DELETE  /chapter-progresses/:id} : delete the "id" chapterProgress.
-     *
-     * @param id the id of the chapterProgress to delete.
-     * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteChapterProgress(@PathVariable("id") Long id) {
@@ -186,34 +157,26 @@ public class ChapterProgressResource {
 
     /**
      * {@code POST  /chapter-progresses/chapter/:chapterId/complete} : Mark a chapter as completed.
-     * Use case 24: Mark lesson as completed
-     *
-     * @param chapterId the id of the chapter to mark as completed.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)}.
      */
     @PostMapping("/chapter/{chapterId}/complete")
     public ResponseEntity<Void> markChapterComplete(@PathVariable("chapterId") Long chapterId) {
         LOG.debug("REST request to mark Chapter as completed : {}", chapterId);
-        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
+        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated")
+        );
         chapterProgressService.markAsCompleted(chapterId, userLogin);
         return ResponseEntity.ok().build();
     }
 
-
     /**
      * {@code PUT  /chapter-progresses/chapter/:chapterId/progress} : Update progress for a chapter.
-     * Use case 25: Save progress
-     *
-     * @param chapterId the id of the chapter.
-     * @param percent the completion percentage (0-100).
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)}.
      */
     @PutMapping("/chapter/{chapterId}/progress")
     public ResponseEntity<Void> updateChapterProgress(@PathVariable("chapterId") Long chapterId, @RequestParam("percent") Integer percent) {
         LOG.debug("REST request to update progress for Chapter {} to {}%", chapterId, percent);
-        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
+        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated")
+        );
 
         if (percent < 0 || percent > 100) {
             throw new BadRequestAlertException("Percent must be between 0 and 100", ENTITY_NAME, "invalidpercent");
@@ -225,16 +188,13 @@ public class ChapterProgressResource {
 
     /**
      * {@code GET  /chapter-progresses/book/:bookId} : Get all progress for chapters in a book.
-     * Use case 26: View learning progress
-     *
-     * @param bookId the id of the book.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of progress in body.
      */
     @GetMapping("/book/{bookId}")
     public ResponseEntity<List<ChapterProgressDTO>> getProgressByBook(@PathVariable("bookId") Long bookId) {
         LOG.debug("REST request to get progress for book : {}", bookId);
-        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
+        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated")
+        );
 
         List<ChapterProgressDTO> progress = chapterProgressService.getProgressByBook(bookId, userLogin);
         return ResponseEntity.ok().body(progress);
@@ -242,16 +202,13 @@ public class ChapterProgressResource {
 
     /**
      * {@code GET  /chapter-progresses/book/:bookId/completion} : Get overall completion percentage for a book.
-     * Use case 26: View learning progress
-     *
-     * @param bookId the id of the book.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and completion percentage in body.
      */
     @GetMapping("/book/{bookId}/completion")
     public ResponseEntity<Double> getBookCompletion(@PathVariable("bookId") Long bookId) {
         LOG.debug("REST request to get completion for book : {}", bookId);
-        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
+        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated")
+        );
 
         Double completion = chapterProgressService.getBookCompletionPercentage(bookId, userLogin);
         return ResponseEntity.ok().body(completion);
@@ -259,14 +216,13 @@ public class ChapterProgressResource {
 
     /**
      * {@code GET  /chapter-progresses/my-chapters} : Get all chapters that the user has saved and is learning.
-     *
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of chapters with progress in body.
      */
     @GetMapping("/my-chapters")
     public ResponseEntity<List<MyChapterDTO>> getMyChapters() {
         LOG.debug("REST request to get my chapters");
-        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
+        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated")
+        );
 
         List<MyChapterDTO> chapters = chapterProgressService.getMyChapters(userLogin);
         return ResponseEntity.ok().body(chapters);
@@ -274,14 +230,13 @@ public class ChapterProgressResource {
 
     /**
      * {@code GET  /chapter-progresses/my-chapters/in-progress} : Get chapters that the user is currently learning.
-     *
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of in-progress chapters in body.
      */
     @GetMapping("/my-chapters/in-progress")
     public ResponseEntity<List<MyChapterDTO>> getMyInProgressChapters() {
         LOG.debug("REST request to get my in-progress chapters");
-        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
+        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated")
+        );
 
         List<MyChapterDTO> chapters = chapterProgressService.getMyInProgressChapters(userLogin);
         return ResponseEntity.ok().body(chapters);
@@ -289,14 +244,13 @@ public class ChapterProgressResource {
 
     /**
      * {@code GET  /chapter-progresses/my-chapters/completed} : Get chapters that the user has completed.
-     *
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of completed chapters in body.
      */
     @GetMapping("/my-chapters/completed")
     public ResponseEntity<List<MyChapterDTO>> getMyCompletedChapters() {
         LOG.debug("REST request to get my completed chapters");
-        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated"));
+        String userLogin = com.langleague.security.SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new BadRequestAlertException("User not authenticated", ENTITY_NAME, "notauthenticated")
+        );
 
         List<MyChapterDTO> chapters = chapterProgressService.getMyCompletedChapters(userLogin);
         return ResponseEntity.ok().body(chapters);

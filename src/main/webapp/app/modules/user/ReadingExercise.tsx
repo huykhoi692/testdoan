@@ -10,18 +10,27 @@ import { colors, spacing, borderRadius, shadows, typography, cardBaseStyle, page
 
 const { Title, Text, Paragraph } = Typography;
 
-const ReadingExercise: React.FC = () => {
+interface ReadingExerciseProps {
+  exercise?: IReadingExercise;
+}
+
+const ReadingExercise: React.FC<ReadingExerciseProps> = ({ exercise: propExercise }) => {
   const { exerciseId } = useParams<{ exerciseId: string }>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const [exercise, setExercise] = useState<IReadingExercise | null>(null);
+  const [exercise, setExercise] = useState<IReadingExercise | null>(propExercise || null);
   const [selectedAnswer, setSelectedAnswer] = useState<string>('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!propExercise);
 
   useEffect(() => {
+    if (propExercise) {
+      setExercise(propExercise);
+      setLoading(false);
+      return;
+    }
     if (!exerciseId) return;
 
     const fetchExercise = async () => {
@@ -38,7 +47,7 @@ const ReadingExercise: React.FC = () => {
     };
 
     fetchExercise();
-  }, [exerciseId, dispatch]);
+  }, [exerciseId, propExercise]);
 
   const handleSubmit = () => {
     if (!selectedAnswer) {
@@ -58,7 +67,7 @@ const ReadingExercise: React.FC = () => {
           upsertChapterProgress({
             chapterId: exercise.chapterId,
             exercisesCompleted: 1,
-          }),
+          } as any),
         );
       }
     } else {

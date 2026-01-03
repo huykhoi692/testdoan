@@ -70,7 +70,8 @@ public class StudySessionService {
             .orElseThrow(() -> new BadRequestAlertException("User profile not found", ENTITY_NAME, "usernotfound"));
 
         // Find or create UserChapter
-        UserChapter userChapter = userChapterRepository.findByAppUserIdAndChapterId(appUser.getId(), chapterId)
+        UserChapter userChapter = userChapterRepository
+            .findByAppUserIdAndChapterId(appUser.getId(), chapterId)
             .orElseGet(() -> {
                 // Create new UserChapter if not exists (logic to be implemented or reused)
                 // For now, assuming we need to handle this.
@@ -85,18 +86,20 @@ public class StudySessionService {
             });
 
         if (userChapter == null) {
-             // If UserChapter doesn't exist, we might need to create it.
-             // But UserChapter creation might require more info.
-             // Let's assume for now we just create a session linked to AppUser and Chapter directly?
-             // StudySession usually links to UserChapter.
-             // Let's check StudySession domain.
-             throw new BadRequestAlertException("UserChapter not found. Please start the chapter first.", ENTITY_NAME, "userchapternotfound");
+            // If UserChapter doesn't exist, we might need to create it.
+            // But UserChapter creation might require more info.
+            // Let's assume for now we just create a session linked to AppUser and Chapter directly?
+            // StudySession usually links to UserChapter.
+            // Let's check StudySession domain.
+            throw new BadRequestAlertException(
+                "UserChapter not found. Please start the chapter first.",
+                ENTITY_NAME,
+                "userchapternotfound"
+            );
         }
 
-        StudySession studySession = new StudySession();
+        StudySession studySession = new StudySession().userChapter(userChapter).startAt(Instant.now());
         studySession.setAppUser(appUser);
-        studySession.setUserChapter(userChapter);
-        studySession.setStartAt(Instant.now());
 
         studySession = studySessionRepository.save(studySession);
         return studySessionMapper.toDto(studySession);

@@ -10,19 +10,28 @@ import { colors, spacing, borderRadius, shadows, typography, cardBaseStyle, page
 
 const { Title, Text, Paragraph } = Typography;
 
-const SpeakingExercise: React.FC = () => {
+interface SpeakingExerciseProps {
+  exercise?: ISpeakingExercise;
+}
+
+const SpeakingExercise: React.FC<SpeakingExerciseProps> = ({ exercise: propExercise }) => {
   const { exerciseId } = useParams<{ exerciseId: string }>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const [exercise, setExercise] = useState<ISpeakingExercise | null>(null);
+  const [exercise, setExercise] = useState<ISpeakingExercise | null>(propExercise || null);
   const [isRecording, setIsRecording] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!propExercise);
   const [recordingTime, setRecordingTime] = useState(0);
   const [samplePlaying, setSamplePlaying] = useState(false);
 
   useEffect(() => {
+    if (propExercise) {
+      setExercise(propExercise);
+      setLoading(false);
+      return;
+    }
     if (!exerciseId) return;
 
     const fetchExercise = async () => {
@@ -39,7 +48,7 @@ const SpeakingExercise: React.FC = () => {
     };
 
     fetchExercise();
-  }, [exerciseId, dispatch]);
+  }, [exerciseId, propExercise]);
 
   useEffect(() => {
     let timer: ReturnType<typeof setInterval>;
@@ -79,7 +88,7 @@ const SpeakingExercise: React.FC = () => {
         upsertChapterProgress({
           chapterId: exercise.chapterId,
           exercisesCompleted: 1,
-        }),
+        } as any),
       );
     }
   };

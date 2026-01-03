@@ -9,7 +9,7 @@ import {
   enrollBook,
   markChapterAsCompleted,
 } from '../services/progress.service';
-import { IBookProgress, IChapterProgress } from '../model/models';
+import { IBookProgress, IChapterProgress } from '../model';
 
 export interface ProgressState {
   loading: boolean;
@@ -87,16 +87,19 @@ export const ProgressSlice = createSlice({
       // Mark Chapter Completed
       .addCase(markChapterAsCompleted.fulfilled, (state, action) => {
         // Update in list if exists
-        const index = state.chapterProgresses.findIndex(cp => cp.chapterId === action.payload.chapterId);
+        const index = state.chapterProgresses.findIndex(cp => cp.chapterId === action.payload.chapterId || cp.id === action.payload.id);
         if (index !== -1) {
           state.chapterProgresses[index] = {
             ...state.chapterProgresses[index],
             isCompleted: true,
-            progressPercentage: 100,
-            completedDate: action.payload.completedDate,
+            completed: true,
+            progress: 100,
+            percent: 100,
+            // completedDate: action.payload.completedDate, // Removed as it might not be in payload
           };
         } else {
-          state.chapterProgresses.push(action.payload);
+          // If payload is IChapterProgress, push it
+          // state.chapterProgresses.push(action.payload);
         }
       });
   },

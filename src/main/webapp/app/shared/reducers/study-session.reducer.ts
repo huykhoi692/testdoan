@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { serializeAxiosError } from '../utils/reducer.utils';
-import { IStudySession } from '../model/models';
+import { IStudySession } from '../model';
 
 export type StudySession = IStudySession;
 

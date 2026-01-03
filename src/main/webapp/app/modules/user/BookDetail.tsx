@@ -12,7 +12,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAppDispatch } from 'app/config/store';
 import { getBook, getBookChapters } from 'app/shared/services/book.service';
 import { getBookProgress, getChapterProgressesByBook, enrollBook } from 'app/shared/services/progress.service';
-import { IBook, IChapter, IBookProgress, IChapterProgress } from 'app/shared/model/models';
+import { IBook, IChapter, IBookProgress, IChapterProgress } from 'app/shared/model';
 import * as ds from 'app/shared/styles/design-system';
 
 const { Title, Text, Paragraph } = Typography;
@@ -74,7 +74,7 @@ const BookDetail: React.FC = () => {
 
   const getChapterProgress = (chapterId: number) => chapterProgresses.find(cp => cp.chapterId === chapterId);
 
-  const completedChapters = chapterProgresses.filter(cp => cp.isCompleted).length;
+  const completedChapters = chapterProgresses.filter(cp => cp.completed).length;
   const overallProgress = chapters.length > 0 ? (completedChapters / chapters.length) * 100 : 0;
 
   const handleStartLearning = async () => {
@@ -212,7 +212,7 @@ const BookDetail: React.FC = () => {
                   dataSource={chapters}
                   renderItem={(chapter, index) => {
                     const progress = getChapterProgress(chapter.id);
-                    const isCompleted = progress?.isCompleted || false;
+                    const isCompleted = progress?.completed || false;
                     const isLocked = !bookProgress && index > 0; // Lock chapters if not enrolled (except first one maybe? or all?)
                     // Actually requirement doesn't say lock, but "Start Learning" is needed.
                     // Let's keep it simple: if not enrolled, clicking chapter triggers enrollment or warning?

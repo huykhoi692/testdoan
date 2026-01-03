@@ -10,6 +10,8 @@ import com.langleague.domain.StudySession;
 import com.langleague.domain.User;
 import com.langleague.repository.AppUserRepository;
 import com.langleague.repository.StudySessionRepository;
+import com.langleague.repository.UserChapterRepository;
+import com.langleague.security.DomainUserDetailsService;
 import com.langleague.service.dto.AppUserDTO;
 import com.langleague.service.dto.StudySessionDTO;
 import com.langleague.service.mapper.StudySessionMapper;
@@ -48,6 +50,9 @@ class StudySessionOverlapDetectionTest {
     @Mock
     private AppUserRepository appUserRepository;
 
+    @Mock
+    private UserChapterRepository userChapterRepository;
+
     private StudySessionService studySessionService;
 
     private AppUser testAppUser;
@@ -57,7 +62,13 @@ class StudySessionOverlapDetectionTest {
 
     @BeforeEach
     void setUp() {
-        studySessionService = new StudySessionService(studySessionRepository, studySessionMapper, studySessionValidator, appUserRepository);
+        studySessionService = new StudySessionService(
+            studySessionRepository,
+            studySessionMapper,
+            studySessionValidator,
+            appUserRepository,
+            userChapterRepository
+        );
 
         // Setup test user
         testUser = new User();
@@ -69,7 +80,15 @@ class StudySessionOverlapDetectionTest {
         testAppUser.setInternalUser(testUser);
 
         // Mock security context
-        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken("testuser", "password"));
+        DomainUserDetailsService.UserWithId userWithId = new DomainUserDetailsService.UserWithId(
+            "testuser",
+            "password",
+            new ArrayList<>(),
+            TEST_USER_ID
+        );
+        SecurityContextHolder.getContext().setAuthentication(
+            new UsernamePasswordAuthenticationToken(userWithId, "password", new ArrayList<>())
+        );
     }
 
     /**
@@ -295,14 +314,14 @@ class StudySessionOverlapDetectionTest {
         // Mock validator to throw error for duration < 1
         doThrow(new BadRequestAlertException("Session duration must be at least 1 minute(s)", "studySession", "durationtooshort"))
             .when(studySessionValidator)
-            .validate(any());
+            .validateCreate(any());
 
         // When & Then
         assertThatThrownBy(() -> studySessionService.save(newSessionDTO))
             .isInstanceOf(BadRequestAlertException.class)
             .hasMessageContaining("durationtooshort");
 
-        verify(studySessionValidator).validate(any());
+        verify(studySessionValidator).validateCreate(any());
     }
 
     /**

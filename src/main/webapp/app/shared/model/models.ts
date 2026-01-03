@@ -59,6 +59,7 @@ export interface IWord {
   imageUrl?: string;
   chapterId?: number;
   orderIndex?: number;
+  exampleSentence?: string; // Added for frontend display
 }
 
 // WordExample DTO - matches WordExampleDTO.java
@@ -78,6 +79,7 @@ export interface IGrammar {
   explanation?: string;
   chapterId?: number;
   orderIndex?: number;
+  examples?: IGrammarExample[]; // Added for frontend display
 }
 
 // GrammarExample DTO
@@ -148,18 +150,7 @@ export interface IWritingExercise extends IExerciseBase {
   maxScore?: number;
 }
 
-// StudySession DTO - matches StudySessionDTO.java
-export interface IStudySession {
-  id?: number;
-  userId?: number;
-  chapterId?: number;
-  startTime?: string;
-  endTime?: string;
-  duration?: number;
-  status?: string;
-  progress?: number;
-  score?: number;
-}
+// StudySession DTO - Moved to study-session.model.ts
 
 // UserProgress DTO - matches UserProgressDTO.java (Book Progress)
 export interface IBookProgress {
@@ -176,19 +167,7 @@ export interface IBookProgress {
   completedDate?: string;
 }
 
-// ChapterProgress DTO
-export interface IChapterProgress {
-  id?: number;
-  userId?: number;
-  chapterId?: number;
-  progressPercentage?: number;
-  wordsLearned?: number;
-  grammarsLearned?: number;
-  exercisesCompleted?: number;
-  isCompleted?: boolean;
-  completedDate?: string;
-  lastAccessedDate?: string;
-}
+// ChapterProgress DTO - Moved to chapter-progress.model.ts
 
 // UserVocabulary DTO - matches UserVocabularyDTO.java
 export interface IUserVocabulary {

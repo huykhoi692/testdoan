@@ -13,19 +13,28 @@ import { colors, spacing, borderRadius, shadows, typography, cardBaseStyle, page
 
 const { Title, Text, Paragraph } = Typography;
 
-const WritingExercise: React.FC = () => {
+interface WritingExerciseProps {
+  exercise?: IWritingExercise;
+}
+
+const WritingExercise: React.FC<WritingExerciseProps> = ({ exercise: propExercise }) => {
   const { exerciseId } = useParams<{ exerciseId: string }>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const haptic = useHapticFeedback();
 
-  const [exercise, setExercise] = useState<IWritingExercise | null>(null);
+  const [exercise, setExercise] = useState<IWritingExercise | null>(propExercise || null);
   const [userAnswer, setUserAnswer] = useState<string>('');
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!propExercise);
   const [showSample, setShowSample] = useState(false);
 
   useEffect(() => {
+    if (propExercise) {
+      setExercise(propExercise);
+      setLoading(false);
+      return;
+    }
     if (!exerciseId) return;
 
     const fetchExercise = async () => {
@@ -42,7 +51,7 @@ const WritingExercise: React.FC = () => {
     };
 
     fetchExercise();
-  }, [exerciseId, dispatch]);
+  }, [exerciseId, propExercise]);
 
   const countWords = (text: string) => {
     // Count Korean characters as words
@@ -77,7 +86,7 @@ const WritingExercise: React.FC = () => {
         upsertChapterProgress({
           chapterId: exercise.chapterId,
           exercisesCompleted: 1,
-        }),
+        } as any),
       );
     }
   };

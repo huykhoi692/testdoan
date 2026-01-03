@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { IBookProgress, IChapterProgress } from '../model/models';
+import { IBookProgress, IChapterProgress } from '../model';
 
 // ==================== BOOK PROGRESS APIs - Using UserBookResource ====================
 
@@ -196,9 +196,11 @@ export const markChapterAsCompleted = createAsyncThunk('progress/complete_chapte
     // Return minimal progress object to update state
     return {
       chapterId,
+      completed: true,
       isCompleted: true,
-      progressPercentage: 100,
-      completedDate: new Date().toISOString(),
+      percent: 100,
+      progress: 100,
+      // completedDate: new Date().toISOString(), // Not in interface currently
     } as IChapterProgress;
   } catch (error: any) {
     console.error('Error marking chapter as completed:', error);

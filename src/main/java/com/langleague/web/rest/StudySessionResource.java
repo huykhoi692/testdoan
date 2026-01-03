@@ -1,6 +1,11 @@
 package com.langleague.web.rest;
 
+import com.langleague.domain.AppUser;
+import com.langleague.domain.UserChapter;
+import com.langleague.repository.AppUserRepository;
 import com.langleague.repository.StudySessionRepository;
+import com.langleague.repository.UserChapterRepository;
+import com.langleague.security.SecurityUtils;
 import com.langleague.service.StudySessionService;
 import com.langleague.service.dto.StudySessionDTO;
 import com.langleague.web.rest.errors.BadRequestAlertException;
@@ -23,11 +28,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
-import com.langleague.repository.UserChapterRepository;
-import com.langleague.domain.UserChapter;
-import com.langleague.domain.AppUser;
-import com.langleague.repository.AppUserRepository;
-import com.langleague.security.SecurityUtils;
 
 /**
  * REST controller for managing {@link com.langleague.domain.StudySession}.
@@ -215,6 +215,7 @@ public class StudySessionResource {
     }
 
     public static class StartSessionRequest {
+
         private Long chapterId;
 
         public Long getChapterId() {
