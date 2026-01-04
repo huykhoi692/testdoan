@@ -16,6 +16,9 @@ import achievement from '../shared/reducers/achievement.reducer';
 import favorite from '../shared/reducers/favorite.reducer';
 import userBook from '../shared/reducers/user-book.reducer';
 import userChapter from '../shared/reducers/user-chapter.reducer';
+import word from '../shared/reducers/word.reducer';
+import grammar from '../shared/reducers/grammar.reducer';
+import exercise from '../shared/reducers/exercise.reducer';
 
 const store = configureStore({
   reducer: {
@@ -32,6 +35,9 @@ const store = configureStore({
     favorite,
     userBook,
     userChapter,
+    word,
+    grammar,
+    exercise,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

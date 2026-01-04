@@ -49,8 +49,8 @@ public class Book implements Serializable {
     @Column(name = "thumbnail", length = 500)
     private String thumbnail;
 
-    @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
+    @Column(name = "is_activate", nullable = false)
+    private Boolean isActivate = false;
 
     @Column(name = "average_rating")
     private Double averageRating = 0.0;
@@ -147,17 +147,17 @@ public class Book implements Serializable {
         this.thumbnail = thumbnail;
     }
 
-    public Boolean getIsActive() {
-        return this.isActive;
+    public Boolean getIsActivate() {
+        return this.isActivate;
     }
 
-    public Book isActive(Boolean isActive) {
-        this.setIsActive(isActive);
+    public Book isActivate(Boolean isActivate) {
+        this.setIsActivate(isActivate);
         return this;
     }
 
-    public void setIsActive(Boolean isActive) {
-        this.isActive = isActive;
+    public void setIsActivate(Boolean isActivate) {
+        this.isActivate = isActivate;
     }
 
     public Double getAverageRating() {

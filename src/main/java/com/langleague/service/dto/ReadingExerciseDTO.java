@@ -28,6 +28,8 @@ public class ReadingExerciseDTO implements Serializable {
     @NotNull
     private Integer maxScore;
 
+    private java.util.Set<ReadingOptionDTO> options = new java.util.HashSet<>();
+
     public Long getId() {
         return id;
     }
@@ -66,6 +68,14 @@ public class ReadingExerciseDTO implements Serializable {
 
     public void setMaxScore(Integer maxScore) {
         this.maxScore = maxScore;
+    }
+
+    public java.util.Set<ReadingOptionDTO> getOptions() {
+        return options;
+    }
+
+    public void setOptions(java.util.Set<ReadingOptionDTO> options) {
+        this.options = options;
     }
 
     @Override

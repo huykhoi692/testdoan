@@ -38,12 +38,17 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     Optional<Book> findWithFullDetailsById(Long id);
 
     /**
-     * Find all active books with chapters eagerly loaded.
+     * Find all activated books with chapters eagerly loaded.
      * Use case: Display book list with chapter count
      */
     @EntityGraph(attributePaths = { "chapters" })
-    @Query("SELECT b FROM Book b WHERE b.isActive = true")
-    Page<Book> findActiveWithChapters(Pageable pageable);
+    @Query("SELECT b FROM Book b WHERE b.isActivate = true")
+    Page<Book> findActivatedWithChapters(Pageable pageable);
+
+    /**
+     * Find books waiting for approval (isActivate = false).
+     */
+    List<Book> findByIsActivateFalse();
 
     /**
      * Find books by title or description containing keyword (case-insensitive).
@@ -82,33 +87,33 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     boolean existsByTitleAndIdNot(String title, Long id);
 
     /**
-     * Find only active books.
-     * Use case: Display only active books to users
+     * Find only activated books.
+     * Use case: Display only activated books to users
      */
-    Page<Book> findByIsActiveTrue(Pageable pageable);
+    Page<Book> findByIsActivateTrue(Pageable pageable);
 
     /**
-     * Find active books by level.
+     * Find activated books by level.
      */
-    List<Book> findByIsActiveTrueAndLevel(Level level);
+    List<Book> findByIsActivateTrueAndLevel(Level level);
 
     /**
-     * Find active books by multiple levels.
+     * Find activated books by multiple levels.
      */
-    List<Book> findByIsActiveTrueAndLevelIn(List<Level> levels);
+    List<Book> findByIsActivateTrueAndLevelIn(List<Level> levels);
 
     /**
-     * Search active books only.
+     * Search activated books only.
      */
-    Page<Book> findByIsActiveTrueAndTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
+    Page<Book> findByIsActivateTrueAndTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
         String title,
         String description,
         Pageable pageable
     );
 
     /**
-     * Find only inactive books.
-     * Use case: Display only inactive books to admins
+     * Find only inactivated books.
+     * Use case: Display only inactivated books to admins
      */
-    Page<Book> findByIsActiveFalse(Pageable pageable);
+    Page<Book> findByIsActivateFalse(Pageable pageable);
 }

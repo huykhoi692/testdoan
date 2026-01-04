@@ -20,7 +20,7 @@ const BookApproval: React.FC = () => {
   const fetchInactiveBooks = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('/api/books/inactive');
+      const response = await axios.get('/api/books/unapproved');
       setBooks(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       message.error(t('admin:bookApproval.errorLoadBooks') || 'Không thể tải danh sách sách chờ duyệt');

@@ -156,77 +156,44 @@ public class BookResource {
 
     /**
      * {@code GET  /books} : get all the books.
+     * Use case 4: View homepage (public books)
      *
      * @param pageable the pagination information.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of books in body.
      */
     @GetMapping("")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<BookDTO>> getAllBooks(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         LOG.debug("REST request to get a page of Books");
-        Page<BookDTO> page = bookService.findAll(pageable);
+        Page<BookDTO> page = bookService.findAllActivatedWithChapters(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
     /**
-     * {@code GET  /books/active} : get all active books.
-     * Use case 4: View homepage (public books)
+     * {@code GET  /books/unapproved} : get all unapproved books.
      *
-     * @param pageable the pagination information.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of active books in body.
-     */
-    @GetMapping("/active")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<BookDTO>> getActiveBooks(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
-        LOG.debug("REST request to get a page of active Books");
-        Page<BookDTO> page = bookService.findAllActive(pageable);
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
-        return ResponseEntity.ok().headers(headers).body(page.getContent());
-    }
-
-    /**
-     * {@code GET  /books/inactive} : get all inactive books for admin review (ADMIN ONLY).
-     *
-     * @param pageable the pagination information.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of inactive books in body.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of books in body.
      */
     @PreAuthorize("hasAuthority('" + AuthoritiesConstants.ADMIN + "')")
-    @GetMapping("/inactive")
-    public ResponseEntity<List<BookDTO>> getInactiveBooks(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
-        LOG.debug("REST request to get inactive Books for admin review");
-        Page<BookDTO> page = bookService.findInactive(pageable);
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
-        return ResponseEntity.ok().headers(headers).body(page.getContent());
+    @GetMapping("/unapproved")
+    public ResponseEntity<List<BookDTO>> getUnapprovedBooks() {
+        LOG.debug("REST request to get unapproved Books");
+        List<BookDTO> list = bookService.findUnapprovedBooks();
+        return ResponseEntity.ok().body(list);
     }
 
     /**
-     * {@code GET  /books/:id} : get the "id" book.
+     * {@code PUT  /books/:id/approve} : Approve a book.
      *
-     * @param id the id of the bookDTO to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the bookDTO, or with status {@code 404 (Not Found)}.
+     * @param id the id of the book to approve.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)}.
      */
-    @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<BookDTO> getBook(@PathVariable("id") Long id) {
-        LOG.debug("REST request to get Book : {}", id);
-        Optional<BookDTO> bookDTO = bookService.findOne(id);
-        return ResponseUtil.wrapOrNotFound(bookDTO);
-    }
-
-    /**
-     * {@code GET  /books/:id/details} : get the "id" book with complete details.
-     * Use case 16: View assigned lessons with complete details
-     *
-     * @param id the id of the book to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the bookDetailDTO, or with status {@code 404 (Not Found)}.
-     */
-    @GetMapping("/{id}/details")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<com.langleague.service.dto.BookDetailDTO> getBookDetails(@PathVariable("id") Long id) {
-        LOG.debug("REST request to get Book details : {}", id);
-        Optional<com.langleague.service.dto.BookDetailDTO> bookDetailDTO = bookService.findOneWithDetails(id);
-        return ResponseUtil.wrapOrNotFound(bookDetailDTO);
+    @PreAuthorize("hasAuthority('" + AuthoritiesConstants.ADMIN + "')")
+    @PutMapping("/{id}/approve")
+    public ResponseEntity<Void> approveBook(@PathVariable Long id) {
+        LOG.debug("REST request to approve Book : {}", id);
+        bookService.approveBook(id);
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -422,19 +389,7 @@ public class BookResource {
         }
     }
 
-    /**
-     * {@code PUT  /books/:id/approve} : approve and activate a book (ADMIN ONLY).
-     *
-     * @param id the id of the book to approve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the approved bookDTO.
-     */
-    @PreAuthorize("hasAuthority('" + AuthoritiesConstants.ADMIN + "')")
-    @PutMapping("/{id}/approve")
-    public ResponseEntity<BookDTO> approveBook(@PathVariable("id") Long id) {
-        LOG.debug("REST request to approve Book : {}", id);
-        BookDTO result = bookService.approve(id);
-        return ResponseEntity.ok().headers(HeaderUtil.createAlert(applicationName, "bookManagement.approved", id.toString())).body(result);
-    }
+
 
     /**
      * {@code PUT  /books/:id/reject} : reject and deactivate a book (ADMIN ONLY).

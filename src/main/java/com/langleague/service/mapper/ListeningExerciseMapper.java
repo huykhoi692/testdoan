@@ -9,14 +9,15 @@ import org.mapstruct.*;
 /**
  * Mapper for the entity {@link ListeningExercise} and its DTO {@link ListeningExerciseDTO}.
  */
-@Mapper(componentModel = "spring", uses = { ListeningAudioMapper.class })
+@Mapper(componentModel = "spring", uses = { ListeningAudioMapper.class, ListeningOptionMapper.class })
 public interface ListeningExerciseMapper extends EntityMapper<ListeningExerciseDTO, ListeningExercise> {
     @Mapping(target = "listeningAudio", source = "listeningAudio")
+    @Mapping(target = "options", source = "options")
     ListeningExerciseDTO toDto(ListeningExercise s);
 
     @Override
     @Mapping(target = "listeningAudio", ignore = true)
-    @Mapping(target = "options", ignore = true)
+    @Mapping(target = "options", source = "options")
     @Mapping(target = "removeOption", ignore = true)
     @Mapping(target = "exerciseResults", ignore = true)
     @Mapping(target = "removeExerciseResult", ignore = true)

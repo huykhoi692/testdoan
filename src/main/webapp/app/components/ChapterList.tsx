@@ -93,7 +93,7 @@ const ChapterList: React.FC<ChapterListProps> = ({ bookId }) => {
                     <Button
                       type={isCompleted ? 'default' : 'primary'}
                       block
-                      onClick={() => navigate(`/learning/${effectiveBookId}/chapter/${chapter.id}`)}
+                      onClick={() => navigate(`/dashboard/learning/${effectiveBookId}/chapter/${chapter.id}`)}
                     >
                       {isCompleted ? 'Review' : 'Continue'}
                     </Button>

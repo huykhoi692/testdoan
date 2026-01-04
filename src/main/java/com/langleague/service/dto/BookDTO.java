@@ -32,7 +32,7 @@ public class BookDTO implements Serializable {
     )
     private String thumbnail;
 
-    private Boolean isActive;
+    private Boolean isActivate;
 
     private Double averageRating;
 
@@ -78,12 +78,12 @@ public class BookDTO implements Serializable {
         this.thumbnail = thumbnail;
     }
 
-    public Boolean getIsActive() {
-        return isActive;
+    public Boolean getIsActivate() {
+        return isActivate;
     }
 
-    public void setIsActive(Boolean isActive) {
-        this.isActive = isActive;
+    public void setIsActivate(Boolean isActivate) {
+        this.isActivate = isActivate;
     }
 
     public Double getAverageRating() {

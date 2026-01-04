@@ -163,7 +163,7 @@ public class BookUploadService {
         book.setLevel(extractionDTO.getLevel());
         book.setDescription(extractionDTO.getDescription());
         book.setThumbnail(extractionDTO.getThumbnailUrl());
-        book.setIsActive(true);
+        book.setIsActivate(true);
         book.setAverageRating(0.0);
         book.setTotalReviews(0L);
 
@@ -284,7 +284,7 @@ public class BookUploadService {
             book.setLevel(metadata.getLevel());
             book.setDescription(metadata.getDescription());
             book.setThumbnail(metadata.getThumbnailUrl());
-            book.setIsActive(false); // Admin review required
+            book.setIsActivate(false); // Admin review required
             book.setAverageRating(0.0);
             book.setTotalReviews(0L);
 

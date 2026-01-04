@@ -27,9 +27,19 @@ public class ReadingExerciseService {
 
     private final ReadingExerciseMapper readingExerciseMapper;
 
-    public ReadingExerciseService(ReadingExerciseRepository readingExerciseRepository, ReadingExerciseMapper readingExerciseMapper) {
+    private final com.langleague.repository.ReadingOptionRepository readingOptionRepository;
+    private final com.langleague.service.mapper.ReadingOptionMapper readingOptionMapper;
+
+    public ReadingExerciseService(
+        ReadingExerciseRepository readingExerciseRepository,
+        ReadingExerciseMapper readingExerciseMapper,
+        com.langleague.repository.ReadingOptionRepository readingOptionRepository,
+        com.langleague.service.mapper.ReadingOptionMapper readingOptionMapper
+    ) {
         this.readingExerciseRepository = readingExerciseRepository;
         this.readingExerciseMapper = readingExerciseMapper;
+        this.readingOptionRepository = readingOptionRepository;
+        this.readingOptionMapper = readingOptionMapper;
     }
 
     /**
@@ -42,6 +52,17 @@ public class ReadingExerciseService {
         LOG.debug("Request to save ReadingExercise : {}", readingExerciseDTO);
         ReadingExercise readingExercise = readingExerciseMapper.toEntity(readingExerciseDTO);
         readingExercise = readingExerciseRepository.save(readingExercise);
+
+        // Save options if present
+        if (readingExerciseDTO.getOptions() != null) {
+            ReadingExercise finalReadingExercise = readingExercise;
+            readingExerciseDTO.getOptions().forEach(optionDTO -> {
+                com.langleague.domain.ReadingOption option = readingOptionMapper.toEntity(optionDTO);
+                option.setReadingExercise(finalReadingExercise);
+                readingOptionRepository.save(option);
+            });
+        }
+
         return readingExerciseMapper.toDto(readingExercise);
     }
 
@@ -55,6 +76,19 @@ public class ReadingExerciseService {
         LOG.debug("Request to update ReadingExercise : {}", readingExerciseDTO);
         ReadingExercise readingExercise = readingExerciseMapper.toEntity(readingExerciseDTO);
         readingExercise = readingExerciseRepository.save(readingExercise);
+
+        // Update options logic
+        if (readingExerciseDTO.getOptions() != null) {
+             ReadingExercise finalReadingExercise = readingExercise;
+             readingExerciseDTO.getOptions().stream()
+                 .filter(opt -> opt.getId() == null)
+                 .forEach(optionDTO -> {
+                     com.langleague.domain.ReadingOption option = readingOptionMapper.toEntity(optionDTO);
+                     option.setReadingExercise(finalReadingExercise);
+                     readingOptionRepository.save(option);
+                 });
+        }
+
         return readingExerciseMapper.toDto(readingExercise);
     }
 

@@ -67,8 +67,8 @@ public class BookService {
         validateBook(bookDTO);
         Book book = bookMapper.toEntity(bookDTO);
         // Set default values for new book
-        if (book.getIsActive() == null) {
-            book.setIsActive(true);
+        if (book.getIsActivate() == null) {
+            book.setIsActivate(false); // Default to pending
         }
         if (book.getAverageRating() == null) {
             book.setAverageRating(0.0);
@@ -171,7 +171,7 @@ public class BookService {
         }
 
         // Soft delete: mark as inactive instead of hard delete
-        book.setIsActive(false);
+        book.setIsActivate(false);
         bookRepository.save(book);
 
         // Audit logging
@@ -186,14 +186,14 @@ public class BookService {
     }
 
     /**
-     * Get all inactive books (for admin review).
+     * Get all inactivated books (for admin review).
      *
      * @param pageable the pagination information.
      * @return the page of books.
      */
-    public Page<BookDTO> findInactive(Pageable pageable) {
-        LOG.debug("Request to get all inactive Books");
-        return bookRepository.findByIsActiveFalse(pageable).map(bookMapper::toDto);
+    public Page<BookDTO> findInactivated(Pageable pageable) {
+        LOG.debug("Request to get all inactivated Books");
+        return bookRepository.findByIsActivateFalse(pageable).map(bookMapper::toDto);
     }
 
     /**
@@ -206,7 +206,7 @@ public class BookService {
         LOG.debug("Request to approve Book : {}", id);
         Book book = bookRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Book not found with id: " + id));
 
-        book.setIsActive(true);
+        book.setIsActivate(true);
         book = bookRepository.save(book);
 
         String currentUser = getCurrentUserLogin();
@@ -224,7 +224,7 @@ public class BookService {
         LOG.debug("Request to reject Book : {}", id);
         Book book = bookRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Book not found with id: " + id));
 
-        book.setIsActive(false);
+        book.setIsActivate(false);
         bookRepository.save(book);
 
         String currentUser = getCurrentUserLogin();
@@ -299,10 +299,10 @@ public class BookService {
         LOG.debug("Request to search Books with keyword : {}", keyword);
         try {
             if (keyword == null || keyword.trim().isEmpty()) {
-                return findAllActive(pageable);
+                return findAllActivated(pageable);
             }
             return bookRepository
-                .findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(keyword, keyword, pageable)
+                .findByIsActivateTrueAndTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(keyword, keyword, pageable)
                 .map(bookMapper::toDto);
         } catch (Exception e) {
             LOG.error("Error searching books with keyword: {}", keyword, e);
@@ -494,16 +494,54 @@ public class BookService {
     }
 
     /**
-     * Get all active books.
-     * Use case: Display only active books to users
+     * Get all activated books.
+     * Use case: Display only activated books to users
      *
      * @param pageable the pagination information
-     * @return page of active books
+     * @return page of activated books
      */
     @Transactional(readOnly = true)
-    public Page<BookDTO> findAllActive(Pageable pageable) {
-        LOG.debug("Request to get all active Books");
-        return bookRepository.findByIsActiveTrue(pageable).map(bookMapper::toDto);
+    public Page<BookDTO> findAllActivated(Pageable pageable) {
+        LOG.debug("Request to get all activated Books");
+        return bookRepository.findByIsActivateTrue(pageable).map(bookMapper::toDto);
+    }
+
+    /**
+     * Approve a book.
+     *
+     * @param id the id of the book to approve.
+     */
+    @CacheEvict(value = { "books", "booksByLevel" }, allEntries = true)
+    public void approveBook(Long id) {
+        LOG.debug("Request to approve Book : {}", id);
+        bookRepository.findById(id).ifPresent(book -> {
+            book.setIsActivate(true);
+            bookRepository.save(book);
+        });
+    }
+
+    /**
+     * Get all unapproved books.
+     *
+     * @return the list of entities.
+     */
+    @Transactional(readOnly = true)
+    public List<BookDTO> findUnapprovedBooks() {
+        LOG.debug("Request to get all unapproved Books");
+        return bookRepository.findByIsActivateFalse().stream().map(bookMapper::toDto).toList();
+    }
+
+    /**
+     * Get all activated books with chapters.
+     *
+     * @param pageable the pagination information.
+     * @return the list of entities.
+     */
+    @Transactional(readOnly = true)
+    @Cacheable(value = "books")
+    public Page<BookDTO> findAllActivatedWithChapters(Pageable pageable) {
+        LOG.debug("Request to get all activated Books with chapters");
+        return bookRepository.findActivatedWithChapters(pageable).map(bookMapper::toDto);
     }
 
     /**
@@ -519,12 +557,12 @@ public class BookService {
 
         Book book = bookRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Book not found with id: " + id));
 
-        if (Boolean.TRUE.equals(book.getIsActive())) {
+        if (Boolean.TRUE.equals(book.getIsActivate())) {
             throw new IllegalStateException("Book is already active");
         }
 
         String currentUser = getCurrentUserLogin();
-        book.setIsActive(true);
+        book.setIsActivate(true);
         bookRepository.save(book);
 
         // Audit logging

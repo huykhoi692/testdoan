@@ -19,6 +19,7 @@ import {
   Breadcrumb,
   Upload,
   Select,
+  Checkbox,
 } from 'antd';
 import {
   PlusOutlined,
@@ -29,9 +30,10 @@ import {
   FileTextOutlined,
   SoundOutlined,
   FileImageOutlined,
+  MinusCircleOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import { useAppDispatch } from 'app/config/store';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getChapter } from 'app/shared/reducers/chapter.reducer';
 import { getWordsByChapter, createWord, updateWord, deleteWord } from 'app/shared/services/word.service';
 import { getGrammarsByChapter, createGrammar, updateGrammar, deleteGrammar } from 'app/shared/services/grammar.service';
@@ -72,21 +74,24 @@ const StaffContentEditor: React.FC = () => {
   const [activeTab, setActiveTab] = useState('words');
 
   // Words state
-  const [words, setWords] = useState<IWord[]>([]);
+  const words = useAppSelector(state => state.word.entities);
+  const wordLoading = useAppSelector(state => state.word.loading);
   const [isWordModalVisible, setIsWordModalVisible] = useState(false);
   const [isEditWordMode, setIsEditWordMode] = useState(false);
   const [selectedWord, setSelectedWord] = useState<IWord | null>(null);
   const [wordForm] = Form.useForm();
 
   // Grammar state
-  const [grammars, setGrammars] = useState<IGrammar[]>([]);
+  const grammars = useAppSelector(state => state.grammar.entities);
+  const grammarLoading = useAppSelector(state => state.grammar.loading);
   const [isGrammarModalVisible, setIsGrammarModalVisible] = useState(false);
   const [isEditGrammarMode, setIsEditGrammarMode] = useState(false);
   const [selectedGrammar, setSelectedGrammar] = useState<IGrammar | null>(null);
   const [grammarForm] = Form.useForm();
 
   // Exercise state
-  const [exercises, setExercises] = useState<any[]>([]);
+  const exercises = useAppSelector(state => state.exercise.entities);
+  const exerciseLoading = useAppSelector(state => state.exercise.loading);
   const [exerciseType, setExerciseType] = useState<'LISTENING' | 'SPEAKING' | 'READING' | 'WRITING'>('LISTENING');
   const [isExerciseModalVisible, setIsExerciseModalVisible] = useState(false);
   const [isEditExerciseMode, setIsEditExerciseMode] = useState(false);
@@ -120,60 +125,36 @@ const StaffContentEditor: React.FC = () => {
   }, [chapterId]);
 
   // Fetch words
-  const fetchWords = async () => {
+  const fetchWords = () => {
     if (!chapterId) return;
-    setLoading(true);
-    try {
-      const data = await dispatch(getWordsByChapter(parseInt(chapterId, 10))).unwrap();
-      setWords(Array.isArray(data) ? data : []);
-    } catch (error: any) {
-      message.error('Không thể tải danh sách từ vựng');
-    } finally {
-      setLoading(false);
-    }
+    dispatch(getWordsByChapter(parseInt(chapterId, 10)));
   };
 
   // Fetch grammars
-  const fetchGrammars = async () => {
+  const fetchGrammars = () => {
     if (!chapterId) return;
-    setLoading(true);
-    try {
-      const data = await dispatch(getGrammarsByChapter(parseInt(chapterId, 10))).unwrap();
-      setGrammars(Array.isArray(data) ? data : []);
-    } catch (error: any) {
-      message.error('Không thể tải danh sách ngữ pháp');
-    } finally {
-      setLoading(false);
-    }
+    dispatch(getGrammarsByChapter(parseInt(chapterId, 10)));
   };
 
   // Fetch exercises by type
-  const fetchExercises = async (type: string) => {
+  const fetchExercises = (type: string) => {
     if (!chapterId) return;
-    setLoading(true);
-    try {
-      let data: any[] = [];
-      switch (type) {
-        case 'LISTENING':
-          data = await dispatch(getListeningExercisesByChapter(parseInt(chapterId, 10))).unwrap();
-          break;
-        case 'SPEAKING':
-          data = await dispatch(getSpeakingExercisesByChapter(parseInt(chapterId, 10))).unwrap();
-          break;
-        case 'READING':
-          data = await dispatch(getReadingExercisesByChapter(parseInt(chapterId, 10))).unwrap();
-          break;
-        case 'WRITING':
-          data = await dispatch(getWritingExercisesByChapter(parseInt(chapterId, 10))).unwrap();
-          break;
-        default:
-          data = [];
-      }
-      setExercises(Array.isArray(data) ? data : []);
-    } catch (error: any) {
-      message.error('Không thể tải danh sách bài tập');
-    } finally {
-      setLoading(false);
+    const cId = parseInt(chapterId, 10);
+    switch (type) {
+      case 'LISTENING':
+        dispatch(getListeningExercisesByChapter(cId));
+        break;
+      case 'SPEAKING':
+        dispatch(getSpeakingExercisesByChapter(cId));
+        break;
+      case 'READING':
+        dispatch(getReadingExercisesByChapter(cId));
+        break;
+      case 'WRITING':
+        dispatch(getWritingExercisesByChapter(cId));
+        break;
+      default:
+        break;
     }
   };
 
@@ -350,6 +331,7 @@ const StaffContentEditor: React.FC = () => {
             question: values.question,
             correctAnswer: values.correctAnswer,
             maxScore: values.maxScore || 10,
+            options: values.options,
           };
           break;
         case 'SPEAKING':
@@ -368,6 +350,7 @@ const StaffContentEditor: React.FC = () => {
             question: values.question,
             correctAnswer: values.correctAnswer,
             maxScore: values.maxScore || 10,
+            options: values.options,
           };
           break;
         case 'WRITING':
@@ -691,7 +674,13 @@ const StaffContentEditor: React.FC = () => {
                   <Button type="primary" icon={<PlusOutlined />} onClick={() => showWordModal()} style={{ marginBottom: 16 }}>
                     Thêm từ vựng
                   </Button>
-                  <Table columns={wordColumns} dataSource={words} rowKey="id" loading={loading} pagination={{ pageSize: 20 }} />
+                  <Table
+                    columns={wordColumns}
+                    dataSource={words}
+                    rowKey="id"
+                    loading={loading || wordLoading}
+                    pagination={{ pageSize: 20 }}
+                  />
                 </div>
               ),
             },
@@ -708,7 +697,13 @@ const StaffContentEditor: React.FC = () => {
                   <Button type="primary" icon={<PlusOutlined />} onClick={() => showGrammarModal()} style={{ marginBottom: 16 }}>
                     Thêm ngữ pháp
                   </Button>
-                  <Table columns={grammarColumns} dataSource={grammars} rowKey="id" loading={loading} pagination={{ pageSize: 20 }} />
+                  <Table
+                    columns={grammarColumns}
+                    dataSource={grammars}
+                    rowKey="id"
+                    loading={loading || grammarLoading}
+                    pagination={{ pageSize: 20 }}
+                  />
                 </div>
               ),
             },
@@ -740,7 +735,13 @@ const StaffContentEditor: React.FC = () => {
                             : 'Viết'}
                     </Button>
                   </Space>
-                  <Table columns={exerciseColumns} dataSource={exercises} rowKey="id" loading={loading} pagination={{ pageSize: 20 }} />
+                  <Table
+                    columns={exerciseColumns}
+                    dataSource={exercises}
+                    rowKey="id"
+                    loading={loading || exerciseLoading}
+                    pagination={{ pageSize: 20 }}
+                  />
                 </div>
               ),
             },
@@ -897,6 +898,28 @@ const StaffContentEditor: React.FC = () => {
                   <Form.Item label="Đáp án đúng" name="correctAnswer">
                     <Input placeholder="VD: A, B, C..." />
                   </Form.Item>
+                  <Form.List name="options">
+                    {(fields, { add, remove }) => (
+                      <>
+                        {fields.map(({ key, name, ...restField }) => (
+                          <Space key={key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
+                            <Form.Item {...restField} name={[name, 'text']} rules={[{ required: true, message: 'Missing option' }]}>
+                              <Input placeholder="Option text" />
+                            </Form.Item>
+                            <Form.Item {...restField} name={[name, 'isCorrect']} valuePropName="checked">
+                              <Checkbox>Correct</Checkbox>
+                            </Form.Item>
+                            <MinusCircleOutlined onClick={() => remove(name)} />
+                          </Space>
+                        ))}
+                        <Form.Item>
+                          <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                            Add Option
+                          </Button>
+                        </Form.Item>
+                      </>
+                    )}
+                  </Form.List>
                 </>
               )}
 
@@ -932,6 +955,28 @@ const StaffContentEditor: React.FC = () => {
                   <Form.Item label="Đáp án đúng" name="correctAnswer">
                     <Input placeholder="VD: A, B, C..." />
                   </Form.Item>
+                  <Form.List name="options">
+                    {(fields, { add, remove }) => (
+                      <>
+                        {fields.map(({ key, name, ...restField }) => (
+                          <Space key={key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
+                            <Form.Item {...restField} name={[name, 'text']} rules={[{ required: true, message: 'Missing option' }]}>
+                              <Input placeholder="Option text" />
+                            </Form.Item>
+                            <Form.Item {...restField} name={[name, 'isCorrect']} valuePropName="checked">
+                              <Checkbox>Correct</Checkbox>
+                            </Form.Item>
+                            <MinusCircleOutlined onClick={() => remove(name)} />
+                          </Space>
+                        ))}
+                        <Form.Item>
+                          <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                            Add Option
+                          </Button>
+                        </Form.Item>
+                      </>
+                    )}
+                  </Form.List>
                 </>
               )}
 

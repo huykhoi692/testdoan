@@ -10,6 +10,9 @@ import achievementReducer from './achievement.reducer';
 import favoriteReducer from './favorite.reducer';
 import userBookReducer from './user-book.reducer';
 import userChapterReducer from './user-chapter.reducer';
+import wordReducer from './word.reducer';
+import grammarReducer from './grammar.reducer';
+import exerciseReducer from './exercise.reducer';
 import authentication from '../auth/auth.reducer';
 
 const rootReducer = combineReducers({
@@ -25,6 +28,9 @@ const rootReducer = combineReducers({
   favorite: favoriteReducer,
   userBook: userBookReducer,
   userChapter: userChapterReducer,
+  word: wordReducer,
+  grammar: grammarReducer,
+  exercise: exerciseReducer,
 });
 
 export default rootReducer;

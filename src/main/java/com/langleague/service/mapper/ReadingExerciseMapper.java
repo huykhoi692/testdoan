@@ -9,14 +9,15 @@ import org.mapstruct.*;
 /**
  * Mapper for the entity {@link ReadingExercise} and its DTO {@link ReadingExerciseDTO}.
  */
-@Mapper(componentModel = "spring", uses = { ReadingPassageMapper.class })
+@Mapper(componentModel = "spring", uses = { ReadingPassageMapper.class, ReadingOptionMapper.class })
 public interface ReadingExerciseMapper extends EntityMapper<ReadingExerciseDTO, ReadingExercise> {
     @Mapping(target = "readingPassage", source = "readingPassage")
+    @Mapping(target = "options", source = "options")
     ReadingExerciseDTO toDto(ReadingExercise s);
 
     @Override
     @Mapping(target = "readingPassage", ignore = true)
-    @Mapping(target = "options", ignore = true)
+    @Mapping(target = "options", source = "options")
     @Mapping(target = "removeOption", ignore = true)
     @Mapping(target = "exerciseResults", ignore = true)
     @Mapping(target = "removeExerciseResult", ignore = true)

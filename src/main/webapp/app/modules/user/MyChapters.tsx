@@ -207,8 +207,8 @@ const MyChapters: React.FC = () => {
     const bookId = chapter.bookId || chapter.book?.id || 0;
 
     if (chapterId && bookId) {
-      // Navigate to correct route: /learning/:bookId/chapter/:chapterId
-      navigate(`/learning/${bookId}/chapter/${chapterId}`);
+      // Navigate to correct route: /dashboard/learning/:bookId/chapter/:chapterId
+      navigate(`/dashboard/learning/${bookId}/chapter/${chapterId}`);
     } else {
       message.error('Không thể tìm thấy thông tin chapter');
     }
