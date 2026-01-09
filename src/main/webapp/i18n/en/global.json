@@ -1,13 +1,22 @@
 {
   "global": {
-    "title": "Sds",
+    "title": "Langleague",
     "browsehappy": "You are using an <strong>outdated</strong> browser. Please <a href=\"http://browsehappy.com/?locale=en\">upgrade your browser</a> to improve your experience.",
     "menu": {
       "home": "Home",
       "jhipster-needle-menu-add-element": "JHipster will add additional menu entries here (do not translate!)",
       "entities": {
         "main": "Entities",
-        "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
+        "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)",
+        "userProfile": "User Profile",
+        "book": "Book",
+        "enrollment": "Enrollment",
+        "unit": "Unit",
+        "vocabulary": "Vocabulary",
+        "grammar": "Grammar",
+        "exercise": "Exercise",
+        "exerciseOption": "Exercise Option",
+        "progress": "Progress"
       },
       "account": {
         "main": "Account",
@@ -143,7 +152,5 @@
       "not.image": "File was expected to be an image but was found to be \"{{ fileType }}\""
     }
   },
-  "footer": {
-    "copyright": "© 2025 LangLeague. All rights reserved."
-  }
+  "footer": "This is your footer"
 }

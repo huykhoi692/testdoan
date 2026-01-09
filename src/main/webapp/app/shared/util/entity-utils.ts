@@ -1,51 +1,46 @@
-/**
- * Utility functions for entity operations
- */
-
-export interface IPaginationState {
-  page: number;
-  size: number;
-  sort: string;
-}
+import pick from 'lodash/pick';
+import { IPaginationBaseState, ISortBaseState } from 'react-jhipster';
 
 /**
- * Override pagination state with query params from URL
- * @param paginationBaseState - Base pagination state
- * @returns Updated pagination state
+ * Removes fields with an 'id' field that equals ''.
+ * This function was created to prevent entities to be sent to
+ * the server with an empty id and thus resulting in a 500.
+ *
+ * @param entity Object to clean.
  */
-export const overridePaginationStateWithQueryParams = (paginationBaseState: IPaginationState): IPaginationState => {
-  // Try to get params from URL
-  if (typeof window !== 'undefined') {
-    const urlParams = new URLSearchParams(window.location.search);
-    const page = urlParams.get('page');
-    const size = urlParams.get('size');
-    const sort = urlParams.get('sort');
+export const cleanEntity = entity => {
+  const keysToKeep = Object.keys(entity).filter(k => !(entity[k] instanceof Object) || (entity[k].id !== '' && entity[k].id !== -1));
 
-    return {
-      page: page ? parseInt(page, 10) : paginationBaseState.page,
-      size: size ? parseInt(size, 10) : paginationBaseState.size,
-      sort: sort || paginationBaseState.sort,
-    };
-  }
-
-  return paginationBaseState;
+  return pick(entity, keysToKeep);
 };
 
 /**
- * Get sort state from URL params
+ * Simply map a list of element to a list a object with the element as id.
+ *
+ * @param idList Elements to map.
+ * @returns The list of objects with mapped ids.
  */
-export const getSortState = (location: any, itemsPerPage: number, sortField = 'id', sortOrder = 'asc') => {
-  const pageParam = new URLSearchParams(location.search).get('page');
-  const sortParam = new URLSearchParams(location.search).get('sort');
+export const mapIdList = (idList: ReadonlyArray<any>) => idList?.filter((id: any) => id !== '').map((id: any) => ({ id }));
 
-  let sort = `${sortField},${sortOrder}`;
-  if (sortParam) {
-    sort = sortParam;
+export const overrideSortStateWithQueryParams = (paginationBaseState: ISortBaseState, locationSearch: string) => {
+  const params = new URLSearchParams(locationSearch);
+  const sort = params.get('sort');
+  if (sort) {
+    const sortSplit = sort.split(',');
+    paginationBaseState.sort = sortSplit[0];
+    paginationBaseState.order = sortSplit[1];
   }
+  return paginationBaseState;
+};
 
-  return {
-    page: pageParam ? parseInt(pageParam, 10) : 1,
-    size: itemsPerPage,
-    sort,
-  };
+export const overridePaginationStateWithQueryParams = (paginationBaseState: IPaginationBaseState, locationSearch: string) => {
+  const sortedPaginationState: IPaginationBaseState = <IPaginationBaseState>(
+    overrideSortStateWithQueryParams(paginationBaseState, locationSearch)
+  );
+  const params = new URLSearchParams(locationSearch);
+  const page = params.get('page');
+  if (page) {
+    sortedPaginationState.activePage = +page;
+  }
+  return sortedPaginationState;
 };

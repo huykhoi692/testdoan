@@ -31,31 +31,14 @@ module.exports = async options =>
             'style-loader',
             {
               loader: 'css-loader',
-              options: {
-                sourceMap: true,
-                modules: false,
-                importLoaders: 2,
-                esModule: false,
-              },
+              options: { url: false },
             },
             {
               loader: 'postcss-loader',
-              options: {
-                sourceMap: true,
-                postcssOptions: {
-                  plugins: [require('autoprefixer')],
-                },
-              },
             },
             {
               loader: 'sass-loader',
-              options: {
-                implementation: sass,
-                sourceMap: true,
-                sassOptions: {
-                  quietDeps: true,
-                },
-              },
+              options: { implementation: sass },
             },
           ],
         },
@@ -93,7 +76,7 @@ module.exports = async options =>
             target: `http${options.tls ? 's' : ''}://localhost:${options.watch ? '8080' : '9060'}`,
             ws: true,
             proxyOptions: {
-              changeOrigin: true, //pass the Host header to the backend unchanged https://github.com/Browsersync/browser-sync/issues/430
+              changeOrigin: false, //pass the Host header to the backend unchanged https://github.com/Browsersync/browser-sync/issues/430
             },
           },
           socket: {

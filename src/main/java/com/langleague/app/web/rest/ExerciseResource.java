@@ -1,0 +1,252 @@
+package com.langleague.app.web.rest;
+
+import com.langleague.app.domain.Book;
+import com.langleague.app.domain.Exercise;
+import com.langleague.app.domain.Unit;
+import com.langleague.app.repository.ExerciseRepository;
+import com.langleague.app.repository.UnitRepository;
+import com.langleague.app.service.ExerciseService;
+import com.langleague.app.service.dto.CheckAnswerDTO;
+import com.langleague.app.service.dto.ExerciseDTO;
+import com.langleague.app.web.rest.errors.BadRequestAlertException;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import tech.jhipster.web.util.HeaderUtil;
+import tech.jhipster.web.util.PaginationUtil;
+import tech.jhipster.web.util.ResponseUtil;
+
+/**
+ * REST controller for managing {@link com.langleague.app.domain.Exercise}.
+ */
+@RestController
+@RequestMapping("/api/exercises")
+public class ExerciseResource {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ExerciseResource.class);
+
+    private static final String ENTITY_NAME = "exercise";
+
+    @Value("${jhipster.clientApp.name}")
+    private String applicationName;
+
+    private final ExerciseService exerciseService;
+
+    private final ExerciseRepository exerciseRepository;
+
+    private final UnitRepository unitRepository;
+
+    public ExerciseResource(ExerciseService exerciseService, ExerciseRepository exerciseRepository, UnitRepository unitRepository) {
+        this.exerciseService = exerciseService;
+        this.exerciseRepository = exerciseRepository;
+        this.unitRepository = unitRepository;
+    }
+
+    private void checkOwnership(Book book) {
+        if (!SecurityUtils.hasCurrentUserAnyOfAuthorities(AuthoritiesConstants.TEACHER)) {
+            throw new AccessDeniedException("You do not have the authority to perform this action");
+        }
+        String currentUserLogin = SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new AccessDeniedException("User not logged in"));
+
+        if (
+            book.getTeacherProfile() == null ||
+            book.getTeacherProfile().getUser() == null ||
+            !currentUserLogin.equals(book.getTeacherProfile().getUser().getLogin())
+        ) {
+            throw new AccessDeniedException("You are not the owner of this book");
+        }
+    }
+
+    /**
+     * {@code POST  /exercises} : Create a new exercise.
+     *
+     * @param exerciseDTO the exerciseDTO to create.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new exerciseDTO, or with status {@code 400 (Bad Request)} if the exercise has already an ID.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    @PostMapping("")
+    public ResponseEntity<ExerciseDTO> createExercise(@Valid @RequestBody ExerciseDTO exerciseDTO) throws URISyntaxException {
+        LOG.debug("REST request to save Exercise : {}", exerciseDTO);
+        if (exerciseDTO.getId() != null) {
+            throw new BadRequestAlertException("A new exercise cannot already have an ID", ENTITY_NAME, "idexists");
+        }
+        if (exerciseDTO.getUnit() == null || exerciseDTO.getUnit().getId() == null) {
+            throw new BadRequestAlertException("A new exercise must belong to a unit", ENTITY_NAME, "unitnull");
+        }
+        Unit unit = unitRepository
+            .findById(exerciseDTO.getUnit().getId())
+            .orElseThrow(() -> new BadRequestAlertException("Unit not found", ENTITY_NAME, "unitnotfound"));
+        checkOwnership(unit.getBook());
+
+        exerciseDTO = exerciseService.save(exerciseDTO);
+        return ResponseEntity.created(new URI("/api/exercises/" + exerciseDTO.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, exerciseDTO.getId().toString()))
+            .body(exerciseDTO);
+    }
+
+    /**
+     * {@code PUT  /exercises/:id} : Updates an existing exercise.
+     *
+     * @param id the id of the exerciseDTO to save.
+     * @param exerciseDTO the exerciseDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated exerciseDTO,
+     * or with status {@code 400 (Bad Request)} if the exerciseDTO is not valid,
+     * or with status {@code 500 (Internal Server Error)} if the exerciseDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<ExerciseDTO> updateExercise(
+        @PathVariable(value = "id", required = false) final Long id,
+        @Valid @RequestBody ExerciseDTO exerciseDTO
+    ) throws URISyntaxException {
+        LOG.debug("REST request to update Exercise : {}, {}", id, exerciseDTO);
+        if (exerciseDTO.getId() == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        if (!Objects.equals(id, exerciseDTO.getId())) {
+            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+        }
+
+        if (!exerciseRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
+        Exercise exercise = exerciseRepository
+            .findById(id)
+            .orElseThrow(() -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+        checkOwnership(exercise.getUnit().getBook());
+
+        exerciseDTO = exerciseService.update(exerciseDTO);
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, exerciseDTO.getId().toString()))
+            .body(exerciseDTO);
+    }
+
+    /**
+     * {@code PATCH  /exercises/:id} : Partial updates given fields of an existing exercise, field will ignore if it is null
+     *
+     * @param id the id of the exerciseDTO to save.
+     * @param exerciseDTO the exerciseDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated exerciseDTO,
+     * or with status {@code 400 (Bad Request)} if the exerciseDTO is not valid,
+     * or with status {@code 404 (Not Found)} if the exerciseDTO is not found,
+     * or with status {@code 500 (Internal Server Error)} if the exerciseDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    public ResponseEntity<ExerciseDTO> partialUpdateExercise(
+        @PathVariable(value = "id", required = false) final Long id,
+        @NotNull @RequestBody ExerciseDTO exerciseDTO
+    ) throws URISyntaxException {
+        LOG.debug("REST request to partial update Exercise partially : {}, {}", id, exerciseDTO);
+        if (exerciseDTO.getId() == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        if (!Objects.equals(id, exerciseDTO.getId())) {
+            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+        }
+
+        if (!exerciseRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
+        Exercise exercise = exerciseRepository
+            .findById(id)
+            .orElseThrow(() -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+        checkOwnership(exercise.getUnit().getBook());
+
+        Optional<ExerciseDTO> result = exerciseService.partialUpdate(exerciseDTO);
+
+        return ResponseUtil.wrapOrNotFound(
+            result,
+            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, exerciseDTO.getId().toString())
+        );
+    }
+
+    /**
+     * {@code GET  /exercises} : get all the exercises.
+     *
+     * @param pageable the pagination information.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of exercises in body.
+     */
+    @GetMapping("")
+    public ResponseEntity<List<ExerciseDTO>> getAllExercises(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
+        LOG.debug("REST request to get a page of Exercises");
+        Page<ExerciseDTO> page = exerciseService.findAll(pageable);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    /**
+     * {@code GET  /exercises/:id} : get the "id" exercise.
+     *
+     * @param id the id of the exerciseDTO to retrieve.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the exerciseDTO, or with status {@code 404 (Not Found)}.
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<ExerciseDTO> getExercise(@PathVariable("id") Long id) {
+        LOG.debug("REST request to get Exercise : {}", id);
+        Optional<ExerciseDTO> exerciseDTO = exerciseService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(exerciseDTO);
+    }
+
+    /**
+     * {@code GET  /exercises/by-unit/:unitId} : get all the exercises by unitId.
+     *
+     * @param unitId the id of the unit.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of exercises in body.
+     */
+    @GetMapping("/by-unit/{unitId}")
+    public List<ExerciseDTO> getAllExercisesByUnit(@PathVariable Long unitId) {
+        LOG.debug("REST request to get all Exercises by unitId : {}", unitId);
+        return exerciseService.findAllByUnitId(unitId);
+    }
+
+    /**
+     * {@code POST  /exercises/:id/check} : Check the answer for the "id" exercise.
+     *
+     * @param id the id of the exercise.
+     * @param checkAnswerDTO the answer to check.
+     * @return the result ("CORRECT" or "WRONG").
+     */
+    @PostMapping("/{id}/check")
+    public ResponseEntity<String> checkAnswer(@PathVariable Long id, @RequestBody CheckAnswerDTO checkAnswerDTO) {
+        LOG.debug("REST request to check answer for Exercise : {}", id);
+        String result = exerciseService.checkAnswer(id, checkAnswerDTO.getStudentAnswer());
+        return ResponseEntity.ok(result);
+    }
+
+    /**
+     * {@code DELETE  /exercises/:id} : delete the "id" exercise.
+     *
+     * @param id the id of the exerciseDTO to delete.
+     * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteExercise(@PathVariable("id") Long id) {
+        LOG.debug("REST request to delete Exercise : {}", id);
+
+        Exercise exercise = exerciseRepository
+            .findById(id)
+            .orElseThrow(() -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+        checkOwnership(exercise.getUnit().getBook());
+
+        exerciseService.delete(id);
+        return ResponseEntity.noContent()
+            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
+            .build();
+    }
+}

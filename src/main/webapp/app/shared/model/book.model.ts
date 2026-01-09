@@ -1,8 +1,22 @@
-import { IBook } from './models';
+import dayjs from 'dayjs';
+import { IUserProfile } from 'app/shared/model/user-profile.model';
 
-export type { IBook };
+export interface IBook {
+  id?: number;
+  title?: string;
+  description?: string | null; // TextBlob
+  coverImageUrl?: string | null;
+  isPublic?: boolean;
+  createdAt?: dayjs.Dayjs;
+  teacherProfile?: IUserProfile;
+}
 
 export const defaultValue: Readonly<IBook> = {
+  id: undefined,
   title: '',
-  isActive: true,
+  description: '',
+  coverImageUrl: '',
+  isPublic: false,
+  createdAt: undefined,
+  teacherProfile: undefined,
 };

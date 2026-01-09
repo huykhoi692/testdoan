@@ -1,38 +1,37 @@
-import * as React from 'react';
-import { ToastContainer } from 'react-toastify';
-import { ConfigProvider, theme as antdTheme } from 'antd';
-import ErrorBoundary from './shared/error/error-boundary';
-import AppRoutes from './routes';
-import { useAppSelector } from './config/store';
 import 'react-toastify/dist/ReactToastify.css';
 import './app.scss';
+import 'app/config/dayjs';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
-const App = () => {
-  const themeMode = useAppSelector(state => state.theme.actualTheme);
+import React, { useEffect } from 'react';
+import { BrowserRouter } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+
+import { useAppDispatch } from 'app/config/store';
+import { getSession } from 'app/shared/reducers/authentication';
+import { getProfile } from 'app/shared/reducers/application-profile';
+import ErrorBoundary from 'app/shared/error/error-boundary';
+import AppRoutes from 'app/routes';
+
+const baseHref = document.querySelector('base').getAttribute('href').replace(/\/$/, '');
+
+export const App = () => {
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(getSession());
+    dispatch(getProfile());
+  }, []);
 
   return (
-    <ConfigProvider
-      theme={{
-        algorithm: themeMode === 'dark' ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
-        token: {
-          colorPrimary: '#58CC02',
-          colorSuccess: '#58CC02',
-          colorWarning: '#FFC800',
-          colorError: '#FF4B4B',
-          colorInfo: '#1CB0F6',
-          borderRadius: 8,
-        },
-      }}
-    >
+    <BrowserRouter basename={baseHref}>
       <div className="app-container">
-        <ToastContainer position="top-left" className="toastify-container" />
+        <ToastContainer position="top-right" className="toastify-container" toastClassName="toastify-toast" />
         <ErrorBoundary>
-          <React.Suspense fallback={<div className="loading-spinner">Loading...</div>}>
-            <AppRoutes />
-          </React.Suspense>
+          <AppRoutes />
         </ErrorBoundary>
       </div>
-    </ConfigProvider>
+    </BrowserRouter>
   );
 };
 

@@ -1,36 +1,32 @@
-import { combineReducers } from '@reduxjs/toolkit';
-import localeReducer from './locale.reducer';
-import themeReducer from './theme.reducer';
-import bookReducer from './book.reducer';
-import chapterReducer from './chapter.reducer';
-import progressReducer from './progress.reducer';
-import bookReviewReducer from './book-review.reducer';
-import commentReducer from './comment.reducer';
-import achievementReducer from './achievement.reducer';
-import favoriteReducer from './favorite.reducer';
-import userBookReducer from './user-book.reducer';
-import userChapterReducer from './user-chapter.reducer';
-import wordReducer from './word.reducer';
-import grammarReducer from './grammar.reducer';
-import exerciseReducer from './exercise.reducer';
-import authentication from '../auth/auth.reducer';
+import { ReducersMapObject } from '@reduxjs/toolkit';
+import { loadingBarReducer as loadingBar } from 'react-redux-loading-bar';
 
-const rootReducer = combineReducers({
+import userManagement from 'app/modules/admin/user-management/user-management.reducer';
+import register from 'app/modules/account/register/register.reducer';
+import activate from 'app/modules/account/activate/activate.reducer';
+import password from 'app/modules/account/password/password.reducer';
+import settings from 'app/modules/account/settings/settings.reducer';
+import passwordReset from 'app/modules/account/password-reset/password-reset.reducer';
+import entitiesReducers from 'app/entities/reducers';
+import applicationProfile from './application-profile';
+import authentication from './authentication';
+import locale from './locale';
+import admin from 'app/modules/admin';
+/* jhipster-needle-add-reducer-import - JHipster will add reducer here */
+
+const rootReducer: ReducersMapObject = {
   authentication,
-  locale: localeReducer,
-  theme: themeReducer,
-  book: bookReducer,
-  chapter: chapterReducer,
-  progress: progressReducer,
-  bookReview: bookReviewReducer,
-  comment: commentReducer,
-  achievement: achievementReducer,
-  favorite: favoriteReducer,
-  userBook: userBookReducer,
-  userChapter: userChapterReducer,
-  word: wordReducer,
-  grammar: grammarReducer,
-  exercise: exerciseReducer,
-});
+  locale,
+  applicationProfile,
+  userManagement,
+  register,
+  activate,
+  passwordReset,
+  password,
+  settings,
+  loadingBar,
+  /* jhipster-needle-add-reducer-combine - JHipster will add reducer here */
+  ...entitiesReducers,
+};
 
 export default rootReducer;
