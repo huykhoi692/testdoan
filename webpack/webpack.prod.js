@@ -26,7 +26,7 @@ module.exports = async () =>
     module: {
       rules: [
         {
-          test: /\.(sa|sc|c)ss$/,
+          test: /\.module\.(sa|sc|c)ss$/,
           use: [
             {
               loader: MiniCssExtractPlugin.loader,
@@ -37,28 +37,48 @@ module.exports = async () =>
             {
               loader: 'css-loader',
               options: {
-                url: false,
-                sourceMap: false,
-                modules: false,
-              },
-            },
-            {
-              loader: 'postcss-loader',
-              options: {
-                sourceMap: false,
-                postcssOptions: {
-                  plugins: [require('autoprefixer')],
+                url: true,
+                modules: {
+                  localIdentName: '[local]',
+                  exportLocalsConvention: 'camelCaseOnly',
                 },
               },
             },
             {
+              loader: 'postcss-loader',
+            },
+            {
               loader: 'sass-loader',
-              options: {
-                implementation: sass,
-                sourceMap: false,
-              },
+              options: { implementation: sass },
             },
           ],
+        },
+        {
+          test: /\.(sa|sc|c)ss$/,
+          exclude: /\.module\.(sa|sc|c)ss$/,
+          use: [
+            {
+              loader: MiniCssExtractPlugin.loader,
+              options: {
+                publicPath: '../',
+              },
+            },
+            {
+              loader: 'css-loader',
+              options: { url: true }, // Changed to true to allow font files
+            },
+            {
+              loader: 'postcss-loader',
+            },
+            {
+              loader: 'sass-loader',
+              options: { implementation: sass },
+            },
+          ],
+        },
+        {
+          test: /\.(woff|woff2|eot|ttf|otf)$/,
+          type: 'asset/resource',
         },
       ],
     },
@@ -103,14 +123,6 @@ module.exports = async () =>
         }),
         new CssMinimizerPlugin({
           parallel: true,
-          minimizerOptions: {
-            preset: [
-              'default',
-              {
-                discardComments: { removeAll: true },
-              },
-            ],
-          },
         }),
       ],
     },
@@ -119,7 +131,6 @@ module.exports = async () =>
         // Options similar to the same options in webpackOptions.output
         filename: 'content/[name].[contenthash].css',
         chunkFilename: 'content/[name].[chunkhash].css',
-        ignoreOrder: true,
       }),
       new webpack.LoaderOptionsPlugin({
         minimize: true,

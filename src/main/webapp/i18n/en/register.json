@@ -1,26 +1,12 @@
 {
   "register": {
-    "title": "Sign Up",
-    "subtitle": "Start your learning journey today",
-    "welcomeMessage": "Start your learning journey",
-    "helloFriend": "Hello, Friend!",
-    "helloFriendMessage": "Enter your personal details and start journey with us",
-    "haveAccount": "Already have an account?",
-    "logIn": "Log in",
-    "login": "Log in",
-    "name": "Full Name",
-    "email": "Email",
-    "password": "Password",
-    "confirmPassword": "Confirm Password",
-    "terms": "I agree to the Terms and Conditions",
-    "registerButton": "Sign up",
-    "registering": "Registering...",
-    "orUseEmail": "or use your email for registration",
-    "success": "Registration successful! Please check your email to activate your account.",
-    "error": "Registration failed. Please try again.",
-    "orContinueWith": "Or continue with",
+    "title": "Registration",
     "form": {
-      "button": "Register"
+      "button": "Register",
+      "button.registering": "Registering...",
+      "email": {
+        "placeholder": "Enter your email"
+      }
     },
     "messages": {
       "validate": {
@@ -29,23 +15,26 @@
           "minlength": "Your username is required to be at least 1 character.",
           "maxlength": "Your username cannot be longer than 50 characters.",
           "pattern": "Your username is invalid."
+        },
+        "email": {
+          "required": "Please enter your email.",
+          "invalid": "Your email is invalid."
+        },
+        "newpassword": {
+          "required": "Please enter a password.",
+          "minlength": "Your password is required to be at least 4 characters."
+        },
+        "confirmpassword": {
+          "required": "Please confirm your password."
         }
       },
       "success": "<strong>Registration saved!</strong> Please check your email for confirmation.",
       "error": {
         "fail": "<strong>Registration failed!</strong> Please try again later.",
         "userexists": "<strong>Login name already registered!</strong> Please choose another one.",
-        "emailexists": "<strong>Email is already in use!</strong> Please choose another one."
+        "emailexists": "<strong>Email is already in use!</strong> Please choose another one.",
+        "dontmatch": "The password and its confirmation do not match!"
       }
-    },
-    "validation": {
-      "nameRequired": "Please enter your name",
-      "emailRequired": "Please enter your email",
-      "emailInvalid": "Please enter a valid email",
-      "passwordRequired": "Please enter your password",
-      "passwordMin": "Password must be at least 8 characters",
-      "confirmRequired": "Please confirm your password",
-      "passwordMatch": "Passwords do not match"
     }
   }
 }

@@ -1,0 +1,466 @@
+﻿{
+  "langleague": {
+    "apiKey": {
+      "setupTitle": "CÃ i Äáº·t API Key",
+      "setupDescription": "Äá»ƒ sá»­ dá»¥ng tÃ­nh nÄƒng AI, báº¡n cáº§n cung cáº¥p API Key cá»§a riÃªng báº¡n (Google Gemini hoáº·c OpenAI). NÃ³ miá»…n phÃ­ vÃ  chÃºng tÃ´i chá»‰ lÆ°u trong trÃ¬nh duyá»‡t cá»§a báº¡n.",
+      "label": "API Key",
+      "placeholder": "DÃ¡n API key cá»§a báº¡n vÃ o Ä‘Ã¢y (AIza... hoáº·c sk-...)",
+      "formatHint": "Äá»‹nh dáº¡ng há»— trá»£: Google Gemini (AIza...) hoáº·c OpenAI (sk-...)",
+      "showKey": "Hiá»‡n key",
+      "hideKey": "áº¨n key",
+      "getKeyTitle": "Láº¥y API key miá»…n phÃ­:",
+      "providers": {
+        "gemini": "Google Gemini API Key",
+        "openai": "OpenAI / ChatGPT API Key"
+      },
+      "recommendation": "ðŸ’¡ Khuyáº¿n nghá»‹:",
+      "recommendationText": "ChÃºng tÃ´i khuyáº¿n nghá»‹ dÃ¹ng Google Gemini vÃ¬ há»— trá»£ tiáº¿ng Viá»‡t tá»‘t hÆ¡n vÃ  hoÃ n toÃ n miá»…n phÃ­!",
+      "cancel": "Há»§y",
+      "saveButton": "LÆ°u & Tiáº¿p Tá»¥c",
+      "errors": {
+        "empty": "Vui lÃ²ng nháº­p API key",
+        "invalidFormat": "Äá»‹nh dáº¡ng API key khÃ´ng há»£p lá»‡. Vui lÃ²ng kiá»ƒm tra vÃ  thá»­ láº¡i.\\nKey Gemini báº¯t Ä‘áº§u vá»›i 'AIza', key OpenAI báº¯t Ä‘áº§u vá»›i 'sk-'"
+      }
+    },
+    "student": {
+      "dashboard": {
+        "title": "Báº£ng Äiá»u Khiá»ƒn",
+        "loading": "Äang táº£i sÃ¡ch...",
+        "welcome": "ChÃ o má»«ng trá»Ÿ láº¡i, {{name}}!",
+        "activeBooks": "KhÃ³a Há»c Äang Há»c",
+        "progress": "Tiáº¿n Äá»™ Tá»•ng Thá»ƒ",
+        "stats": {
+          "hours": "Giá» Há»c",
+          "books": "SÃ¡ch ÄÃ£ HoÃ n ThÃ nh"
+        },
+        "noBooks": "KhÃ´ng tÃ¬m tháº¥y sÃ¡ch",
+        "noBooksDescription": "Thá»­ Ä‘iá»u chá»‰nh tÃ¬m kiáº¿m hoáº·c bá»™ lá»c Ä‘á»ƒ tÃ¬m nhá»¯ng gÃ¬ báº¡n cáº§n.",
+        "loadMore": "Táº£i thÃªm sÃ¡ch",
+        "search": {
+          "placeholder": "TÃ¬m kiáº¿m sÃ¡ch..."
+        },
+        "filter": {
+          "all": "Táº¥t Cáº£",
+          "enrolled": "ÄÃ£ ÄÄƒng KÃ½",
+          "notEnroll": "ChÆ°a ÄÄƒng KÃ½"
+        },
+        "book": {
+          "continue": "Tiáº¿p Tá»¥c",
+          "start": "Báº¯t Äáº§u",
+          "completed": "ÄÃ£ HoÃ n ThÃ nh",
+          "enrolled": "ÄÃ£ ÄÄƒng KÃ½",
+          "active": "Äang Há»c",
+          "not_enrolled": "ChÆ°a ÄÄƒng KÃ½",
+          "units": "BÃ i Há»c"
+        },
+        "streak": {
+          "label": "Chuá»—i NgÃ y Há»c",
+          "start": "Báº¯t Ä‘áº§u chuá»—i ngÃ y há»c ngay hÃ´m nay!",
+          "active": "Báº¡n Ä‘ang ráº¥t tuyá»‡t! Chuá»—i {{count}} ngÃ y liÃªn tiáº¿p!",
+          "nextMilestone": "Cá»™t má»‘c tiáº¿p theo: {{count}} ngÃ y",
+          "milestone": {
+            "title": "ChÃºc má»«ng!",
+            "message": "ðŸŽ‰ ChÃºc má»«ng! Báº¡n Ä‘Ã£ Ä‘áº¡t chuá»—i {{count}} ngÃ y liÃªn tiáº¿p!",
+            "confirmButton": "Tuyá»‡t vá»i!"
+          }
+        }
+      },
+      "profile": {
+        "title": "Há»“ SÆ¡ Cá»§a TÃ´i",
+        "subtitle": "Quáº£n lÃ½ tÃ i khoáº£n vÃ  tiáº¿n trÃ¬nh cá»§a báº¡n",
+        "actions": {
+          "changePhoto": "Äá»•i áº¢nh",
+          "saveChanges": "LÆ°u Thay Äá»•i",
+          "cancel": "Há»§y"
+        },
+        "personalInfo": {
+          "title": "ThÃ´ng Tin CÃ¡ NhÃ¢n",
+          "fullName": "Há» VÃ  TÃªn",
+          "fullNamePlaceholder": "vd. Nguyá»…n VÄƒn A",
+          "email": "Äá»‹a Chá»‰ Email",
+          "username": "TÃªn ÄÄƒng Nháº­p",
+          "bio": "Tiá»ƒu Sá»­",
+          "bioPlaceholder": "HÃ£y ká»ƒ cho chÃºng tÃ´i vá» báº¡n..."
+        },
+        "stats": {
+          "title": "Thá»‘ng KÃª Há»c Táº­p",
+          "booksEnrolled": "KhÃ³a Há»c ÄÃ£ ÄÄƒng KÃ½",
+          "streak": "Chuá»—i NgÃ y",
+          "achievements": "ThÃ nh TÃ­ch"
+        },
+        "preferences": {
+          "theme": "Chá»§ Äá»",
+          "themeLight": "â˜€ï¸ SÃ¡ng",
+          "themeDark": "ðŸŒ™ Tá»‘i",
+          "themeSystem": "ðŸ’» Há»‡ Thá»‘ng"
+        },
+        "messages": {
+          "success": "Cáº­p nháº­t há»“ sÆ¡ thÃ nh cÃ´ng!",
+          "error": "Cáº­p nháº­t há»“ sÆ¡ tháº¥t báº¡i",
+          "themeChanged": "ÄÃ£ cáº­p nháº­t chá»§ Ä‘á»!",
+          "themeError": "KhÃ´ng thá»ƒ thay Ä‘á»•i chá»§ Ä‘á»",
+          "photoComingSoon": "TÃ­nh nÄƒng táº£i áº£nh sáº½ cÃ³ sá»›m!"
+        }
+      },
+      "books": {
+        "title": "Kho SÃ¡ch KhÃ³a Há»c",
+        "description": "Chá»n má»™t cuá»‘n sÃ¡ch Ä‘á»ƒ tiáº¿p tá»¥c hÃ nh trÃ¬nh há»c táº­p cá»§a báº¡n",
+        "public": "CÃ´ng Khai",
+        "viewDetails": "Xem Chi Tiáº¿t",
+        "noBooks": "ChÆ°a cÃ³ sÃ¡ch nÃ o",
+        "noBooksDescription": "Quay láº¡i sau Ä‘á»ƒ xem tÃ i liá»‡u há»c táº­p má»›i",
+        "detail": {
+          "loading": "Äang táº£i...",
+          "backToBooks": "Quay Láº¡i Danh SÃ¡ch SÃ¡ch",
+          "startLearning": "Báº¯t Äáº§u Há»c",
+          "enrollNow": "ÄÄƒng KÃ½ Ngay",
+          "studyNow": "Há»c Ngay",
+          "chapters": "ChÆ°Æ¡ng",
+          "completed": "ÄÃ£ HoÃ n ThÃ nh",
+          "units": {
+            "title": "CÃC BÃ€I Há»ŒC TRONG SÃCH NÃ€Y",
+            "empty": "ChÆ°a cÃ³ bÃ i há»c nÃ o"
+          },
+          "relatedBooks": "SÃ¡ch LiÃªn Quan"
+        },
+        "messages": {
+          "enrollSuccess": "ÄÄƒng kÃ½ sÃ¡ch thÃ nh cÃ´ng!",
+          "enrollError": "ÄÄƒng kÃ½ tháº¥t báº¡i. Vui lÃ²ng thá»­ láº¡i."
+        }
+      },
+      "learning": {
+        "backToBook": "Quay Láº¡i SÃ¡ch",
+        "selectUnit": "Chá»n má»™t bÃ i há»c Ä‘á»ƒ báº¯t Ä‘áº§u há»c",
+        "bookContent": "Ná»™i Dung SÃ¡ch",
+        "unit": "BÃ i Há»c",
+        "nextLesson": "BÃ i Tiáº¿p Theo",
+        "previousLesson": "BÃ i TrÆ°á»›c",
+        "complete": "HoÃ n ThÃ nh",
+        "unitCompleted": "ÄÃ£ hoÃ n thÃ nh bÃ i há»c! Chuyá»ƒn sang bÃ i tiáº¿p theo...",
+        "bookCompleted": "ChÃºc má»«ng! Báº¡n Ä‘Ã£ hoÃ n thÃ nh cuá»‘n sÃ¡ch!",
+        "sections": {
+          "vocabulary": "Tá»« Vá»±ng",
+          "grammar": "Ngá»¯ PhÃ¡p",
+          "exercise": "BÃ i Táº­p",
+          "flashcard": "Flashcard",
+          "note": "Ghi ChÃº"
+        },
+        "vocabulary": {
+          "unit": "BÃ€I",
+          "title": "Tá»ª Vá»°NG",
+          "wordsToLearn": "tá»« cáº§n há»c",
+          "vocabularyWords": "Danh SÃ¡ch Tá»« Vá»±ng",
+          "meaning": "NghÄ©a:",
+          "example": "VÃ­ Dá»¥:",
+          "noVocabulary": "ChÆ°a cÃ³ tá»« vá»±ng",
+          "noVocabularyDescription": "Tá»« vá»±ng sáº½ xuáº¥t hiá»‡n á»Ÿ Ä‘Ã¢y khi giÃ¡o viÃªn thÃªm vÃ o",
+          "clickToHear": "Nháº¥n vÃ o tá»« Ä‘á»ƒ nghe phÃ¡t Ã¢m",
+          "navigation": {
+            "previous": "TrÆ°á»›c",
+            "next": "Tiáº¿p"
+          }
+        },
+        "grammar": {
+          "unit": "BÃ€I",
+          "title": "NGá»® PHÃP",
+          "lessons": "bÃ i há»c ngá»¯ phÃ¡p",
+          "topics": "Chá»§ Äá» Ngá»¯ PhÃ¡p",
+          "content": "Ná»™i Dung",
+          "examples": "VÃ­ Dá»¥",
+          "noGrammar": "ChÆ°a cÃ³ bÃ i ngá»¯ phÃ¡p",
+          "noGrammarDescription": "BÃ i há»c ngá»¯ phÃ¡p sáº½ xuáº¥t hiá»‡n á»Ÿ Ä‘Ã¢y khi giÃ¡o viÃªn thÃªm vÃ o",
+          "example": "VÃ­ dá»¥:",
+          "practiceFlashcard": "Luyá»‡n táº­p Ngá»¯ phÃ¡p vá»›i Flashcards"
+        },
+        "exercise": {
+          "title": "BÃ€I Táº¬P",
+          "noExercises": "ChÆ°a cÃ³ bÃ i táº­p",
+          "backToBook": "Quay Láº¡i Danh SÃ¡ch SÃ¡ch",
+          "defaultTitle": "BÃ i Táº­p",
+          "loading": "Äang táº£i...",
+          "loadingExercises": "Äang táº£i bÃ i táº­p...",
+          "question": "CÃ¢u há»i",
+          "of": "trÃªn",
+          "playAudio": "PhÃ¡t Ã‚m Thanh",
+          "audioNotSupported": "TrÃ¬nh duyá»‡t cá»§a báº¡n khÃ´ng há»— trá»£ pháº§n tá»­ Ã¢m thanh.",
+          "correctAnswer": "ChÃ­nh XÃ¡c!",
+          "incorrectAnswer": "ChÆ°a ÄÃºng",
+          "correctAnswerIs": "CÃ¢u tráº£ lá»i Ä‘Ãºng lÃ :",
+          "selectAllCorrect": "Chá»n táº¥t cáº£ Ä‘Ã¡p Ã¡n Ä‘Ãºng:",
+          "typeAnswer": "Nháº­p cÃ¢u tráº£ lá»i cá»§a báº¡n...",
+          "previous": "TrÆ°á»›c",
+          "checkAnswer": "Kiá»ƒm Tra CÃ¢u Tráº£ Lá»i",
+          "nextQuestion": "CÃ¢u Há»i Tiáº¿p Theo",
+          "finish": "HoÃ n ThÃ nh",
+          "pleaseAnswer": "Vui lÃ²ng chá»n hoáº·c nháº­p cÃ¢u tráº£ lá»i trÆ°á»›c!",
+          "correct": "ChÃ­nh xÃ¡c!",
+          "incorrect": "ChÆ°a Ä‘Ãºng, hÃ£y thá»­ láº¡i hoáº·c xem Ä‘Ã¡p Ã¡n.",
+          "explainWithAI": "Giáº£i ThÃ­ch Báº±ng AI"
+        },
+        "aiTutor": {
+          "button": "Giáº£i ThÃ­ch Báº±ng AI",
+          "grammarButton": "Há»i AI Gia SÆ°",
+          "title": "Giáº£i ThÃ­ch Tá»« AI Gia SÆ°",
+          "grammarTitle": "AI Gia SÆ° Ngá»¯ PhÃ¡p",
+          "thinking": "Äang suy nghÄ©...",
+          "question": "CÃ¢u Há»i",
+          "close": "ÄÃ³ng",
+          "changeKey": "Äá»•i Key",
+          "cancel": "Há»§y",
+          "saveAndExplain": "LÆ°u & Giáº£i ThÃ­ch",
+          "setupTitle": "CÃ i Äáº·t AI Gia SÆ°",
+          "setupDescription": "Äá»ƒ sá»­ dá»¥ng tÃ­nh nÄƒng AI Gia SÆ°, báº¡n cáº§n cung cáº¥p Google Gemini API Key cá»§a riÃªng báº¡n. NÃ³ miá»…n phÃ­ vÃ  chÃºng tÃ´i chá»‰ lÆ°u trong trÃ¬nh duyá»‡t cá»§a báº¡n.",
+          "apiKeyLabel": "Gemini API Key",
+          "apiKeyPlaceholder": "DÃ¡n API key cá»§a báº¡n vÃ o Ä‘Ã¢y...",
+          "getFreeKey": "Láº¥y key miá»…n phÃ­ táº¡i Ä'Ã¢y",
+          "invalidKeyError": "API Key khÃ´ng há»£p lá»‡. Vui lÃ²ng kiá»ƒm tra vÃ  thá»­ láº¡i.",
+          "rateLimitError": "⚠️ ÄÃ£ vÆ°á»£t quÃ¡ háº¡n má»©c API. Há»‡ thá»'ng Ä'Ã£ tá»± Ä'á»™ng thá»­ láº¡i nhÆ°ng váº«n tháº¥t báº¡i. Vui lÃ²ng Ä'á»£i vÃ i phÃºt trÆ°á»›c khi thá»­ láº¡i, hoáº·c nÃ¢ng cáº¥p gÃ³i API cá»§a báº¡n. GÃ³i miá»…n phÃ­ cÃ³ giá»›i háº¡n hÃ ng ngÃ y.",
+          "somethingWentWrong": "ÄÃ£ xáº£y ra lá»—i.",
+          "grammarPromptPlaceholder": "Há»i báº¥t cá»© Ä‘iá»u gÃ¬ vá» chá»§ Ä‘á» ngá»¯ phÃ¡p nÃ y...\\nVÃ­ dá»¥: Báº¡n cÃ³ thá»ƒ cho tÃ´i thÃªm vÃ­ dá»¥ khÃ´ng? Äiá»ƒm khÃ¡c biá»‡t vá»›i... lÃ  gÃ¬?",
+          "grammarAsk": "Há»i",
+          "grammarClear": "XÃ³a TrÃ² Chuyá»‡n"
+        },
+        "flashcard": {
+          "back": "Quay Láº¡i",
+          "learning": "Há»c Táº­p",
+          "title": "Flashcards",
+          "shuffle": "XÃ¡o Trá»™n",
+          "studyMode": "Cháº¿ Äá»™ Há»c",
+          "notes": "Ghi ChÃº",
+          "card": "Tháº»",
+          "of": "trÃªn",
+          "definition": "Äá»ŠNH NGHÄ¨A",
+          "answer": "TRáº¢ Lá»œI",
+          "clickToFlip": "Nháº¥n Äá»ƒ Láº­t",
+          "terminology": "Thuáº­t ngá»¯ trong pháº§n nÃ y",
+          "noCards": "ChÆ°a cÃ³ flashcards",
+          "noCardsDescription": "Flashcards sáº½ xuáº¥t hiá»‡n á»Ÿ Ä‘Ã¢y khi cÃ³ tá»« vá»±ng",
+          "reviewMode": "Cháº¿ Äá»™ Ã”n Táº­p ({{count}})",
+          "reviewSession": "PhiÃªn Ã”n Táº­p"
+        },
+        "flashcardList": {
+          "title": "Flashcards",
+          "description": "Chá»n má»™t bÃ i há»c Ä‘á»ƒ há»c flashcards",
+          "loading": "Äang táº£i...",
+          "noSets": "ChÆ°a cÃ³ sÃ¡ch",
+          "enrollDescription": "ÄÄƒng kÃ½ sÃ¡ch Ä‘á»ƒ báº¯t Ä‘áº§u há»c vá»›i flashcards",
+          "studyFlashcards": "Há»c Flashcards",
+          "noUnits": "ChÆ°a cÃ³ bÃ i há»c trong sÃ¡ch nÃ y",
+          "customSession": "PhiÃªn TÃ¹y Chá»‰nh"
+        },
+        "bookLearn": {
+          "progress": "Tiáº¿n Äá»™ Cá»§a Báº¡n",
+          "backToBook": "Quay Láº¡i SÃ¡ch",
+          "bookContent": "Ná»™i Dung SÃ¡ch",
+          "selectUnit": "Chá»n má»™t bÃ i há»c Ä‘á»ƒ báº¯t Ä‘áº§u há»c",
+          "unitCompleted": "ÄÃ£ hoÃ n thÃ nh bÃ i há»c! Chuyá»ƒn sang bÃ i tiáº¿p theo...",
+          "bookCompleted": "ChÃºc má»«ng! Báº¡n Ä‘Ã£ hoÃ n thÃ nh cuá»‘n sÃ¡ch!",
+          "messages": {
+            "unitCompleted": "ÄÃ£ hoÃ n thÃ nh bÃ i há»c! Chuyá»ƒn sang bÃ i tiáº¿p theo...",
+            "bookCompleted": "ChÃºc má»«ng! Báº¡n Ä‘Ã£ hoÃ n thÃ nh cuá»‘n sÃ¡ch!"
+          }
+        },
+        "itemCount": {
+          "words": "{{count}} tá»«",
+          "topics": "{{count}} chá»§ Ä‘á»",
+          "questions": "{{count}} cÃ¢u há»i",
+          "interactive": "TÆ°Æ¡ng TÃ¡c"
+        },
+        "notes": {
+          "title": "Ghi ChÃº Cá»§a TÃ´i",
+          "loading": "Äang táº£i ghi chÃº...",
+          "empty": "ChÆ°a cÃ³ ghi chÃº cho bÃ i há»c nÃ y.",
+          "emptyDescription": "Báº¯t Ä‘áº§u ghi chÃº Ä‘á»ƒ giÃºp báº¡n nhá»› cÃ¡c Ä‘iá»ƒm quan trá»ng!",
+          "placeholder": "Viáº¿t ghi chÃº cá»§a báº¡n á»Ÿ Ä‘Ã¢y (Há»— trá»£ Markdown)...",
+          "placeholderDisabled": "Báº¡n Ä‘Ã£ cÃ³ ghi chÃº cho bÃ i há»c nÃ y. Nháº¥n Sá»­a Ä‘á»ƒ chá»‰nh sá»­a.",
+          "addButton": "ThÃªm Ghi ChÃº",
+          "updateButton": "Cáº­p Nháº­t",
+          "saving": "Äang lÆ°u...",
+          "updating": "Äang cáº­p nháº­t...",
+          "editButton": "Sá»­a",
+          "deleteButton": "XÃ³a",
+          "cancelButton": "Há»§y",
+          "deleteConfirm": "Báº¡n cÃ³ cháº¯c muá»‘n xÃ³a ghi chÃº nÃ y?",
+          "duplicateWarning": "Báº¡n Ä‘Ã£ cÃ³ ghi chÃº cho bÃ i há»c nÃ y. Vui lÃ²ng xÃ³a ghi chÃº cÅ© trÆ°á»›c náº¿u muá»‘n táº¡o ghi chÃº má»›i.",
+          "limitInfo": "Báº¡n chá»‰ cÃ³ thá»ƒ cÃ³ má»™t ghi chÃº cho má»—i bÃ i há»c. Sá»­a hoáº·c xÃ³a ghi chÃº hiá»‡n táº¡i.",
+          "created": "Táº¡o:",
+          "updated": "Cáº­p nháº­t:",
+          "lastUpdated": "Cáº­p nháº­t láº§n cuá»‘i",
+          "characters": "kÃ½ tá»±",
+          "clear": "XÃ³a",
+          "save": "LÆ°u",
+          "preview": "Xem TrÆ°á»›c",
+          "maximize": "PhÃ³ng To",
+          "minimize": "Thu Nhá»",
+          "emptyPreview": "ChÆ°a cÃ³ ná»™i dung Ä‘á»ƒ xem trÆ°á»›c..."
+        }
+      },
+      "games": {
+        "title": "TrÃ² ChÆ¡i Há»c Táº­p",
+        "subtitle": "Há»c vui hÆ¡n! ChÆ¡i trÃ² chÆ¡i Ä‘á»ƒ cáº£i thiá»‡n ká»¹ nÄƒng ngÃ´n ngá»¯",
+        "backToDashboard": "Quay Láº¡i Báº£ng Äiá»u Khiá»ƒn",
+        "backToMenu": "Quay Láº¡i Menu",
+        "loading": "Äang táº£i trÃ² chÆ¡i...",
+        "noGamesForDifficulty": "KhÃ´ng tÃ¬m tháº¥y trÃ² chÆ¡i cho má»©c Ä‘á»™ nÃ y",
+        "noGames": "KhÃ´ng cÃ³ trÃ² chÆ¡i",
+        "noGamesDescription": "Thá»­ Ä‘iá»u chá»‰nh bá»™ lá»c Ä‘á»™ khÃ´",
+        "progress": "Tiáº¿n Ä‘á»™",
+        "score": "Äiá»ƒm",
+        "question": "CÃ¢u há»i",
+        "filterByDifficulty": "Lá»c theo Ä‘á»™ khÃ³:",
+        "playNow": "ChÆ¡i Ngay",
+        "comingSoon": "Sáº¯p Ra Máº¯t",
+        "active": "Äang Hoáº¡t Äá»™ng",
+        "inactive": "KhÃ´ng Hoáº¡t Äá»™ng",
+        "difficulty": {
+          "all": "Táº¥t Cáº£ TrÃ² ChÆ¡i",
+          "easy": "Dá»…",
+          "medium": "Trung BÃ¬nh",
+          "hard": "KhÃ³"
+        },
+        "stats": {
+          "played": "ÄÃ£ ChÆ¡i",
+          "score": "Tá»•ng Äiá»ƒm",
+          "achievements": "ThÃ nh TÃ­ch"
+        },
+        "dataSource": {
+          "title": "Chá»n TÃ i Liá»‡u Há»c",
+          "description": "Chá»n cÃ¡c bÃ i há»c báº¡n muá»‘n Ã´n táº­p.",
+          "selectAll": "Chá»n Táº¥t Cáº£",
+          "unitsSelected": "{{count}} bÃ i Ä‘Ã£ chá»n",
+          "cancel": "Há»§y",
+          "startGame": "Báº¯t Äáº§u"
+        },
+        "list": {
+          "vocabularyMatch": {
+            "title": "GhÃ©p Tá»« Vá»±ng",
+            "description": "GhÃ©p cÃ¡c tá»« vá»›i nghÄ©a cá»§a chÃºng trong trÃ² chÆ¡i trÃ­ nhá»› nhanh",
+            "time": "5-10 phÃºt"
+          },
+          "wordScramble": {
+            "title": "Xáº¿p Chá»¯",
+            "description": "Sáº¯p xáº¿p cÃ¡c chá»¯ cÃ¡i Ä‘á»ƒ táº¡o thÃ nh tá»« vá»±ng Ä‘Ãºng",
+            "time": "10-15 phÃºt"
+          },
+          "bridgeGame": {
+            "title": "Cáº§u Äá»©t GÃ£y",
+            "description": "Äiá»n tá»« vÃ o chá»— trá»‘ng Ä‘á»ƒ vÆ°á»£t qua cÃ¢y cáº§u",
+            "time": "10-15 phÃºt"
+          },
+          "grammarQuest": {
+            "title": "Nhiá»‡m Vá»¥ Ngá»¯ PhÃ¡p",
+            "description": "PhiÃªu lÆ°u qua cÃ¡c thá»­ thÃ¡ch ngá»¯ phÃ¡p vÃ  má»Ÿ khÃ³a thÃ nh tÃ­ch",
+            "time": "15-20 phÃºt"
+          },
+          "listeningChallenge": {
+            "title": "Thá»­ ThÃ¡ch Nghe",
+            "description": "Nghe vÃ  nháº­n diá»‡n cÃ¡c tá»« Ä‘Ãºng trong nhiá»u ngá»¯ cáº£nh khÃ¡c nhau",
+            "time": "10-15 phÃºt"
+          },
+          "speedQuiz": {
+            "title": "Äá»‘ Nhanh",
+            "description": "Tráº£ lá»i cÃ ng nhiá»u cÃ¢u há»i cÃ ng tá»‘t trong thá»i gian giá»›i háº¡n",
+            "time": "5 phÃºt"
+          },
+          "sentenceBuilder": {
+            "title": "XÃ¢y Dá»±ng CÃ¢u",
+            "description": "Táº¡o cÃ¢u Ä‘Ãºng tá»« cÃ¡c tá»« vÃ  cá»¥m tá»« bá»‹ xÃ¡o trá»™n",
+            "time": "10-15 phÃºt"
+          }
+        },
+        "vocabularyMatch": {
+          "title": "GhÃ©p Tá»« Vá»±ng",
+          "instructions": "Nháº¥n vÃ o má»™t tá»« vÃ  sau Ä‘Ã³ nháº¥n vÃ o nghÄ©a tÆ°Æ¡ng á»©ng",
+          "matched": "ÄÃ£ GhÃ©p",
+          "total": "Tá»•ng",
+          "attempts": "LÆ°á»£t Thá»­"
+        },
+        "wordScramble": {
+          "title": "Xáº¿p Chá»¯",
+          "instructions": "Nháº¥n vÃ o cÃ¡c chá»¯ cÃ¡i theo thá»© tá»± Ä‘Ãºng Ä‘á»ƒ táº¡o thÃ nh tá»«",
+          "meaning": "NghÄ©a",
+          "tapLetters": "Nháº¥n vÃ o cÃ¡c chá»¯ cÃ¡i bÃªn dÆ°á»›i...",
+          "removeLetter": "XÃ³a KÃ½ Tá»± Cuá»‘i",
+          "example": "VÃ­ Dá»¥",
+          "hideHint": "áº¨n Gá»£i Ã",
+          "showHint": "Hiá»‡n Gá»£i Ã",
+          "skip": "Bá» Qua",
+          "correct": "ChÃ­nh XÃ¡c!",
+          "incorrect": "Thá»­ Láº¡i!"
+        },
+        "speedQuiz": {
+          "title": "Äá»‘ Nhanh",
+          "instructions": "Chá»n cÃ¢u tráº£ lá»i Ä‘Ãºng trÆ°á»›c khi háº¿t giá»!",
+          "selectMeaning": "Chá»n nghÄ©a cá»§a tá»«:",
+          "selectWord": "Chá»n tá»« cho nghÄ©a:",
+          "notEnoughWords": "Cáº§n Ã­t nháº¥t 4 tá»« Ä‘á»ƒ chÆ¡i Äá»‘ Nhanh"
+        },
+        "bridge": {
+          "title": "Cáº§u Äá»©t GÃ£y",
+          "loading": "Äang táº£i trÃ² chÆ¡i...",
+          "fillBlank": "Äiá»n tá»« vÃ o chá»— trá»‘ng:",
+          "victory": "ðŸŽ‰ Chiáº¿n Tháº¯ng!",
+          "victoryMessage": "Báº¡n Ä‘Ã£ vÆ°á»£t qua táº¥t cáº£ cÃ¡c cÃ¢y cáº§u!",
+          "gameOver": "ðŸ’” TrÃ² ChÆ¡i Káº¿t ThÃºc",
+          "gameOverMessage": "CÃ¢y cáº§u Ä‘Ã£ sáº­p!",
+          "reviewMistakes": "Xem Láº¡i CÃ¡c CÃ¢u Sai:",
+          "tryAgain": "Thá»­ Láº¡i",
+          "playAgain": "ChÆ¡i Láº¡i",
+          "noSentences": "KhÃ´ng cÃ³ cÃ¢u vÃ­ dá»¥ nÃ o",
+          "noQuestions": "KhÃ´ng thá»ƒ táº¡o cÃ¢u há»i",
+          "loadError": "KhÃ´ng thá»ƒ táº£i trÃ² chÆ¡i",
+          "correctAnswers": "CÃ¢u Tráº£ Lá»i ÄÃºng",
+          "viewReview": "Xem ÄÃ¡nh GiÃ¡",
+          "reviewTitle": "ðŸ“‹ ÄÃ¡nh GiÃ¡ CÃ¢u Tráº£ Lá»i",
+          "reviewSummary": "Báº¡n tráº£ lá»i Ä‘Ãºng {{correct}} trong tá»•ng sá»‘ {{total}} cÃ¢u há»i!",
+          "questionNum": "CÃ¢u Há»i #{{num}}",
+          "correct": "ÄÃºng",
+          "incorrect": "Sai",
+          "yourAnswer": "CÃ¢u Tráº£ Lá»i Cá»§a Báº¡n",
+          "correctAnswer": "ÄÃ¡p Ãn ÄÃºng"
+        },
+        "result": {
+          "title": "HoÃ n ThÃ nh TrÃ² ChÆ¡i!",
+          "score": "Äiá»ƒm Sá»‘",
+          "time": "Thá»i Gian",
+          "playAgain": "ChÆ¡i Láº¡i",
+          "exit": "ThoÃ¡t",
+          "correctAnswers": "CÃ¢u Tráº£ Lá»i ÄÃºng",
+          "timeTaken": "Thá»i gian",
+          "backToMenu": "Quay Láº¡i Menu",
+          "excellent": {
+            "title": "Xuáº¥t Sáº¯c!",
+            "message": "ThÃ nh tÃ­ch vÆ°á»£t trá»™i! Báº¡n Ä‘Ã£ náº¯m vá»¯ng ná»™i dung nÃ y!"
+          },
+          "good": {
+            "title": "LÃ m Tá»‘t Láº¯m!",
+            "message": "LÃ m tá»‘t láº¯m! HÃ£y tiáº¿p tá»¥c phÃ¡t huy!"
+          },
+          "fair": {
+            "title": "CÅ©ng ÄÆ°á»£c!",
+            "message": "KhÃ´ng tá»‡! Luyá»‡n táº­p thÃªm má»™t chÃºt ná»¯a lÃ  báº¡n sáº½ lÃ m ráº¥t tá»‘t!"
+          },
+          "needsImprovement": {
+            "title": "Thá»­ Láº¡i NhÃ©!",
+            "message": "Äá»«ng bá» cuá»™c! CÃ³ cÃ´ng mÃ i sáº¯t cÃ³ ngÃ y nÃªn kim!"
+          }
+        }
+      }
+    }
+  },
+  "games": {
+    "points": "Äiá»ƒm",
+    "playAgain": "ChÆ¡i Láº¡i",
+    "backToMenu": "Quay Láº¡i Menu",
+    "tryAgain": "Thá»­ Láº¡i"
+  },
+  "student": {
+    "bookList": {
+      "title": "ThÆ° Viá»‡n",
+      "search": {
+        "placeholder": "TÃ¬m kiáº¿m sÃ¡ch..."
+      },
+      "startLearning": "Báº¯t Äáº§u Há»c"
+    }
+  }
+}

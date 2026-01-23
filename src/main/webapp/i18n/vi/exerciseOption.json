@@ -1,0 +1,27 @@
+{
+  "langleagueApp": {
+    "exerciseOption": {
+      "home": {
+        "title": "Lựa Chọn Bài Tập",
+        "refreshListLabel": "Làm mới danh sách",
+        "createLabel": "Thêm mới một Lựa Chọn",
+        "createOrEditLabel": "Thêm mới hoặc cập nhật Lựa Chọn",
+        "notFound": "Không tìm thấy Lựa Chọn nào"
+      },
+      "created": "Một Lựa Chọn mới được tạo với định danh {{ param }}",
+      "updated": "Một Lựa Chọn cập nhật với định danh {{ param }}",
+      "deleted": "Một Lựa Chọn đã xóa với định danh {{ param }}",
+      "delete": {
+        "question": "Bạn có chắc là muốn xóa Lựa Chọn {{ id }}?"
+      },
+      "detail": {
+        "title": "Lựa Chọn Bài Tập"
+      },
+      "id": "ID",
+      "optionText": "Nội Dung Lựa Chọn",
+      "isCorrect": "Là Đáp Án Đúng",
+      "orderIndex": "Thứ Tự",
+      "exercise": "Bài Tập"
+    }
+  }
+}

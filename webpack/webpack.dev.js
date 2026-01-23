@@ -26,26 +26,47 @@ module.exports = async options =>
     module: {
       rules: [
         {
-          test: /\.(sa|sc|c)ss$/,
+          test: /\.module\.(sa|sc|c)ss$/,
           use: [
             'style-loader',
             {
               loader: 'css-loader',
               options: {
-                sourceMap: true,
-                modules: false,
-                importLoaders: 2,
-                esModule: false,
+                url: true,
+                modules: {
+                  localIdentName: '[local]',
+                  exportLocalsConvention: 'camelCaseOnly',
+                },
               },
             },
             {
               loader: 'postcss-loader',
+            },
+            {
+              loader: 'sass-loader',
+              options: { implementation: sass },
+            },
+          ],
+        },
+        {
+          test: /\.(sa|sc|c)ss$/,
+          exclude: /\.module\.(sa|sc|c)ss$/,
+          use: [
+            'style-loader',
+            {
+              loader: 'css-loader',
               options: {
-                sourceMap: true,
-                postcssOptions: {
-                  plugins: [require('autoprefixer')],
+                url: true,
+                importLoaders: 2,
+                // Enable CSS Modules for files ending in .module.css/scss
+                modules: {
+                  auto: true,
+                  localIdentName: '[name]__[local]__[hash:base64:5]',
                 },
               },
+            },
+            {
+              loader: 'postcss-loader',
             },
             {
               loader: 'sass-loader',
@@ -53,11 +74,15 @@ module.exports = async options =>
                 implementation: sass,
                 sourceMap: true,
                 sassOptions: {
-                  quietDeps: true,
+                  includePaths: [utils.root('node_modules')],
                 },
               },
             },
           ],
+        },
+        {
+          test: /\.(woff|woff2|eot|ttf|otf)$/,
+          type: 'asset/resource',
         },
       ],
     },
@@ -69,7 +94,7 @@ module.exports = async options =>
       port: 9060,
       proxy: [
         {
-          context: ['/api', '/services', '/management', '/v3/api-docs', '/h2-console'],
+          context: ['/api', '/services', '/management', '/v3/api-docs', '/h2-console', '/content/uploads'],
           target: `http${options.tls ? 's' : ''}://localhost:8080`,
           secure: false,
           changeOrigin: options.tls,
@@ -93,7 +118,7 @@ module.exports = async options =>
             target: `http${options.tls ? 's' : ''}://localhost:${options.watch ? '8080' : '9060'}`,
             ws: true,
             proxyOptions: {
-              changeOrigin: true, //pass the Host header to the backend unchanged https://github.com/Browsersync/browser-sync/issues/430
+              changeOrigin: false, //pass the Host header to the backend unchanged https://github.com/Browsersync/browser-sync/issues/430
             },
           },
           socket: {

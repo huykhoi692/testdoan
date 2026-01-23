@@ -1,109 +1,257 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import {
-  getBookProgress,
-  updateBookProgress,
-  getMyBooks,
-  getChapterProgress,
-  updateChapterProgress,
-  getChapterProgressesByBook,
-  enrollBook,
-  markChapterAsCompleted,
-} from '../services/progress.service';
-import { IBookProgress, IChapterProgress } from '../model';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import axios from 'axios';
+import { IProgress } from 'app/shared/model/progress.model';
 
-export interface ProgressState {
+interface ProgressState {
+  progresses: IProgress[];
+  userProgresses: IProgress[];
   loading: boolean;
+  updating: boolean;
   errorMessage: string | null;
-  bookProgress: IBookProgress | null;
-  chapterProgress: IChapterProgress | null;
-  userBooks: IBookProgress[];
-  chapterProgresses: IChapterProgress[];
 }
 
 const initialState: ProgressState = {
+  progresses: [],
+  userProgresses: [],
   loading: false,
+  updating: false,
   errorMessage: null,
-  bookProgress: null,
-  chapterProgress: null,
-  userBooks: [],
-  chapterProgresses: [],
 };
 
-export const ProgressSlice = createSlice({
+// Async thunks
+
+export const fetchProgressByUserAndUnit = createAsyncThunk(
+  'progress/fetchByUserAndUnit',
+  async ({ userProfileId, unitId }: { userProfileId: number; unitId: number }) => {
+    // Use the dedicated endpoint for fetching by user and unit
+    const response = await axios.get<IProgress>(`/api/progresses/user/${userProfileId}/unit/${unitId}`);
+    return response.data;
+  },
+);
+
+export const fetchProgressesByUser = createAsyncThunk('progress/fetchByUser', async (userProfileId: number) => {
+  // Use the dedicated endpoint for fetching by user
+  const response = await axios.get<IProgress[]>(`/api/progresses/user/${userProfileId}`);
+  return response.data;
+});
+
+export const fetchProgressesByUnit = createAsyncThunk('progress/fetchByUnit', async (unitId: number) => {
+  // Use the dedicated endpoint for fetching by unit
+  const response = await axios.get<IProgress[]>(`/api/progresses/unit/${unitId}`);
+  return response.data;
+});
+
+export const fetchMyProgresses = createAsyncThunk('progress/fetchMy', async () => {
+  // Use the secure endpoint that returns only the current user's progresses
+  const response = await axios.get<IProgress[]>('/api/progresses/my-progresses');
+  return response.data;
+});
+
+export const fetchMyProgressByUnit = createAsyncThunk('progress/fetchMyByUnit', async (unitId: number) => {
+  // Use the secure endpoint that returns only the current user's progress for a specific unit
+  const response = await axios.get<IProgress>(`/api/progresses/my-progresses/unit/${unitId}`);
+  return response.data;
+});
+
+export const createProgress = createAsyncThunk('progress/create', async (progress: IProgress) => {
+  const response = await axios.post<IProgress>('/api/progresses', progress);
+  return response.data;
+});
+
+export const updateProgress = createAsyncThunk('progress/update', async (progress: IProgress) => {
+  const response = await axios.put<IProgress>(`/api/progresses/${progress.id}`, progress);
+  return response.data;
+});
+
+export const markUnitComplete = createAsyncThunk('progress/markComplete', async (unitId: number) => {
+  // Use the dedicated endpoint that handles completion logic on the backend
+  const response = await axios.post<IProgress>(`/api/progresses/complete-unit/${unitId}`);
+  return response.data;
+});
+
+export const deleteProgress = createAsyncThunk('progress/delete', async (id: number) => {
+  await axios.delete(`/api/progresses/${id}`);
+  return id;
+});
+
+// Slice
+const progressSlice = createSlice({
   name: 'progress',
   initialState,
   reducers: {
-    reset(state) {
-      Object.assign(state, initialState);
+    reset: () => initialState,
+    clearProgresses(state) {
+      state.progresses = [];
+    },
+    // Optimistic update for better UX - updates UI immediately
+    updateProgressOptimistic(state, action: PayloadAction<Partial<IProgress> & { id: number }>) {
+      const { id, ...updates } = action.payload;
+
+      // Update in progresses array
+      const index = state.progresses.findIndex(p => p.id === id);
+      if (index !== -1) {
+        state.progresses[index] = { ...state.progresses[index], ...updates };
+      }
+
+      // Update in userProgresses array
+      const userIndex = state.userProgresses.findIndex(p => p.id === id);
+      if (userIndex !== -1) {
+        state.userProgresses[userIndex] = { ...state.userProgresses[userIndex], ...updates };
+      }
     },
   },
   extraReducers(builder) {
     builder
-      // Book Progress
-      .addCase(getBookProgress.pending, state => {
+      // fetchProgressByUserAndUnit
+      .addCase(fetchProgressByUserAndUnit.pending, state => {
         state.loading = true;
+        state.errorMessage = null;
       })
-      .addCase(getBookProgress.fulfilled, (state, action) => {
+      .addCase(fetchProgressByUserAndUnit.fulfilled, (state, action: PayloadAction<IProgress>) => {
         state.loading = false;
-        state.bookProgress = action.payload;
-      })
-      .addCase(getBookProgress.rejected, (state, action) => {
-        state.loading = false;
-        state.errorMessage = action.error.message || 'Failed to fetch book progress';
-      })
-      .addCase(updateBookProgress.fulfilled, (state, action: PayloadAction<IBookProgress>) => {
-        state.bookProgress = action.payload;
-      })
-      .addCase(getMyBooks.fulfilled, (state, action: PayloadAction<IBookProgress[]>) => {
-        state.userBooks = action.payload;
-      })
-      // Chapter Progress
-      .addCase(getChapterProgress.fulfilled, (state, action) => {
-        state.chapterProgress = action.payload;
-      })
-      .addCase(updateChapterProgress.fulfilled, (state, action: PayloadAction<IChapterProgress>) => {
-        state.chapterProgress = action.payload;
-        // Update in list if exists
-        const index = state.chapterProgresses.findIndex(cp => cp.id === action.payload.id);
-        if (index !== -1) {
-          state.chapterProgresses[index] = action.payload;
-        }
-      })
-      .addCase(getChapterProgressesByBook.fulfilled, (state, action) => {
-        state.chapterProgresses = action.payload;
-      })
-      // Enroll Book
-      .addCase(enrollBook.pending, state => {
-        state.loading = true;
-      })
-      .addCase(enrollBook.fulfilled, (state, action) => {
-        state.loading = false;
-        state.bookProgress = action.payload;
-      })
-      .addCase(enrollBook.rejected, (state, action) => {
-        state.loading = false;
-        state.errorMessage = action.error.message || 'Failed to enroll in book';
-      })
-      // Mark Chapter Completed
-      .addCase(markChapterAsCompleted.fulfilled, (state, action) => {
-        // Update in list if exists
-        const index = state.chapterProgresses.findIndex(cp => cp.chapterId === action.payload.chapterId || cp.id === action.payload.id);
-        if (index !== -1) {
-          state.chapterProgresses[index] = {
-            ...state.chapterProgresses[index],
-            isCompleted: true,
-            completed: true,
-            progress: 100,
-            percent: 100,
-            // completedDate: action.payload.completedDate, // Removed as it might not be in payload
-          };
+        const existingIndex = state.progresses.findIndex(p => p.id === action.payload.id);
+        if (existingIndex !== -1) {
+          state.progresses[existingIndex] = action.payload;
         } else {
-          // If payload is IChapterProgress, push it
-          // state.chapterProgresses.push(action.payload);
+          state.progresses.push(action.payload);
         }
+      })
+      .addCase(fetchProgressByUserAndUnit.rejected, (state, action) => {
+        state.loading = false;
+        // Don't set error for not found in this context
+      })
+      // fetchProgressesByUser
+      .addCase(fetchProgressesByUser.pending, state => {
+        state.loading = true;
+        state.errorMessage = null;
+      })
+      .addCase(fetchProgressesByUser.fulfilled, (state, action: PayloadAction<IProgress[]>) => {
+        state.loading = false;
+        state.progresses = action.payload;
+      })
+      .addCase(fetchProgressesByUser.rejected, (state, action) => {
+        state.loading = false;
+        state.errorMessage = action.error.message || 'Failed to fetch progresses';
+      })
+      // fetchProgressesByUnit
+      .addCase(fetchProgressesByUnit.pending, state => {
+        state.loading = true;
+        state.errorMessage = null;
+      })
+      .addCase(fetchProgressesByUnit.fulfilled, (state, action: PayloadAction<IProgress[]>) => {
+        state.loading = false;
+        state.progresses = action.payload;
+      })
+      .addCase(fetchProgressesByUnit.rejected, (state, action) => {
+        state.loading = false;
+        state.errorMessage = action.error.message || 'Failed to fetch progresses';
+      })
+      // fetchMyProgresses
+      .addCase(fetchMyProgresses.pending, state => {
+        state.loading = true;
+        state.errorMessage = null;
+      })
+      .addCase(fetchMyProgresses.fulfilled, (state, action: PayloadAction<IProgress[]>) => {
+        state.loading = false;
+        state.userProgresses = action.payload;
+      })
+      .addCase(fetchMyProgresses.rejected, (state, action) => {
+        state.loading = false;
+        state.errorMessage = action.error.message || 'Failed to fetch my progresses';
+      })
+      // fetchMyProgressByUnit
+      .addCase(fetchMyProgressByUnit.pending, state => {
+        state.loading = true;
+        state.errorMessage = null;
+      })
+      .addCase(fetchMyProgressByUnit.fulfilled, (state, action: PayloadAction<IProgress>) => {
+        state.loading = false;
+        const existingIndex = state.userProgresses.findIndex(p => p.id === action.payload.id);
+        if (existingIndex !== -1) {
+          state.userProgresses[existingIndex] = action.payload;
+        } else {
+          state.userProgresses.push(action.payload);
+        }
+      })
+      .addCase(fetchMyProgressByUnit.rejected, (state, action) => {
+        state.loading = false;
+        // Don't set error for not found
+      })
+      // createProgress
+      .addCase(createProgress.pending, state => {
+        state.updating = true;
+        state.errorMessage = null;
+      })
+      .addCase(createProgress.fulfilled, (state, action: PayloadAction<IProgress>) => {
+        state.updating = false;
+        state.progresses.push(action.payload);
+        state.userProgresses.push(action.payload);
+      })
+      .addCase(createProgress.rejected, (state, action) => {
+        state.updating = false;
+        state.errorMessage = action.error.message || 'Failed to create progress';
+      })
+      // updateProgress
+      .addCase(updateProgress.pending, state => {
+        state.updating = true;
+        state.errorMessage = null;
+      })
+      .addCase(updateProgress.fulfilled, (state, action: PayloadAction<IProgress>) => {
+        state.updating = false;
+        const index = state.progresses.findIndex(p => p.id === action.payload.id);
+        if (index !== -1) {
+          state.progresses[index] = action.payload;
+        }
+        const userIndex = state.userProgresses.findIndex(p => p.id === action.payload.id);
+        if (userIndex !== -1) {
+          state.userProgresses[userIndex] = action.payload;
+        }
+      })
+      .addCase(updateProgress.rejected, (state, action) => {
+        state.updating = false;
+        state.errorMessage = action.error.message || 'Failed to update progress';
+      })
+      // markUnitComplete
+      .addCase(markUnitComplete.pending, state => {
+        state.updating = true;
+        state.errorMessage = null;
+      })
+      .addCase(markUnitComplete.fulfilled, (state, action: PayloadAction<IProgress>) => {
+        state.updating = false;
+        const index = state.progresses.findIndex(p => p.id === action.payload.id);
+        if (index !== -1) {
+          state.progresses[index] = action.payload;
+        } else {
+          state.progresses.push(action.payload);
+        }
+        const userIndex = state.userProgresses.findIndex(p => p.id === action.payload.id);
+        if (userIndex !== -1) {
+          state.userProgresses[userIndex] = action.payload;
+        } else {
+          state.userProgresses.push(action.payload);
+        }
+      })
+      .addCase(markUnitComplete.rejected, (state, action) => {
+        state.updating = false;
+        state.errorMessage = action.error.message || 'Failed to mark unit as complete';
+      })
+      // deleteProgress
+      .addCase(deleteProgress.pending, state => {
+        state.updating = true;
+        state.errorMessage = null;
+      })
+      .addCase(deleteProgress.fulfilled, (state, action: PayloadAction<number>) => {
+        state.updating = false;
+        state.progresses = state.progresses.filter(p => p.id !== action.payload);
+        state.userProgresses = state.userProgresses.filter(p => p.id !== action.payload);
+      })
+      .addCase(deleteProgress.rejected, (state, action) => {
+        state.updating = false;
+        state.errorMessage = action.error.message || 'Failed to delete progress';
       });
   },
 });
 
-export const { reset } = ProgressSlice.actions;
-export default ProgressSlice.reducer;
+export const { reset, clearProgresses, updateProgressOptimistic } = progressSlice.actions;
+
+export default progressSlice.reducer;

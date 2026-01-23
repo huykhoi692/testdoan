@@ -1,0 +1,174 @@
+// ========================================
+// VOCABULARY WIDGET STYLE
+// ========================================
+// File: src/main/webapp/app/modules/student/learn/unit-vocabulary.scss
+
+.vocabulary-grid {
+  display: grid;
+  // Tự động chia cột: Tối thiểu 280px, tối đa là chia đều 1fr
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+
+  .vocabulary-card {
+    // Light Mode Default Style
+    background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); // Xanh dương nhạt
+    border: 1px solid #bae6fd;
+    border-radius: 16px;
+    padding: 1.5rem;
+    height: 100%; // Để các card cao bằng nhau
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+    position: relative;
+    overflow: hidden;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 20px rgba(2, 132, 199, 0.15);
+      border-color: #7dd3fc;
+    }
+
+    // Header: Từ vựng + Loa
+    .vocab-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.5rem;
+    }
+
+    .vocab-word {
+      color: #0369a1;
+      font-size: 1.5rem;
+      font-weight: 800;
+      line-height: 1.2;
+      cursor: pointer;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    .speak-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: white;
+      border: none;
+      color: #0284c7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s;
+      flex-shrink: 0;
+
+      &:hover {
+        background: #0284c7;
+        color: white;
+        transform: scale(1.1);
+      }
+      &.speaking {
+        animation: pulse 1s infinite;
+        background: #0284c7;
+        color: white;
+      }
+    }
+
+    .vocab-pronunciation {
+      color: #0c4a6e;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      opacity: 0.8;
+    }
+
+    .vocab-meaning {
+      color: #334155;
+      font-weight: 500;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      flex-grow: 1;
+    }
+
+    .vocab-example {
+      background: rgba(255, 255, 255, 0.6);
+      padding: 0.75rem;
+      border-radius: 8px;
+      border-left: 3px solid #0ea5e9;
+      font-size: 0.9rem;
+      color: #475569;
+      margin-top: auto;
+
+      em {
+        font-style: italic;
+      }
+    }
+
+    .vocab-image {
+      margin-top: 1rem;
+      border-radius: 8px;
+      overflow: hidden;
+      img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+      }
+    }
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(2, 132, 199, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(2, 132, 199, 0);
+  }
+}
+
+// === DARK MODE OVERRIDE ===
+[data-theme='dark'] {
+  .vocabulary-grid .vocabulary-card {
+    // Gradient tối (Deep Blue)
+    background: linear-gradient(135deg, #0c4a6e 0%, #1e293b 100%);
+    border-color: #075985;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+
+    .vocab-word {
+      color: #7dd3fc;
+    }
+    .vocab-meaning {
+      color: #e2e8f0;
+    }
+    .vocab-pronunciation {
+      color: #bae6fd;
+    }
+
+    .vocab-example {
+      background: rgba(0, 0, 0, 0.3);
+      color: #cbd5e1;
+      border-left-color: #38bdf8;
+    }
+
+    .speak-btn {
+      background: #334155;
+      color: #38bdf8;
+      &:hover {
+        background: #38bdf8;
+        color: #0f172a;
+      }
+    }
+
+    &:hover {
+      box-shadow: 0 10px 20px rgba(56, 189, 248, 0.15);
+      border-color: #38bdf8;
+    }
+  }
+}

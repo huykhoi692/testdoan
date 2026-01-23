@@ -1,0 +1,235 @@
+{
+  "global": {
+    "title": "Langleague",
+    "browsehappy": "당신은 <strong>오래된</strong> 브라우저를 사용하고 있군요. <a href=\"http://browsehappy.com/?locale=en\">브라우저를 업그레이드</a> 해 당신의 경험을 발전시키세요.",
+    "menu": {
+      "home": "홈",
+      "student": "학생",
+      "teacher": "교사",
+      "jhipster-needle-menu-add-element": "JHipster will add additional menu entries here (do not translate!)",
+      "entities": {
+        "main": "엔티티",
+        "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
+      },
+      "account": {
+        "main": "계정",
+        "settings": "설정",
+        "password": "비밀번호",
+        "sessions": "세션",
+        "login": "인증",
+        "logout": "로그아웃",
+        "register": "등록"
+      },
+      "admin": {
+        "main": "관리자",
+        "tracker": "사용자 트랙커",
+        "metrics": "메트릭스",
+        "health": "상태 확인",
+        "configuration": "설정",
+        "logs": "로그",
+        "apidocs": "API",
+        "database": "데이터베이스",
+        "userManagement": "사용자 관리",
+        "jhipster-needle-menu-add-admin-element": "JHipster will add additional menu entries here (do not translate!)"
+      },
+      "teacher": {
+        "main": "교사",
+        "dashboard": "대시보드",
+        "bookManager": "책 관리",
+        "studentAnalytics": "학생 분석"
+      },
+      "language": "언어"
+    },
+    "sidebar": {
+      "hide": "숨기기",
+      "student": {
+        "home": "홈",
+        "myBooks": "내 책",
+        "flashCard": "플래시카드",
+        "games": "게임",
+        "profile": "프로필",
+        "logout": "로그아웃"
+      },
+      "teacher": {
+        "dashboard": "대시보드",
+        "books": "책",
+        "units": "단원",
+        "students": "학생",
+        "logout": "로그아웃"
+      },
+      "admin": {
+        "dashboard": "대시보드",
+        "books": "책",
+        "users": "사용자",
+        "settings": "설정",
+        "logout": "로그아웃"
+      }
+    },
+    "form": {
+      "username.label": "로그인 아이디",
+      "username.placeholder": "로그인 아이디",
+      "currentpassword.label": "현재 비밀번호",
+      "currentpassword.placeholder": "현재 비밀번호",
+      "newpassword.label": "새 비밀번호",
+      "newpassword.placeholder": "새 비밀번호",
+      "confirmpassword.label": "새 비밀번호 확인",
+      "confirmpassword.placeholder": "새 비밀번호 확인",
+      "email.label": "이메일",
+      "email.placeholder": "이메일을 입력하세요"
+    },
+    "messages": {
+      "info": {
+        "authenticated": {
+          "prefix": "",
+          "link": "인증",
+          "suffix": "을 원하시면, 기본 계정을 사용할 수 있습니다:<br/>- 관리자 (아이디=\"admin\", 비밀번호=\"admin\") <br/>- 사용자 (아이디=\"user\", 비밀번호=\"user\")."
+        },
+        "register": {
+          "noaccount": "아직 계정이 없습니까?",
+          "link": "새로운 계정을 등록하세요"
+        }
+      },
+      "error": {
+        "dontmatch": "비밀번호가 일치하지 않습니다!",
+        "missingUnitId": "유닛 ID가 없습니다!"
+      },
+      "validate": {
+        "newpassword": {
+          "required": "비밀번호 입력이 필요합니다.",
+          "minlength": "비밀번호는 최소 4자 이상이어야 합니다",
+          "maxlength": "비밀번호는 최대 50자 까지입니다.",
+          "strength": "비밀번호 길이:"
+        },
+        "confirmpassword": {
+          "required": "확인할 비밀번호 입력이 필요합니다.",
+          "minlength": "확인할 비밀번호는 최소 4자 이상이어야 합니다",
+          "maxlength": "확인할 비밀번호는 최대 50자 까지입니다"
+        },
+        "email": {
+          "required": "이메일 입력이 필요합니다.",
+          "invalid": "잘못된 이메일입니다.",
+          "minlength": "이메일은 최소 5자 이상이어야 합니다",
+          "maxlength": "이메일은 최대 50자 까지입니다."
+        }
+      }
+    },
+    "field": {
+      "id": "ID"
+    },
+    "ribbon": {
+      "dev": "개발"
+    },
+    "item-count": "{{first}} - {{second}} / {{total}} 항목을 표시합니다.",
+    "loading": "로딩 중...",
+    "selectSection": "사이드바에서 섹션을 선택하여 학습을 시작하세요.",
+    "progressSaved": "진행 상황이 자동으로 저장됩니다.",
+    "media": {
+      "invalidAudioType": "잘못된 오디오 파일 형식",
+      "imageUploaded": "이미지가 성공적으로 업로드되었습니다",
+      "audioUploaded": "오디오가 성공적으로 업로드되었습니다",
+      "remove": "제거",
+      "uploadFromComputer": "컴퓨터에서 업로드",
+      "upload": "업로드",
+      "imageSupport": "지원: JPG, PNG, GIF, Google Drive 링크",
+      "audioSupport": "지원: MP3, WAV, Google Drive 링크"
+    },
+    "footer": {
+      "slogan": "현대적이고 인터랙티브한 학습 경험으로 전 세계 언어 학습자에게 힘을 실어줍니다.",
+      "copyright": "모든 권리 보유",
+      "madeWithLove": "사랑으로 만든",
+      "byTeam": "LangLeague 팀",
+      "quickLinks": {
+        "title": "빠른 링크",
+        "home": "홈",
+        "books": "책",
+        "about": "소개",
+        "help": "도움말 센터"
+      },
+      "resources": {
+        "title": "리소스",
+        "faq": "FAQ"
+      },
+      "legal": {
+        "title": "법적 정보",
+        "privacy": "개인정보 처리방침",
+        "terms": "서비스 약관",
+        "cookies": "쿠키 정책"
+      },
+      "connect": {
+        "title": "연결하기"
+      },
+      "social": {
+        "followUs": "소셜 미디어에서 팔로우하세요"
+      }
+    },
+    "user": {
+      "role": "역할",
+      "status": "상태"
+    }
+  },
+  "entity": {
+    "action": {
+      "addblob": "Blob 추가",
+      "addimage": "이미지 추가",
+      "back": "뒤로",
+      "cancel": "취소",
+      "delete": "삭제",
+      "edit": "수정",
+      "open": "Open",
+      "save": "저장",
+      "view": "보기",
+      "show": "Show {{otherEntity}}"
+    },
+    "detail": {
+      "field": "필드",
+      "value": "값"
+    },
+    "delete": {
+      "title": "삭제 확인"
+    },
+    "validation": {
+      "required": "필수항목입니다.",
+      "minlength": "최소 {{min}}자 이상 입력해야 합니다.",
+      "maxlength": "최대 {{max}}자 이하까지만 입력 가능합니다.",
+      "min": "최소 {{min}} 이상의 값만 입력 가능합니다.",
+      "max": "최대 {{max}} 이하의 값만 입력 가능합니다.",
+      "minbytes": "최소 {{min}} 바이트 이상이어야 합니다.",
+      "maxbytes": "최대 {{max}} 바이트 미만이어야 합니다.",
+      "pattern": "{{pattern}} 패턴에 따라 입력해야 합니다.",
+      "number": "숫자만 입력 가능합니다.",
+      "datetimelocal": "날짜와 시간만 입력 가능합니다."
+    },
+    "filters": {
+      "set": "Following filters are set",
+      "clear": "Clear filter",
+      "clearAll": "Clear all filters"
+    }
+  },
+  "error": {
+    "internalServerError": "Internal server error",
+    "server.not.reachable": "Server not reachable",
+    "url.not.found": "Not found",
+    "NotNull": "Field {{fieldName}} cannot be empty!",
+    "Size": "Field {{fieldName}} does not meet min/max size requirements!",
+    "userexists": "Login name already used!",
+    "emailexists": "Email is already in use!",
+    "idexists": "A new {{entityName}} cannot already have an ID",
+    "idnull": "Invalid ID",
+    "idinvalid": "Invalid Id",
+    "idnotfound": "ID cannot be found",
+    "file": {
+      "could.not.extract": "Could not extract file",
+      "not.image": "File was expected to be an image but was found to be \"{{ fileType }}\""
+    }
+  },
+  "footer": "하단영역",
+  "langleague": {
+    "apiKey": {
+      "security": {
+        "browserOnly": "API 키는 브라우저에서만 사용됩니다",
+        "noStorage": "키는 저장되지 않습니다",
+        "noShare": "키를 다른 사람과 공유하지 마세요"
+      }
+    }
+  }
+}

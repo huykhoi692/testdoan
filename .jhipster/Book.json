@@ -1,6 +1,6 @@
 {
   "annotations": {
-    "changelogDate": "20251122061521"
+    "changelogDate": "20260108164534"
   },
   "applications": "*",
   "dto": "mapstruct",
@@ -8,45 +8,51 @@
     {
       "fieldName": "title",
       "fieldType": "String",
-      "fieldValidateRules": ["required", "maxlength"],
-      "fieldValidateRulesMaxlength": "255"
-    },
-    {
-      "fieldName": "level",
-      "fieldType": "Level",
-      "fieldValues": "BEGINNER,INTERMEDIATE,ADVANCED"
+      "fieldValidateRules": ["required"]
     },
     {
       "fieldName": "description",
       "fieldType": "TextBlob"
     },
     {
-      "fieldName": "thumbnail",
-      "fieldType": "String",
-      "fieldValidateRules": ["maxlength"],
-      "fieldValidateRulesMaxlength": "255"
+      "fieldName": "coverImageUrl",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "isPublic",
+      "fieldType": "Boolean",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "createdAt",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
     }
   ],
   "name": "Book",
   "pagination": "pagination",
   "relationships": [
     {
-      "otherEntityName": "chapter",
-      "relationshipName": "chapter",
+      "otherEntityName": "enrollment",
+      "otherEntityRelationshipName": "book",
+      "relationshipName": "enrollments",
       "relationshipSide": "left",
       "relationshipType": "one-to-many"
     },
     {
-      "otherEntityName": "bookReview",
-      "relationshipName": "bookReview",
+      "otherEntityName": "unit",
+      "otherEntityRelationshipName": "book",
+      "relationshipName": "units",
       "relationshipSide": "left",
       "relationshipType": "one-to-many"
     },
     {
-      "otherEntityName": "bookProgress",
-      "relationshipName": "bookProgress",
-      "relationshipSide": "left",
-      "relationshipType": "one-to-many"
+      "otherEntityName": "userProfile",
+      "otherEntityRelationshipName": "books",
+      "relationshipName": "teacherProfile",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
     }
   ],
   "searchEngine": "no",

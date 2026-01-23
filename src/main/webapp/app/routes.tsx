@@ -1,162 +1,113 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import DashboardLayout from './shared/layout/dashboard-layout';
-import PrivateRoute from './shared/auth/PrivateRoute';
-const BookUploadManager = React.lazy(() => import('./modules/staff/BookUploadManager'));
-const ChapterStepperEditor = React.lazy(() => import('./modules/staff/ChapterStepperEditor'));
-import ChapterList from 'app/components/ChapterList';
+import { Route } from 'react-router';
 
-// ==================== PUBLIC PAGES ====================
-const Home = React.lazy(() => import('./modules/home/home'));
-const AuthSlider = React.lazy(() => import('./modules/account/auth-slider'));
-const ForgotPassword = React.lazy(() => import('./modules/account/forgot-password-page'));
-const ContactUs = React.lazy(() => import('./modules/home/contact-us'));
+import Loadable from 'react-loadable';
 
-// ==================== USER PAGES ====================
-const Dashboard = React.lazy(() => import('./modules/dashboard/dashboard'));
-const MyProfile = React.lazy(() => import('./modules/dashboard/MyProfile'));
-const MyCourses = React.lazy(() => import('./modules/dashboard/MyCourses'));
-const BookChapters = React.lazy(() => import('./modules/dashboard/BookChapters'));
-const ChapterExercise = React.lazy(() => import('./modules/dashboard/ChapterExercise'));
-const Settings = React.lazy(() => import('./modules/dashboard/Settings'));
-const Flashcard = React.lazy(() => import('./modules/dashboard/Flashcard'));
-const AddToFlashcard = React.lazy(() => import('./modules/dashboard/AddToFlashcard'));
-const VocabularyList = React.lazy(() => import('./modules/courses/vocabulary-list'));
+import AuthSlider from 'app/modules/account/auth-slider';
+import Activate from 'app/modules/account/activate/activate';
+import PasswordResetInit from 'app/modules/account/password-reset/init/password-reset-init';
+import PasswordResetFinish from 'app/modules/account/password-reset/finish/password-reset-finish';
+import Logout from 'app/modules/account/logout';
+import Home from 'app/modules/home/home';
+import PublicBookList from 'app/modules/home/public-book-list';
+import PublicBookDetail from 'app/modules/home/public-book-detail';
+import ErrorBoundaryRoutes from 'app/shared/error/error-boundary-routes';
+import PageNotFound from 'app/shared/error/page-not-found';
+import PrivateRoute from 'app/shared/auth/private-route';
+import { AUTHORITIES } from 'app/config/constants';
 
-// User learning pages
-const BookLibrary = React.lazy(() => import('./modules/user/BookLibrary'));
-const BookDetail = React.lazy(() => import('./modules/user/BookDetail'));
-const ChapterLearning = React.lazy(() => import('./modules/user/ChapterLearning'));
-const ListeningExercise = React.lazy(() => import('./modules/user/ListeningExercise'));
-const ReadingExercise = React.lazy(() => import('./modules/user/ReadingExercise'));
-const SpeakingExercise = React.lazy(() => import('./modules/user/SpeakingExercise'));
-const WritingExercise = React.lazy(() => import('./modules/user/WritingExercise'));
-const MyBooks = React.lazy(() => import('./modules/user/MyBooks'));
-const MyChapters = React.lazy(() => import('./modules/user/MyChapters'));
+const loading = <div>loading ...</div>;
 
-// New feature pages
-const Achievements = React.lazy(() => import('./modules/user/Achievements'));
-const LearningReports = React.lazy(() => import('./modules/user/LearningReports'));
-const ExerciseAnalytics = React.lazy(() => import('./modules/user/ExerciseAnalytics'));
-const FavoritesPage = React.lazy(() => import('./modules/user/FavoritesPage'));
-const StudySessionPage = React.lazy(() =>
-  import('./entities/study-session/study-session').then(module => ({ default: module.StudySessionPage })),
-);
+const Account = Loadable({
+  loader: () => import(/* webpackChunkName: "account" */ 'app/modules/account'),
+  loading: () => loading,
+});
 
-// ==================== ADMIN PAGES ====================
-const AdminOverview = React.lazy(() => import('./modules/admin/AdminOverview'));
-const UserManagement = React.lazy(() => import('./modules/admin/UserManagement'));
-const CourseManagement = React.lazy(() => import('./modules/admin/CourseManagement'));
-const BookApproval = React.lazy(() => import('./modules/admin/BookApproval'));
-const AdminSettings = React.lazy(() => import('./modules/admin/AdminSettings'));
+const Admin = Loadable({
+  loader: () => import(/* webpackChunkName: "admin" */ 'app/modules/admin'),
+  loading: () => loading,
+});
 
-// ==================== STAFF PAGES ====================
-const StaffOverview = React.lazy(() => import('./modules/staff/StaffOverview'));
-const BookManagement = React.lazy(() => import('./modules/staff/BookManagement'));
-const StaffChapterManagement = React.lazy(() => import('./modules/staff/StaffChapterManagement'));
-const StaffContentEditor = React.lazy(() => import('./modules/staff/StaffContentEditor'));
-const ChapterContentEditor = React.lazy(() => import('./modules/staff/ChapterContentEditor'));
-const UploadBooks = React.lazy(() => import('./modules/staff/UploadBooks'));
-const StaffSettings = React.lazy(() => import('./modules/staff/StaffSettings'));
+const Teacher = Loadable({
+  loader: () => import(/* webpackChunkName: "teacher" */ 'app/modules/teacher'),
+  loading: () => loading,
+});
 
+const Student = Loadable({
+  loader: () => import(/* webpackChunkName: "student" */ 'app/modules/student'),
+  loading: () => loading,
+});
 const AppRoutes = () => {
   return (
-    <Routes>
-      {/* ==================== PUBLIC ROUTES ==================== */}
-      <Route index element={<Home />} />
-      <Route path="login" element={<AuthSlider />} />
-      <Route path="register" element={<AuthSlider />} />
-      <Route path="forgot-password" element={<ForgotPassword />} />
-      <Route path="contact" element={<ContactUs />} />
+    <main id="main-content" className="view-routes" role="main">
+      <ErrorBoundaryRoutes>
+        <Route index element={<Home />} />
+        <Route path="login" element={<AuthSlider />} />
+        <Route path="logout" element={<Logout />} />
+        <Route path="account">
+          {/* Public routes - no authentication required */}
+          <Route path="register" element={<AuthSlider />} />
+          <Route path="activate" element={<Activate />} />
+          <Route path="reset">
+            <Route path="request" element={<PasswordResetInit />} />
+            <Route path="finish" element={<PasswordResetFinish />} />
+          </Route>
 
-      {/* ==================== USER ROUTES (ROLE_USER) ==================== */}
-      <Route
-        path="dashboard"
-        element={
-          <PrivateRoute hasAnyAuthorities={['ROLE_USER', 'ROLE_ADMIN', 'ROLE_STAFF']}>
-            <DashboardLayout />
-          </PrivateRoute>
-        }
-      >
-        <Route index element={<Dashboard />} />
-        <Route path="profile" element={<MyProfile />} />
-        <Route path="settings" element={<Settings />} />
-        <Route path="flashcard" element={<Flashcard />} />
-        <Route path="flashcard/add" element={<AddToFlashcard />} />
+          {/* Protected account routes - require authentication */}
+          <Route
+            path="*"
+            element={
+              <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.TEACHER, AUTHORITIES.STUDENT]}>
+                <Account />
+              </PrivateRoute>
+            }
+          />
+        </Route>
 
-        {/* Courses & Learning */}
-        <Route path="courses" element={<MyCourses />} />
-        <Route path="courses/:courseId/chapters" element={<BookChapters />} />
-        <Route path="courses/chapter/:id" element={<ChapterExercise />} />
-        <Route path="vocabulary" element={<VocabularyList />} />
+        {/* Public Book Routes */}
+        <Route path="books" element={<PublicBookList />} />
+        <Route path="book/:id" element={<PublicBookDetail />} />
 
-        {/* Book Library */}
-        <Route path="books" element={<BookLibrary />} />
-        <Route path="books/:bookId/chapters" element={<ChapterList />} />
-        <Route path="books/:bookId" element={<BookDetail />} />
-        <Route path="books/:bookId/chapter/:chapterId" element={<ChapterLearning />} />
-        <Route path="chapters/:chapterId/study" element={<StudySessionPage />} />
+        {/* ============================================
+         * PROTECTED ROUTES - ROLE-BASED ACCESS CONTROL
+         * ============================================ */}
 
-        {/* My Books & Chapters */}
-        <Route path="my-books" element={<MyBooks />} />
-        <Route path="my-books/:bookId/chapters" element={<ChapterList />} />
-        <Route path="learning/:bookId/chapter/:chapterId" element={<ChapterLearning />} />
-        <Route path="my-chapters" element={<MyChapters />} />
+        {/* Protected Admin Routes - Only accessible by ROLE_ADMIN */}
+        <Route
+          path="admin/*"
+          element={
+            <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+              <Admin />
+            </PrivateRoute>
+          }
+        />
 
-        {/* Exercises */}
-        <Route path="exercise/listening/:id" element={<ListeningExercise />} />
-        <Route path="exercise/reading/:id" element={<ReadingExercise />} />
-        <Route path="exercise/speaking/:id" element={<SpeakingExercise />} />
-        <Route path="exercise/writing/:id" element={<WritingExercise />} />
+        {/* Protected Teacher Routes - Only accessible by ROLE_TEACHER */}
+        <Route
+          path="teacher/*"
+          element={
+            <PrivateRoute hasAnyAuthorities={[AUTHORITIES.TEACHER]}>
+              <Teacher />
+            </PrivateRoute>
+          }
+        />
 
-        {/* New Feature Pages */}
-        <Route path="achievements" element={<Achievements />} />
-        <Route path="reports" element={<LearningReports />} />
-        <Route path="analytics" element={<ExerciseAnalytics />} />
-        <Route path="favorites" element={<FavoritesPage />} />
-      </Route>
+        {/* Protected Student Routes - Only accessible by ROLE_STUDENT */}
+        <Route
+          path="student/*"
+          element={
+            <PrivateRoute hasAnyAuthorities={[AUTHORITIES.STUDENT]}>
+              <Student />
+            </PrivateRoute>
+          }
+        />
 
-      {/* ==================== ADMIN ROUTES (ROLE_ADMIN) ==================== */}
-      <Route
-        path="admin"
-        element={
-          <PrivateRoute hasAnyAuthorities={['ROLE_ADMIN']}>
-            <DashboardLayout />
-          </PrivateRoute>
-        }
-      >
-        <Route index element={<AdminOverview />} />
-        <Route path="users" element={<UserManagement />} />
-        <Route path="courses" element={<CourseManagement />} />
-        <Route path="book-approval" element={<BookApproval />} />
-        <Route path="settings" element={<AdminSettings />} />
-      </Route>
+        {/* DEPRECATED: Old entity CRUD routes - now integrated into role-specific modules */}
+        {/* <Route path="*" element={<EntitiesRoutes />} /> */}
 
-      {/* ==================== STAFF ROUTES (ROLE_STAFF) ==================== */}
-      <Route
-        path="staff"
-        element={
-          <PrivateRoute hasAnyAuthorities={['ROLE_STAFF', 'ROLE_ADMIN']}>
-            <DashboardLayout />
-          </PrivateRoute>
-        }
-      >
-        <Route index element={<StaffOverview />} />
-        <Route path="books" element={<BookManagement />} />
-        <Route path="books/:bookId/chapters" element={<StaffChapterManagement />} />
-        <Route path="chapters/:chapterId/content" element={<StaffContentEditor />} />
-        <Route path="chapters/:chapterId/edit" element={<ChapterContentEditor />} />
-        <Route path="chapters/:chapterId/stepper" element={<ChapterStepperEditor />} />
-        <Route path="books/:bookId/editor" element={<ChapterContentEditor />} />
-        <Route path="editor/:chapterId" element={<ChapterContentEditor />} />
-        <Route path="upload" element={<UploadBooks />} />
-        <Route path="upload-manager" element={<BookUploadManager />} />
-        <Route path="settings" element={<StaffSettings />} />
-      </Route>
-
-      {/* ==================== 404 REDIRECT ==================== */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        <Route path="*" element={<PageNotFound />} />
+      </ErrorBoundaryRoutes>
+    </main>
   );
 };
 

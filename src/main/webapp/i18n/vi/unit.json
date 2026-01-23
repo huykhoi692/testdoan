@@ -1,0 +1,31 @@
+{
+  "langleagueApp": {
+    "unit": {
+      "home": {
+        "title": "Bài Học",
+        "refreshListLabel": "Làm mới danh sách",
+        "createLabel": "Thêm mới một Bài Học",
+        "createOrEditLabel": "Thêm mới hoặc cập nhật Bài Học",
+        "notFound": "Không tìm thấy Bài Học nào"
+      },
+      "created": "Một Bài Học mới được tạo với định danh {{ param }}",
+      "updated": "Một Bài Học cập nhật với định danh {{ param }}",
+      "deleted": "Một Bài Học đã xóa với định danh {{ param }}",
+      "delete": {
+        "question": "Bạn có chắc là muốn xóa Bài Học {{ id }}?"
+      },
+      "detail": {
+        "title": "Bài Học"
+      },
+      "id": "ID",
+      "title": "Tiêu Đề",
+      "orderIndex": "Thứ Tự",
+      "summary": "Tóm Tắt",
+      "vocabularies": "Từ Vựng",
+      "grammars": "Ngữ Pháp",
+      "exercises": "Bài Tập",
+      "progresses": "Tiến Độ",
+      "book": "Sách"
+    }
+  }
+}

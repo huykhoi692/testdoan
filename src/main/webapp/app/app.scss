@@ -1,376 +1,678 @@
-/* Global App Styles with Dark Mode Support */
+// Override Bootstrap variables
+@import 'bootstrap-variables';
+// Import Bootstrap source files from node_modules
+@import 'bootstrap/scss/bootstrap';
+// Bootstrap Icons are loaded via webpack - see app.tsx
+// Removed from SCSS to improve build performance
 
+// Import theme helpers for consistent theming
+@import 'theme-helpers';
+
+// Import modern UI components
+@import 'modern-ui';
+
+// ========================================
+// Centralized Theme Variables
+// All color and theme variables for the entire application
+// ========================================
 :root {
-  /* Primary brand colors - SYNCED WITH design-system.ts */
-  --color-primary: #58cc02;
-  --color-primary-dark: #46a302;
-  --color-primary-light: #d7ffb8;
-  --color-secondary: #ffc800;
-  --color-secondary-dark: #e5b400;
+  // ===== Light Theme (Default) =====
 
-  /* Semantic colors */
-  --color-success: #58cc02;
-  --color-warning: #ffc800;
-  --color-error: #ff4b4b;
-  --color-info: #1cb0f6;
+  // Background Colors
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --bg-tertiary: #e0e0e0;
+  --bg-color: #f8fafc;
 
-  /* Background colors - Modern Clean Palette */
-  --bg-primary: #ffffff; /* Pure white for cards */
-  --bg-secondary: #f8f9fb; /* Soft gray with blue tint (upgraded from #f5f5f5) */
-  --bg-tertiary: #f1f5f9; /* Slate gray light (upgraded from #e8e8e8) */
-
-  /* Text colors */
-  --text-primary: #262626;
+  // Text Colors
+  --text-primary: #1a1a1a;
   --text-secondary: #666666;
-  --text-disabled: #bfbfbf;
-  --text-white: #ffffff;
+  --text-tertiary: #999999;
+  --text-color: #1e293b;
 
-  /* Border colors */
-  --border-color: #d9d9d9;
-  --border-light: #f0f0f0;
-  --border-default: #d9d9d9;
+  // Primary Brand Colors
+  --primary-color: #4169e1; /* Royal Blue - used in modern UI */
+  --primary-color-alt: #1152d4; /* Alternative primary - used in student layouts */
+  --secondary-color: #5a67d8; /* Indigo */
+  --primary-rgb: 65, 105, 225;
 
-  /* Shadows */
+  // Accent Colors
+  --accent-primary: #2d5f5d;
+  --accent-secondary: #3d6060;
+  --accent-hover: #4a7a78;
+
+  // Semantic Colors
+  --success-color: #4caf50;
+  --warning-color: #ff9800;
+  --error-color: #f44336;
+  --info-color: #2196f3;
+
+  // UI Element Colors
+  --border-color: #dddddd;
+  --input-bg: #ffffff;
+
+  // Shadows
   --shadow: rgba(0, 0, 0, 0.1);
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1);
-  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-medium: rgba(0, 0, 0, 0.15);
+  --shadow-large: rgba(0, 0, 0, 0.2);
 
-  /* Gradients */
-  --gradient-primary: linear-gradient(135deg, #58cc02 0%, #46a302 100%);
-  --gradient-secondary: linear-gradient(135deg, #ffc800 0%, #ffb000 100%);
-  --gradient-info: linear-gradient(135deg, #1cb0f6 0%, #0e8fd6 100%);
+  // Placeholder color with WCAG AA compliant contrast (4.5:1)
+  --placeholder-color: #718096;
+
+  // Disabled state
+  --disabled-color: #94a3b8;
+  --disabled-bg: #f1f5f9;
 }
 
-html.dark {
-  /* Primary brand colors - slightly adjusted for dark mode */
-  --color-primary: #6bd60a;
-  --color-primary-dark: #58cc02;
-  --color-primary-light: #2d4a1a;
-  --color-secondary: #ffd633;
-  --color-secondary-dark: #ffc800;
+// System preference based dark theme
+@media (prefers-color-scheme: dark) {
+  :root:not(.theme-light):not([data-theme='light']) {
+    // Auto-apply dark theme if user hasn't set preference
+    // This respects system settings by default
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --bg-tertiary: #404040;
+    --bg-color: #1e293b;
+    --text-primary: #ffffff;
+    --text-secondary: #b3b3b3;
+    --text-tertiary: #808080;
+    --text-color: #f8fafc;
+    --primary-color: #5a8dff;
+    --primary-color-alt: #4a7ff0;
+    --secondary-color: #7c7ff1;
+    --accent-primary: #4a9b99;
+    --accent-secondary: #5bb1af;
+    --accent-hover: #6cc6c4;
+    --success-color: #66bb6a;
+    --warning-color: #ffa726;
+    --error-color: #ef5350;
+    --info-color: #42a5f5;
+    --border-color: #404040;
+    --input-bg: #2d2d2d;
+    --shadow: rgba(0, 0, 0, 0.5);
+    --shadow-medium: rgba(0, 0, 0, 0.6);
+    --shadow-large: rgba(0, 0, 0, 0.7);
+    --placeholder-color: #94a3b8;
+    --disabled-color: #64748b;
+    --disabled-bg: #334155;
+  }
+}
 
-  /* Background colors - Dark Mode Premium (Slate) */
-  --bg-primary: #1e293b; /* Slate 800 - Blue-gray dark (upgraded from #141414) */
-  --bg-secondary: #0f172a; /* Slate 900 - Deep charcoal (upgraded from #1f1f1f) */
-  --bg-tertiary: #334155; /* Slate 700 - Medium blue-gray (upgraded from #2d2d2d) */
+// Explicit dark theme via class or data attribute
+body.theme-dark,
+[data-theme='dark'] {
+  // ===== Dark Theme =====
 
-  /* Text colors */
-  --text-primary: #ffffff;
-  --text-secondary: #a0a0a0;
-  --text-disabled: #4a4a4a;
-  --text-white: #ffffff;
+  // Background Colors
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d2d2d;
+  --bg-tertiary: #404040;
+  --bg-color: #1e293b;
 
-  /* Border colors - Updated for Slate theme */
-  --border-color: #334155; /* Slate 700 - matches tertiary bg (upgraded from #434343) */
-  --border-light: #1e293b; /* Slate 800 - matches primary bg (upgraded from #2d2d2d) */
-  --border-default: #334155;
+  // Text Colors (Enhanced contrast for dark mode - WCAG AAA compliant)
+  --text-primary: #ffffff; // Pure white for maximum contrast
+  --text-secondary: #e5e5e5; // Much brighter for better readability (contrast ratio 12.6:1)
+  --text-tertiary: #cccccc; // Brighter for better readability (contrast ratio 9.7:1)
+  --text-color: #f8fafc;
 
-  /* Shadows - darker for dark mode */
+  // Primary Brand Colors (lighter for better contrast on dark)
+  --primary-color: #5a8dff;
+  --primary-color-alt: #4a7ff0;
+  --secondary-color: #7c7ff1;
+  --primary-rgb: 90, 141, 255;
+
+  // Accent Colors (adjusted for dark mode)
+  --accent-primary: #4a9b99;
+  --accent-secondary: #5bb1af;
+  --accent-hover: #6cc6c4;
+
+  // Semantic Colors (adjusted for dark mode)
+  --success-color: #66bb6a;
+  --warning-color: #ffa726;
+  --error-color: #ef5350;
+  --info-color: #42a5f5;
+
+  // UI Element Colors
+  --border-color: #404040;
+  --input-bg: #2d2d2d;
+
+  // Shadows (colored shadows for depth in dark mode)
   --shadow: rgba(0, 0, 0, 0.5);
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.6);
-  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-medium: rgba(0, 0, 0, 0.6);
+  --shadow-large: rgba(0, 0, 0, 0.7);
+
+  // Placeholder color for dark mode
+  --placeholder-color: #a0aec0; // Brighter placeholder for better visibility
+
+  // Disabled state for dark mode
+  --disabled-color: #94a3b8; // Brighter disabled text
+  --disabled-bg: #334155;
 }
 
-/* ============================================
-   GLOBAL STYLES
-   ============================================ */
+// Explicit light theme via class or data attribute (overrides system preference)
+body.theme-light,
+[data-theme='light'] {
+  // Force light theme variables even if system prefers dark
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --bg-tertiary: #e0e0e0;
+  --bg-color: #f8fafc;
+  // Text colors with improved contrast (WCAG AA compliant)
+  --text-primary: #1a1a1a;
+  --text-secondary: #525252; // Improved from #666666
+  --text-tertiary: #737373; // Improved from #999999
+  --text-color: #1e293b;
+  --primary-color: #4169e1;
+  --primary-color-alt: #1152d4;
+  --secondary-color: #5a67d8;
+  --primary-rgb: 65, 105, 225;
+  --accent-primary: #2d5f5d;
+  --accent-secondary: #3d6060;
+  --accent-hover: #4a7a78;
+  --success-color: #4caf50;
+  --warning-color: #ff9800;
+  --error-color: #f44336;
+  --info-color: #2196f3;
+  --border-color: #dddddd;
+  --input-bg: #ffffff;
+  --shadow: rgba(0, 0, 0, 0.1);
+  --shadow-medium: rgba(0, 0, 0, 0.15);
+  --shadow-large: rgba(0, 0, 0, 0.2);
+  --placeholder-color: #718096;
+  --disabled-color: #94a3b8;
+  --disabled-bg: #f1f5f9;
+}
+// ========================================
+// End Theme Variables
+// ========================================
+
 * {
-  margin: 0;
-  padding: 0;
+  -moz-box-sizing: border-box;
   box-sizing: border-box;
+  &:after,
+  &::before {
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  }
 }
 
 body {
+  margin: 0;
+  padding: 0;
   font-family:
-    'Nunito',
     'Inter',
     -apple-system,
     BlinkMacSystemFont,
     'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
     sans-serif;
-  background-color: var(--bg-secondary); /* Soft gray-blue background */
-  color: var(--text-primary); /* #3C3C3C instead of pure black */
-  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-color);
+  color: var(--text-color);
   transition:
     background-color 0.3s ease,
     color 0.3s ease;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Smooth scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+// Ensure smooth theme transitions for all themed elements
+* {
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
-::-webkit-scrollbar-track {
-  background: var(--bg-tertiary);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--border-default);
-  border-radius: 4px;
-  transition: background 0.2s ease;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-disabled);
-}
-
-/* Selection color */
-::selection {
-  background-color: var(--color-primary-light);
-  color: var(--text-primary);
-}
-
-::-moz-selection {
-  background-color: var(--color-primary-light);
-  color: var(--text-primary);
-}
-
-/* ============================================
-   ANT DESIGN DARK MODE OVERRIDES
-   ============================================ */
-html.dark {
-  .app-container {
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-  }
-
-  /* Layout */
-  .ant-layout {
-    background-color: var(--bg-primary);
-  }
-
-  .ant-layout-header {
-    background-color: var(--bg-secondary) !important;
-    border-bottom-color: var(--border-color) !important;
-  }
-
-  .ant-layout-content {
-    background-color: var(--bg-primary) !important;
-  }
-
-  .ant-layout-footer {
-    background-color: var(--bg-secondary);
-    color: var(--text-primary);
-  }
-
-  .ant-layout-sider {
-    background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%) !important;
-  }
-
-  /* Cards */
-  .ant-card {
-    background-color: var(--bg-primary);
-    border-color: var(--border-color);
-    color: var(--text-primary);
-  }
-
-  /* Inputs */
-  .ant-input,
-  .ant-input-number,
-  .ant-select-selector,
-  .ant-picker {
-    background-color: var(--bg-secondary);
-    border-color: var(--border-color);
-    color: var(--text-primary);
-  }
-
-  .ant-input:focus,
-  .ant-input-focused,
-  .ant-input-number:focus,
-  .ant-select-focused .ant-select-selector {
-    background-color: var(--bg-secondary);
-    border-color: var(--color-primary);
-  }
-
-  /* Tables */
-  .ant-table {
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-  }
-
-  .ant-table-thead > tr > th {
-    background-color: var(--bg-secondary);
-    color: var(--text-primary);
-    border-color: var(--border-color);
-  }
-
-  .ant-table-tbody > tr > td {
-    border-color: var(--border-color);
-    color: var(--text-primary);
-  }
-
-  .ant-table-tbody > tr:hover > td {
-    background-color: var(--bg-secondary);
-  }
-
-  /* Modals */
-  .ant-modal-content {
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-  }
-
-  .ant-modal-header {
-    background-color: var(--bg-primary);
-    border-color: var(--border-color);
-    color: var(--text-primary);
-  }
-
-  .ant-modal-title {
-    color: var(--text-primary);
-  }
-
-  /* Dropdowns */
-  .ant-select-dropdown {
-    background-color: var(--bg-secondary);
-  }
-
-  .ant-select-item {
-    color: var(--text-primary);
-  }
-
-  .ant-select-item:hover {
-    background-color: var(--bg-tertiary);
-  }
-
-  .ant-select-item-option-selected {
-    background-color: rgba(88, 204, 2, 0.2);
-  }
-
-  /* Buttons */
-  .ant-btn-default {
-    background-color: var(--bg-secondary);
-    border-color: var(--border-color);
-    color: var(--text-primary);
-
-    &:hover:not(:disabled) {
-      border-color: var(--color-primary);
-      color: var(--color-primary);
-    }
-  }
-
-  /* Menu */
-  .ant-menu {
-    background-color: transparent;
-    color: var(--text-primary);
-  }
-
-  .ant-menu-item {
-    color: var(--text-secondary);
-  }
-
-  .ant-menu-item:hover {
-    color: var(--text-primary);
-  }
-
-  .ant-menu-item-selected {
-    background-color: rgba(88, 204, 2, 0.15);
-    color: var(--color-primary);
-  }
-
-  /* Typography */
-  .ant-typography {
-    color: var(--text-primary);
-  }
-
-  /* Dividers */
-  .ant-divider {
-    border-color: var(--border-color);
-  }
-
-  /* Badges */
-  .ant-badge-count {
-    background-color: var(--color-primary);
-  }
-
-  /* Empty state */
-  .ant-empty-description {
-    color: var(--text-secondary);
-  }
-
-  /* Spin */
-  .ant-spin-text {
-    color: var(--text-primary);
-  }
-
-  /* Progress */
-  .ant-progress-text {
-    color: var(--text-primary);
-  }
-}
-
-/* ============================================
-   RESPONSIVE EXERCISE CONTAINERS
-   ============================================ */
-.listening-exercise-container,
-.reading-exercise-container,
-.writing-exercise-container,
-.speaking-exercise-container,
-.exercise-container {
-  padding: 24px; /* Desktop: p-6 */
-  background: var(--bg-secondary);
+.app-container {
   min-height: 100vh;
-  font-family:
-    'Nunito',
-    'Inter',
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    sans-serif;
-  color: var(--text-primary);
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 
-  @media (max-width: 768px) {
-    padding: 16px; /* Tablet/Mobile: p-4 */
-  }
-
-  @media (max-width: 480px) {
-    padding: 12px; /* Small Mobile: p-3 */
+  .view-routes {
+    min-height: 100vh;
+    width: 100%;
   }
 }
 
-/* Responsive card padding */
-.listening-exercise-container .ant-card,
-.reading-exercise-container .ant-card,
-.writing-exercise-container .ant-card,
-.speaking-exercise-container .ant-card,
-.exercise-container .ant-card {
-  @media (max-width: 768px) {
-    .ant-card-body {
-      padding: 16px;
-    }
+.fullscreen {
+  position: fixed;
+  top: 100px;
+  left: 0;
+  width: 100vw;
+  height: calc(100vh - 110px);
+  margin: 0;
+  z-index: 1000;
+  padding: 1.25rem 1.5rem 3rem 1.5rem;
+}
+
+/* ==========================================================================
+Browser Upgrade Prompt
+========================================================================== */
+
+.browserupgrade {
+  margin: 0.2em 0;
+  background: #ccc;
+  color: #000;
+  padding: 0.2em 0;
+}
+
+/* ==========================================================================
+Custom button styles
+========================================================================== */
+
+.icon-button > .btn {
+  background-color: transparent;
+  border-color: transparent;
+  padding: 0.625rem;
+  line-height: 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #f1f5f9;
+    border-color: transparent;
+    transform: scale(1.1);
   }
 
-  @media (max-width: 480px) {
-    .ant-card-body {
-      padding: 12px;
+  &:focus {
+    -webkit-box-shadow: 0 0 0 3px rgba(65, 105, 225, 0.1);
+    box-shadow: 0 0 0 3px rgba(65, 105, 225, 0.1);
+  }
+}
+
+/* ==========================================================================
+Generic styles
+========================================================================== */
+
+/* Temporary workaround for availity-reactstrap-validation */
+.invalid-feedback {
+  display: inline;
+}
+
+/* other generic styles */
+
+.title {
+  font-size: 1.25em;
+  margin: 1px 10px 1px 10px;
+}
+
+.description {
+  font-size: 0.9em;
+  margin: 1px 10px 1px 10px;
+}
+
+.shadow {
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border-radius: 0.75rem;
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+}
+
+.error {
+  color: white;
+  background-color: red;
+}
+
+.break {
+  white-space: normal;
+  word-break: break-all;
+}
+
+.break-word {
+  white-space: normal;
+  word-break: keep-all;
+}
+
+.preserve-space {
+  white-space: pre-wrap;
+}
+
+/* ==========================================================================
+Padding & Spacing Utilities
+Note: Use Bootstrap's native utility classes (p-*, pt-*, pb-*, ps-*, pe-*, m-*)
+Legacy classes below kept for backward compatibility with existing code
+========================================================================== */
+
+// Minimal custom padding classes for specific legacy use cases
+.no-padding {
+  padding: 0 !important;
+}
+.no-padding-left {
+  padding-left: 0 !important;
+}
+.no-padding-right {
+  padding-right: 0 !important;
+}
+.no-padding-top {
+  padding-top: 0 !important;
+}
+.no-padding-bottom {
+  padding-bottom: 0 !important;
+}
+
+/* end of padding helpers */
+
+.no-margin {
+  margin: 0;
+}
+@mixin voffset($size) {
+  @if $size== '' {
+    .voffset {
+      margin-top: 2px !important;
+    }
+  } @else {
+    .voffset-#{$size} {
+      margin-top: #{$size}px !important;
     }
   }
 }
 
-/* Responsive audio controls */
-.listening-exercise-container {
-  .ant-row[gutter] {
-    @media (max-width: 480px) {
-      gap: 8px;
-    }
+@include voffset('');
+@include voffset('5');
+@include voffset('10');
+@include voffset('15');
+@include voffset('30');
+@include voffset('40');
+@include voffset('60');
+@include voffset('80');
+@include voffset('100');
+@include voffset('150');
+
+.readonly {
+  background-color: #eee;
+  opacity: 1;
+}
+
+/* ==========================================================================
+make sure browsers use the pointer cursor for anchors, even with no href
+========================================================================== */
+
+a:hover {
+  cursor: pointer;
+}
+
+.hand {
+  cursor: pointer;
+}
+
+button.anchor-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  align-items: initial;
+  text-align: initial;
+  width: 100%;
+}
+
+a.anchor-btn:hover {
+  text-decoration: none;
+}
+
+/* ==========================================================================
+Metrics and Health styles
+========================================================================== */
+
+#threadDump .popover,
+#healthCheck .popover {
+  top: inherit;
+  display: block;
+  font-size: 10px;
+  max-width: 1024px;
+}
+
+.thread-dump-modal-lock {
+  max-width: 450px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#healthCheck .popover {
+  margin-left: -50px;
+}
+
+.health-details {
+  min-width: 400px;
+}
+
+/* bootstrap 3 input-group 100% width
+http://stackoverflow.com/questions/23436430/bootstrap-3-input-group-100-width */
+
+.width-min {
+  width: 1% !important;
+}
+
+/* ==========================================================================
+Form Elements & Input Accessibility
+========================================================================== */
+
+input,
+textarea,
+select {
+  &::placeholder {
+    color: var(--placeholder-color);
+    opacity: 1; // Firefox default opacity fix
   }
 
-  /* Speed buttons on mobile */
-  .ant-btn-sm {
-    @media (max-width: 480px) {
-      min-width: 40px !important;
-      padding: 0 8px;
-      font-size: 12px;
+  &:disabled {
+    background-color: var(--disabled-bg);
+    color: var(--disabled-color);
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  // Ensure links are distinguishable (not just by color)
+  &[type='url'],
+  &[type='email'] {
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-decoration-thickness: 1px;
+    transition: text-decoration-color 0.2s ease;
+
+    &:focus {
+      text-decoration-color: var(--primary-color);
     }
   }
 }
+
+// Links should be distinguishable from regular text
+a:not(.btn):not(.nav-link) {
+  text-decoration: underline;
+  text-decoration-color: var(--primary-color);
+  text-decoration-thickness: 1px;
+  transition: text-decoration-thickness 0.2s ease;
+
+  &:hover {
+    text-decoration-thickness: 2px;
+  }
+}
+
+// Error message styling with shake animation
+.error-message,
+.invalid-feedback {
+  display: block;
+  color: var(--error-color);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  animation: shake 0.4s ease-in-out;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-10px);
+  }
+  75% {
+    transform: translateX(10px);
+  }
+}
+
+/* ==========================================================================
+Accessibility - Skip to Content Link
+========================================================================== */
+
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--primary-color);
+  color: white;
+  padding: 8px 16px;
+  text-decoration: none;
+  font-weight: 600;
+  border-radius: 0 0 4px 0;
+  z-index: 10000;
+  transition: top 0.3s ease;
+
+  &:focus {
+    top: 0;
+    outline: 3px solid var(--warning-color);
+    outline-offset: 2px;
+  }
+}
+
+/* Screen reader only content */
+.sr-only,
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ==========================================================================
+Responsive Typography with clamp()
+========================================================================== */
+
+h1,
+.h1 {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+}
+
+h2,
+.h2 {
+  font-size: clamp(1.5rem, 3.5vw, 2rem);
+}
+
+h3,
+.h3 {
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+}
+
+h4,
+.h4 {
+  font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+}
+
+h5,
+.h5 {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+}
+
+h6,
+.h6 {
+  font-size: clamp(0.875rem, 1.5vw, 1rem);
+}
+
+/* ==========================================================================
+Z-Index Scale (Centralized Management)
+========================================================================== */
+
+:root {
+  --z-base: 1;
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+  --z-toast: 1080;
+  --z-skip-link: 10000;
+}
+
+/* ==========================================================================
+Responsive Utilities
+========================================================================== */
+
+// Hide elements on specific breakpoints
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .hide-desktop {
+    display: none !important;
+  }
+}
+
+/* ==========================================================================
+Animation Performance - GPU Acceleration
+========================================================================== */
+
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* ==========================================================================
+Micro-interactions - Enhanced Feedback
+========================================================================== */
+
+.success-pulse {
+  animation: successPulse 0.6s ease-in-out;
+}
+
+@keyframes successPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+// Button and card hover effects
+.btn,
+.card {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+}
+
+/* jhipster-needle-scss-add-main JHipster will add new css style */

@@ -2,7 +2,7 @@
 name: langleague
 services:
   mysql:
-    image: mysql:8
+    image: mysql:9.2.0
     volumes:
       - ./config/mysql:/etc/mysql/conf.d
     environment:
@@ -11,10 +11,10 @@ services:
     # If you want to expose these ports outside your dev PC,
     # remove the "127.0.0.1:" prefix
     ports:
-      - 3306:3306
+      - 127.0.0.1:3306:3306
     command: mysqld --lower_case_table_names=1 --skip-mysqlx --character_set_server=utf8mb4 --explicit_defaults_for_timestamp
     healthcheck:
-      test: ['CMD-SHELL', 'mysqladmin ping -h localhost']
+      test: ['CMD-SHELL', 'mysql -e "SHOW DATABASES;" && sleep 5']
       interval: 5s
       timeout: 10s
       retries: 10

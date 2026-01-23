@@ -1,0 +1,10 @@
+{
+  "langleagueApp": {
+    "ExerciseType": {
+      "null": "",
+      "SINGLE_CHOICE": "Single Choice",
+      "MULTI_CHOICE": "Multiple Choice",
+      "FILL_IN_BLANK": "Fill in the Blank"
+    }
+  }
+}

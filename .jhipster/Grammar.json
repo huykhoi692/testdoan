@@ -1,6 +1,6 @@
 {
   "annotations": {
-    "changelogDate": "20251122061527"
+    "changelogDate": "20260108164538"
   },
   "applications": "*",
   "dto": "mapstruct",
@@ -8,33 +8,33 @@
     {
       "fieldName": "title",
       "fieldType": "String",
-      "fieldValidateRules": ["required", "maxlength"],
-      "fieldValidateRulesMaxlength": "255"
+      "fieldValidateRules": ["required"]
     },
     {
-      "fieldName": "level",
-      "fieldType": "Level",
-      "fieldValues": "BEGINNER,INTERMEDIATE,ADVANCED"
+      "fieldName": "contentMarkdown",
+      "fieldType": "TextBlob",
+      "fieldValidateRules": ["required"]
     },
     {
-      "fieldName": "description",
+      "fieldName": "exampleUsage",
       "fieldType": "TextBlob"
+    },
+    {
+      "fieldName": "orderIndex",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
     }
   ],
   "name": "Grammar",
   "pagination": "pagination",
   "relationships": [
     {
-      "otherEntityName": "grammarExample",
-      "relationshipName": "grammarExample",
-      "relationshipSide": "left",
-      "relationshipType": "one-to-many"
-    },
-    {
-      "otherEntityName": "userGrammar",
-      "relationshipName": "userGrammar",
-      "relationshipSide": "left",
-      "relationshipType": "one-to-many"
+      "otherEntityName": "unit",
+      "otherEntityRelationshipName": "grammars",
+      "relationshipName": "unit",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
     }
   ],
   "searchEngine": "no",

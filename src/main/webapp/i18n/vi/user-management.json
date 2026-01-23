@@ -1,31 +1,171 @@
 {
   "userManagement": {
     "home": {
-      "title": "Người dùng",
-      "refreshListLabel": "Làm mới danh sách",
+      "title": "Quản lý người dùng",
       "createLabel": "Tạo người dùng mới",
-      "createOrEditLabel": "Tạo hoặc sửa người dùng"
+      "createOrEditLabel": "Tạo hoặc chỉnh sửa người dùng"
     },
-    "created": "Đã tạo người dùng mới với định danh {{ param }}",
-    "updated": "Đã cập nhật người dùng với định danh {{ param }}",
-    "deleted": "Đã xóa người dùng với định danh {{ param }}",
+    "created": "Người dùng mới đã được tạo với định danh {{ param }}",
+    "updated": "Người dùng đã được cập nhật với định danh {{ param }}",
+    "deleted": "Người dùng đã được xóa với định danh {{ param }}",
     "delete": {
       "question": "Bạn có chắc chắn muốn xóa người dùng {{ login }}?"
     },
     "detail": {
-      "title": "Người dùng"
+      "title": "Người dùng",
+      "breadcrumb": "Quản lý người dùng"
     },
-    "login": "Tên đăng nhập",
-    "firstName": "Tên",
-    "lastName": "Họ",
-    "email": "Email",
-    "activated": "Đã kích hoạt",
-    "deactivated": "Đã vô hiệu hóa",
-    "profiles": "Vai trò",
-    "langKey": "Ngôn ngữ",
-    "createdBy": "Tạo bởi",
-    "createdDate": "Ngày tạo",
-    "lastModifiedBy": "Sửa đổi bởi",
-    "lastModifiedDate": "Ngày sửa đổi"
+    "create": {
+      "breadcrumb": "Thêm người dùng mới",
+      "title": "Thêm người dùng mới",
+      "subtitle": "Nhập thông tin chi tiết bên dưới để tạo tài khoản mới.",
+      "required": "*",
+      "fields": {
+        "login": "Tên đăng nhập",
+        "loginPlaceholder": "Nhập tên đăng nhập (chỉ chữ cái, số, _ . @ -)",
+        "email": "Email",
+        "emailPlaceholder": "Nhập email",
+        "fullName": "Họ và tên",
+        "fullNamePlaceholder": "Nhập họ và tên",
+        "role": "Vai trò",
+        "roleSelect": "Chọn vai trò",
+        "status": "Trạng thái",
+        "password": "Mật khẩu",
+        "passwordPlaceholder": "Nhập mật khẩu",
+        "confirmPassword": "Xác nhận mật khẩu"
+      },
+      "roles": {
+        "student": "Học viên",
+        "teacher": "Giáo viên",
+        "admin": "Quản trị viên"
+      },
+      "status": {
+        "active": "Hoạt động",
+        "inactive": "Không hoạt động",
+        "pending": "Chờ duyệt"
+      },
+      "buttons": {
+        "cancel": "Hủy",
+        "addUser": "Thêm người dùng"
+      },
+      "validation": {
+        "loginRequired": "Vui lòng nhập tên đăng nhập",
+        "loginPattern": "Tên đăng nhập chỉ được chứa chữ cái, số và các ký tự _ . @ - (không được có khoảng trắng)",
+        "emailRequired": "Vui lòng nhập email",
+        "emailInvalid": "Email không hợp lệ",
+        "fullNameRequired": "Vui lòng nhập họ tên",
+        "roleRequired": "Vui lòng chọn vai trò",
+        "passwordRequired": "Vui lòng nhập mật khẩu",
+        "passwordMinLength": "Mật khẩu phải có ít nhất 8 ký tự",
+        "passwordMismatch": "Mật khẩu xác nhận không khớp",
+        "submitError": "Có lỗi xảy ra khi tạo người dùng"
+      }
+    },
+    "edit": {
+      "title": "Chỉnh sửa thông tin người dùng",
+      "breadcrumb": "Chỉnh sửa chi tiết",
+      "subtitle": "Cập nhật thông tin cá nhân, cài đặt vai trò và trạng thái tài khoản.",
+      "loading": "Đang tải...",
+      "notFound": "Không tìm thấy người dùng",
+      "userIdLabel": "ID người dùng",
+      "joinedLabel": "Đã tham gia",
+      "avatarNote": "Ảnh đại diện được quản lý bởi người dùng thông qua cài đặt hồ sơ của họ, không phải bởi quản trị viên",
+      "fields": {
+        "fullName": "Họ và tên",
+        "fullNamePlaceholder": "Nhập họ và tên",
+        "email": "Địa chỉ Email",
+        "emailReadOnly": "(Chỉ đọc)",
+        "role": "Vai trò",
+        "status": "Trạng thái tài khoản",
+        "bio": "Tiểu sử / Giới thiệu",
+        "bioPlaceholder": "Nhập mô tả ngắn gọn...",
+        "login": "Tên đăng nhập"
+      },
+      "roles": {
+        "student": "Học viên",
+        "teacher": "Giáo viên",
+        "admin": "Quản trị viên"
+      },
+      "status": {
+        "active": "Hoạt động",
+        "inactive": "Không hoạt động"
+      },
+      "characterCount": "{{ count }}/500 ký tự",
+      "buttons": {
+        "cancel": "Hủy",
+        "save": "Lưu thay đổi"
+      },
+      "infoBox": {
+        "title": "Chỉnh sửa quyền người dùng",
+        "content": "Thay đổi vai trò của người dùng thành Quản trị viên sẽ cấp cho họ quyền truy cập đầy đủ vào cài đặt hệ thống và bảng quản lý người dùng. Hãy thận trọng."
+      }
+    }
+  },
+  "langleague": {
+    "admin": {
+      "userManagement": {
+        "title": "Quản lý người dùng",
+        "subtitle": "Quản lý tài khoản học viên, giáo viên và nhân viên.",
+        "loading": "Đang tải danh sách người dùng...",
+        "actions": {
+          "addNew": "Thêm người dùng mới",
+          "editTitle": "Chỉnh sửa",
+          "lockTitle": "Khóa",
+          "unlockTitle": "Mở khóa",
+          "deleteTitle": "Xóa"
+        },
+        "search": {
+          "placeholder": "Tìm kiếm người dùng..."
+        },
+        "filters": {
+          "role": {
+            "all": "Tất cả vai trò",
+            "student": "Học viên",
+            "teacher": "Giáo viên",
+            "admin": "Quản trị viên"
+          },
+          "status": {
+            "all": "Tất cả trạng thái",
+            "active": "Hoạt động",
+            "suspended": "Đã khóa",
+            "pending": "Chờ duyệt"
+          }
+        },
+        "table": {
+          "name": "TÊN NGƯỜI DÙNG",
+          "role": "VAI TRÒ",
+          "status": "TRẠNG THÁI",
+          "registrationDate": "NGÀY ĐĂNG KÝ",
+          "actions": "THAO TÁC"
+        },
+        "status": {
+          "active": "Hoạt động",
+          "suspended": "Đã khóa"
+        },
+        "role": {
+          "admin": "Quản trị viên",
+          "teacher": "Giáo viên",
+          "student": "Học viên"
+        },
+        "pagination": {
+          "showing": "Hiển thị",
+          "to": "đến",
+          "of": "trong tổng số",
+          "results": "kết quả"
+        },
+        "confirmDeleteTitle": "Xác nhận xóa",
+        "confirmDelete": "Bạn có chắc chắn muốn xóa người dùng này không?",
+        "deleteSuccess": "Xóa người dùng thành công",
+        "deleteFailed": "Xóa người dùng thất bại",
+        "messages": {
+          "loadError": "Lỗi khi tải danh sách người dùng",
+          "createSuccess": "Tạo người dùng thành công",
+          "createError": "Lỗi khi tạo người dùng",
+          "activateSuccess": "Kích hoạt tài khoản thành công",
+          "deactivateSuccess": "Khóa tài khoản thành công",
+          "updateError": "Lỗi khi cập nhật trạng thái tài khoản"
+        }
+      }
+    }
   }
 }

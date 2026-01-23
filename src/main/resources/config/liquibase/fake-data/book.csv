@@ -1,7 +1,8 @@
-id;title;level;description;thumbnail;is_active;average_rating;total_reviews
-1;Korean for Beginners;BEGINNER;Start your Korean language journey with basic greetings and hangul.;https://via.placeholder.com/300x400/4A90E2/ffffff?text=Korean+Basics;true;4.5;10
-2;Intermediate Korean Conversation;INTERMEDIATE;Build your conversational skills with real-life dialogues.;https://via.placeholder.com/300x400/50C878/ffffff?text=Conversation;true;4.7;8
-3;Advanced Korean Grammar;ADVANCED;Master complex Korean grammar structures and honorifics.;https://via.placeholder.com/300x400/FF6B6B/ffffff?text=Grammar;true;4.8;6
-4;Korean Culture and Idioms;INTERMEDIATE;Explore Korean culture through idiomatic expressions.;https://via.placeholder.com/300x400/F39C12/ffffff?text=Culture;true;4.6;7
-5;Business Korean;ADVANCED;Professional Korean for business settings.;https://via.placeholder.com/300x400/9B59B6/ffffff?text=Business;true;4.9;5
-
+id;title;description;cover_image_url;is_public;created_at;teacher_profile_id
+1;English for Beginners A1;Khóa học tiếng Anh cơ bản dành cho người mới bắt đầu. Học từ vựng, ngữ pháp và giao tiếp hàng ngày.;https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400;true;2026-01-05T08:00:00;3
+2;English Grammar Essentials;Nắm vững ngữ pháp tiếng Anh từ cơ bản đến nâng cao. Bao gồm thì, câu điều kiện, và cấu trúc câu.;https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=400;true;2026-01-06T09:30:00;3
+3;Business English Communication;Tiếng Anh giao tiếp trong môi trường công sở. Email, họp, thuyết trình và đàm phán.;https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400;true;2026-01-07T10:00:00;3
+4;TOEIC Preparation 450-650;Luyện thi TOEIC từ 450 đến 650 điểm. Bao gồm Listening và Reading với đề thi mẫu.;https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400;true;2026-01-08T11:00:00;3
+5;Daily English Conversations;Tiếng Anh giao tiếp hàng ngày - mua sắm, du lịch, ăn uống và các tình huống thực tế.;https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400;true;2026-01-09T08:30:00;3
+6;Advanced English Vocabulary;Mở rộng vốn từ vựng tiếng Anh nâng cao cho các kỳ thi IELTS, TOEFL.;https://images.unsplash.com/photo-1491841550275-ad7854e35ca6?w=400;true;2026-01-10T09:00:00;3
+7;Travel English Guide;Hướng dẫn tiếng Anh du lịch toàn diện: đặt phòng, hỏi đường, và giao tiếp tại sân bay.;https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400;true;2026-01-11T10:30:00;3

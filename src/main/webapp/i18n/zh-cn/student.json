@@ -1,0 +1,466 @@
+﻿{
+  "langleague": {
+    "apiKey": {
+      "setupTitle": "设置 AI API 密钥",
+      "setupDescription": "要使用 AI 功能，您需要提供自己的 API 密钥（Google Gemini 或 OpenAI）。它是免费的，我们只将其存储在您的浏览器中。",
+      "label": "API Key",
+      "placeholder": "在此粘贴您的 API 密钥 (AIza... 或 sk-...)",
+      "formatHint": "支持的格式：Google Gemini (AIza...) 或 OpenAI (sk-...)",
+      "showKey": "显示密钥",
+      "hideKey": "隐藏密钥",
+      "getKeyTitle": "获取您的免费 API 密钥：",
+      "providers": {
+        "gemini": "Google Gemini API Key",
+        "openai": "OpenAI / ChatGPT API Key"
+      },
+      "recommendation": "ðŸ’¡ Recommendation:",
+      "recommendationText": "我们推荐使用 Google Gemini，因为它对越南语支持更好，而且完全免费！",
+      "取消": "取消",
+      "saveButton": "保存并继续",
+      "errors": {
+        "empty": "请输入 API 密钥",
+        "invalidFormat": "Invalid API key format. Please check and try again.\nGemini keys start with 'AIza', OpenAI keys start with 'sk-'"
+      }
+    },
+    "student": {
+      "dashboard": {
+        "title": "我的仪表板",
+        "loading": "加载教材中...",
+        "welcome": "欢迎回来，{{name}}！",
+        "activeBooks": "正在学习的课程",
+        "progress": "整体进度",
+        "stats": {
+          "hours": "学习时长",
+          "books": "已完成教材"
+        },
+        "noBooks": "未找到符合搜索条件的教材。",
+        "noBooksDescription": "尝试调整搜索或筛选条件以找到所需内容。",
+        "loadMore": "加载更多",
+        "search": {
+          "placeholder": "搜索教材..."
+        },
+        "filter": {
+          "all": "全部",
+          "enrolled": "已报名",
+          "notEnroll": "未报名"
+        },
+        "book": {
+          "continue": "继续",
+          "start": "开始",
+          "completed": "完成",
+          "enrolled": "已报名",
+          "active": "学习中",
+          "not_enrolled": "未报名",
+          "units": "单元"
+        },
+        "streak": {
+          "label": "连续天数",
+          "start": "今天开始您的连续学习！",
+          "active": "You are on fire! {{count}} 连续天数!",
+          "nextMilestone": "下一个里程碑：{{count}} 天",
+          "milestone": {
+            "title": "恭喜！",
+            "message": "ðŸŽ‰ 恭喜！ You've reached a {{count}} 连续天数!",
+            "confirmButton": "太好了！"
+          }
+        }
+      },
+      "profile": {
+        "title": "我的个人资料",
+        "subtitle": "管理您的账户和进度",
+        "actions": {
+          "changePhoto": "更换照片",
+          "saveChanges": "保存更改",
+          "取消": "取消"
+        },
+        "personalInfo": {
+          "title": "个人信息",
+          "fullName": "姓名",
+          "fullNamePlaceholder": "例如：张三",
+          "email": "电子邮箱",
+          "用户名": "用户名",
+          "bio": "个人简介",
+          "bioPlaceholder": "简单介绍一下自己..."
+        },
+        "stats": {
+          "title": "学习统计",
+          "booksEnrolled": "已报名课程",
+          "streak": "连续天数",
+          "成就": "成就"
+        },
+        "preferences": {
+          "theme": "主题设置",
+          "themeLight": "â˜€ï¸ Light",
+          "themeDark": "ðŸŒ™ Dark",
+          "themeSystem": "ðŸ’» System"
+        },
+        "messages": {
+          "success": "个人资料更新成功！",
+          "error": "个人资料更新失败",
+          "themeChanged": "主题已更新！",
+          "themeError": "主题更换失败",
+          "photoComingSoon": "照片上传功能即将推出！"
+        }
+      },
+      "books": {
+        "title": "课程教材",
+        "description": "选择教材继续您的学习之旅",
+        "公开": "公开",
+        "viewDetails": "查看详情",
+        "noBooks": "没有可用的教材",
+        "noBooksDescription": "稍后再查看新的学习材料",
+        "detail": {
+          "loading": "加载中...",
+          "backToBooks": "返回教材",
+          "startLearning": "开始学习",
+          "enrollNow": "立即报名",
+          "studyNow": "立即学习",
+          "章节": "章节",
+          "completed": "完成",
+          "units": {
+            "title": "本教材的单元",
+            "empty": "尚无可用单元"
+          },
+          "relatedBooks": "相关教材"
+        },
+        "messages": {
+          "enrollSuccess": "教材报名成功！",
+          "enrollError": "报名失败。请重试。"
+        }
+      },
+      "learning": {
+        "backToBook": "Back to Book",
+        "selectUnit": "Select a unit to 开始学习",
+        "bookContent": "Book Content",
+        "unit": "Unit",
+        "nextLesson": "Next Lesson",
+        "previousLesson": "Previous Lesson",
+        "complete": "Complete",
+        "unitCompleted": "Unit completed! Moving to next unit...",
+        "bookCompleted": "恭喜！ You have completed the book!",
+        "sections": {
+          "vocabulary": "Vocabulary",
+          "grammar": "Grammar",
+          "exercise": "Exercise",
+          "flashcard": "Flashcard",
+          "note": "Note"
+        },
+        "vocabulary": {
+          "unit": "UNIT",
+          "title": "VOCABULARY",
+          "wordsToLearn": "words to learn",
+          "vocabularyWords": "Vocabulary Words",
+          "meaning": "Meaning:",
+          "example": "Example:",
+          "noVocabulary": "No vocabulary words yet",
+          "noVocabularyDescription": "Vocabulary words will appear here once added by your teacher",
+          "clickToHear": "Click on the word to hear pronunciation",
+          "navigation": {
+            "previous": "Previous",
+            "next": "Next"
+          }
+        },
+        "grammar": {
+          "unit": "UNIT",
+          "title": "GRAMMAR",
+          "lessons": "grammar lessons",
+          "topics": "Grammar Topics",
+          "content": "Content",
+          "examples": "Examples",
+          "noGrammar": "No grammar lessons added yet for this unit.",
+          "noGrammarDescription": "Grammar lessons will appear here once added by your teacher",
+          "example": "Example:",
+          "practiceFlashcard": "Practice Grammar with Flashcards"
+        },
+        "exercise": {
+          "title": "EXERCISE",
+          "noExercises": "No exercises added yet for this unit.",
+          "backToBook": "Back to Book List",
+          "defaultTitle": "Exercise",
+          "loading": "加载中...",
+          "loadingExercises": "Loading exercises...",
+          "question": "Question",
+          "of": "of",
+          "playAudio": "Play Audio",
+          "audioNotSupported": "Your browser does not support the audio element.",
+          "correctAnswer": "Correct!",
+          "incorrectAnswer": "Incorrect",
+          "correctAnswerIs": "The correct answer is:",
+          "selectAllCorrect": "Select all correct answers:",
+          "typeAnswer": "Type your answer here...",
+          "previous": "Previous",
+          "checkAnswer": "Check Answer",
+          "nextQuestion": "Next Question",
+          "finish": "Finish",
+          "pleaseAnswer": "Please select or type an answer first!",
+          "correct": "Correct!",
+          "incorrect": "Incorrect, try again or check the answer.",
+          "explainWithAI": "Explain with AI"
+        },
+        "aiTutor": {
+          "button": "Explain with AI",
+          "grammarButton": "Ask AI Tutor",
+          "title": "AI Tutor Explanation",
+          "grammarTitle": "AI Grammar Tutor",
+          "thinking": "Thinking...",
+          "question": "Question",
+          "close": "Close",
+          "changeKey": "Change Key",
+          "取消": "取消",
+          "saveAndExplain": "Save & Explain",
+          "setupTitle": "Setup AI Tutor",
+          "setupDescription": "To use the AI Tutor feature, you need to provide your own Google Gemini API Key. It's free and we only store it in your browser.",
+          "apiKeyLabel": "Gemini API Key",
+          "apiKeyPlaceholder": "Paste your API key here...",
+          "getFreeKey": "Get a free key here",
+          "invalidKeyError": "Invalid API Key. Please check and try again.",
+          "rateLimitError": "⚠️ API 配额已超限。系统已自动重试但仍失败。请等待几分钟后再试，或升级您的 API 计划。免费套餐有每日限制。",
+          "somethingWentWrong": "Something went wrong.",
+          "grammarPromptPlaceholder": "Ask anything about this grammar topic...\nFor example: Can you give me more examples? How is this different from...?",
+          "grammarAsk": "Ask",
+          "grammarClear": "Clear Chat"
+        },
+        "flashcard": {
+          "back": "Back",
+          "learning": "Learning",
+          "title": "Flashcards",
+          "shuffle": "Shuffle",
+          "studyMode": "Study Mode",
+          "notes": "Notes",
+          "card": "Card",
+          "of": "of",
+          "definition": "DEFINITION",
+          "answer": "ANSWER",
+          "clickToFlip": "Click to Flip",
+          "terminology": "Terminology in this section",
+          "noCards": "No flashcards available",
+          "noCardsDescription": "Flashcards will appear here once vocabulary is added",
+          "reviewMode": "Review Mode ({{count}})",
+          "reviewSession": "Review Session"
+        },
+        "flashcardList": {
+          "title": "Flashcards",
+          "description": "Select a unit to study flashcards",
+          "loading": "加载中...",
+          "noSets": "没有可用的教材",
+          "enrollDescription": "Enroll in books to start studying with flashcards",
+          "studyFlashcards": "Study Flashcards",
+          "noUnits": "No units available in this book",
+          "customSession": "Custom Session"
+        },
+        "bookLearn": {
+          "progress": "Your Progress",
+          "backToBook": "Back to Book",
+          "bookContent": "Book Content",
+          "selectUnit": "Select a unit to 开始学习",
+          "unitCompleted": "Unit completed! Moving to next unit...",
+          "bookCompleted": "恭喜！ You have completed the book!",
+          "messages": {
+            "unitCompleted": "Unit completed! Moving to next unit...",
+            "bookCompleted": "恭喜！ You have completed the book!"
+          }
+        },
+        "itemCount": {
+          "words": "{{count}} words",
+          "topics": "{{count}} topics",
+          "questions": "{{count}} questions",
+          "interactive": "Interactive"
+        },
+        "notes": {
+          "title": "My Notes",
+          "loading": "Loading notes...",
+          "empty": "No notes yet for this unit.",
+          "emptyDescription": "Start taking notes to help you remember important points!",
+          "placeholder": "Click here to add your personal notes (Markdown supported)...",
+          "placeholderDisabled": "You already have a note for this unit. Click Edit to modify it.",
+          "addButton": "Add Note",
+          "updateButton": "Update Note",
+          "saving": "Saving...",
+          "updating": "Updating...",
+          "editButton": "Edit",
+          "deleteButton": "Delete",
+          "取消Button": "取消",
+          "deleteConfirm": "Are you sure you want to delete this note?",
+          "duplicateWarning": "You already have a note for this unit. Please delete it first if you want to create a new one.",
+          "limitInfo": "You can only have one note per unit. Edit or delete your existing note.",
+          "created": "Created:",
+          "updated": "Updated:",
+          "lastUpdated": "Last updated",
+          "characters": "characters",
+          "clear": "Clear",
+          "save": "Save",
+          "preview": "Preview",
+          "maximize": "Maximize",
+          "minimize": "Minimize",
+          "emptyPreview": "Nothing to preview yet..."
+        }
+      },
+      "games": {
+        "title": "Learning Games",
+        "subtitle": "Make learning fun! Play games to improve your language skills",
+        "backToDashboard": "Back to Dashboard",
+        "backToMenu": "Back to Menu",
+        "loading": "Loading games...",
+        "noGamesForDifficulty": "No games found for this difficulty level",
+        "noGames": "No games available",
+        "noGamesDescription": "Try adjusting your difficulty filter",
+        "progress": "Progress",
+        "score": "Score",
+        "question": "Question",
+        "filterByDifficulty": "Filter by difficulty:",
+        "playNow": "Play Now",
+        "comingSoon": "Coming Soon",
+        "active": "学习中",
+        "inactive": "Inactive",
+        "difficulty": {
+          "all": "All Games",
+          "easy": "Easy",
+          "medium": "Medium",
+          "hard": "Hard"
+        },
+        "stats": {
+          "played": "Games Played",
+          "score": "Total Score",
+          "成就": "成就"
+        },
+        "dataSource": {
+          "title": "Select Learning Material",
+          "description": "Choose the units you want to practice with.",
+          "selectAll": "Select All",
+          "unitsSelected": "{{count}} units selected",
+          "取消": "取消",
+          "startGame": "Start Game"
+        },
+        "list": {
+          "vocabularyMatch": {
+            "title": "Vocabulary Match",
+            "description": "Match words with their meanings in this fast-paced memory game",
+            "time": "5-10 min"
+          },
+          "wordScramble": {
+            "title": "Word Scramble",
+            "description": "Unscramble letters to form the correct vocabulary words",
+            "time": "10-15 min"
+          },
+          "bridgeGame": {
+            "title": "The Broken Bridge",
+            "description": "Fill in the blanks to cross the broken bridge",
+            "time": "10-15 min"
+          },
+          "grammarQuest": {
+            "title": "Grammar Quest",
+            "description": "Adventure through grammar challenges and unlock 成就",
+            "time": "15-20 min"
+          },
+          "listeningChallenge": {
+            "title": "Listening Challenge",
+            "description": "Listen and identify the correct words in various contexts",
+            "time": "10-15 min"
+          },
+          "speedQuiz": {
+            "title": "Speed Quiz",
+            "description": "Answer as many questions as possible in limited time",
+            "time": "5 min"
+          },
+          "sentenceBuilder": {
+            "title": "Sentence Builder",
+            "description": "Build correct sentences from scrambled words and phrases",
+            "time": "10-15 min"
+          }
+        },
+        "vocabularyMatch": {
+          "title": "Vocabulary Match",
+          "instructions": "Click on a word and then click on its matching meaning",
+          "matched": "Matched",
+          "total": "Total",
+          "attempts": "Attempts"
+        },
+        "wordScramble": {
+          "title": "Word Scramble",
+          "instructions": "Rearrange the letters to form the correct word. Spaces and punctuation are ignored.",
+          "meaning": "Meaning",
+          "tapLetters": "Tap letters below...",
+          "removeLetter": "Remove Last",
+          "example": "Example",
+          "hideHint": "Hide Hint",
+          "showHint": "Show Hint",
+          "skip": "Skip",
+          "correct": "Correct!",
+          "incorrect": "Try again!"
+        },
+        "speedQuiz": {
+          "title": "Speed Quiz",
+          "instructions": "Select the correct answer before the timer runs out. Be quick!",
+          "selectMeaning": "Select the meaning of:",
+          "selectWord": "Select the word for:",
+          "notEnoughWords": "Need at least 4 words to play Speed Quiz"
+        },
+        "bridge": {
+          "title": "The Broken Bridge",
+          "loading": "Loading game...",
+          "fillBlank": "Fill in the blank:",
+          "victory": "ðŸŽ‰ Victory!",
+          "victoryMessage": "You crossed all bridges successfully!",
+          "gameOver": "ðŸ’” Game Over",
+          "gameOverMessage": "The bridge collapsed!",
+          "reviewMistakes": "Review Your Mistakes:",
+          "tryAgain": "Try Again",
+          "playAgain": "Play Again",
+          "noSentences": "No example sentences available",
+          "noQuestions": "Unable to generate questions",
+          "loadError": "Failed to load game",
+          "correctAnswers": "Correct Answers",
+          "viewReview": "View Review",
+          "reviewTitle": "ðŸ“‹ Answer Review",
+          "reviewSummary": "You got {{correct}} out of {{total}} questions correct!",
+          "questionNum": "Question #{{num}}",
+          "correct": "Correct",
+          "incorrect": "Incorrect",
+          "yourAnswer": "Your Answer",
+          "correctAnswer": "Correct Answer"
+        },
+        "result": {
+          "title": "Game Complete!",
+          "score": "Score",
+          "time": "Time",
+          "playAgain": "Play Again",
+          "exit": "Exit",
+          "correctAnswers": "Correct Answers",
+          "timeTaken": "Time taken",
+          "backToMenu": "Back to Menu",
+          "excellent": {
+            "title": "Excellent!",
+            "message": "Outstanding performance! You have mastered this content!"
+          },
+          "good": {
+            "title": "Great Job!",
+            "message": "Well done! Keep up the good work!"
+          },
+          "fair": {
+            "title": "Good Effort!",
+            "message": "Not bad! A bit more practice and you will do great!"
+          },
+          "needsImprovement": {
+            "title": "Try Again!",
+            "message": "Do not give up! Practice makes perfect!"
+          }
+        }
+      }
+    }
+  },
+  "games": {
+    "points": "Points",
+    "playAgain": "Play Again",
+    "backToMenu": "Back to Menu",
+    "tryAgain": "Try Again"
+  },
+  "student": {
+    "bookList": {
+      "title": "Library",
+      "search": {
+        "placeholder": "Search for books..."
+      },
+      "startLearning": "开始学习"
+    }
+  }
+}

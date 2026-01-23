@@ -1,0 +1,413 @@
+// ============================================
+// Unit Notes - Minimalist Single Note Editor
+// ============================================
+// Font: Be Vietnam Pro (loaded globally in index.html)
+
+.notes-widget-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 400px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  font-family: 'Be Vietnam Pro', sans-serif;
+  box-shadow: 0 1px 3px var(--shadow);
+  transition: all 0.3s ease;
+
+  // Expanded (Zoom) State
+  &.expanded {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90vw;
+    max-width: 1200px;
+    height: calc(100vh - 100px);
+    z-index: 1050;
+    box-shadow: 0 10px 40px var(--shadow-large);
+    min-height: unset;
+
+    .notes-editor-wrapper {
+      height: calc(100% - 70px);
+    }
+  }
+
+  // Header Section
+  .notes-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+
+    .header-title {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      flex: 1;
+
+      h3 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+      }
+
+      .last-updated {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+      }
+    }
+
+    .header-controls {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+
+      .control-btn {
+        width: 32px;
+        height: 32px;
+        border: 1px solid var(--border-color);
+        background: var(--bg-primary);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+
+        &:hover {
+          background: var(--bg-tertiary);
+          border-color: var(--text-tertiary);
+          color: var(--text-primary);
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+
+        &.close-btn {
+          color: var(--error-color);
+
+          &:hover {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: var(--error-color);
+            color: var(--error-color);
+          }
+        }
+      }
+    }
+  }
+
+  // Content Wrapper (replaces old editor wrapper)
+  .notes-content-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    .loading-state {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      min-height: 200px;
+      color: var(--text-secondary);
+    }
+
+    // Empty state when no note exists
+    .empty-note-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 2rem;
+      text-align: center;
+
+      .empty-icon {
+        color: var(--text-tertiary);
+        opacity: 0.5;
+        margin-bottom: 1.5rem;
+      }
+
+      .empty-message {
+        color: var(--text-secondary);
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+      }
+    }
+
+    // View mode styles
+    .note-view-mode,
+    .note-edit-mode {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+  }
+
+  // Editor Area (old, keep for compatibility)
+  .notes-editor {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    .loading-state {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--text-secondary);
+    }
+
+    .notes-textarea {
+      flex: 1;
+      width: 100%;
+      padding: 1rem 1.25rem;
+      border: none;
+      outline: none;
+      resize: none;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+      color: var(--text-primary);
+      background: var(--bg-primary);
+      font-family:
+        'Be Vietnam Pro',
+        -apple-system,
+        BlinkMacSystemFont,
+        'Segoe UI',
+        sans-serif;
+
+      &::placeholder {
+        color: var(--placeholder-color);
+      }
+
+      &:disabled {
+        background: var(--bg-secondary);
+        cursor: not-allowed;
+        opacity: 0.7;
+      }
+
+      // Remove default browser styles
+      &::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 4px;
+
+        &:hover {
+          background: var(--text-tertiary);
+        }
+      }
+    }
+  }
+
+  // Footer Section
+  .notes-footer {
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+
+    .footer-info {
+      .char-count {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+      }
+    }
+
+    .footer-actions {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .btn-clear {
+      padding: 0.5rem 1rem;
+      background: var(--bg-primary);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+
+      &:hover:not(:disabled) {
+        background: var(--bg-secondary);
+        border-color: var(--text-tertiary);
+        color: var(--text-secondary);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+
+    .btn-save {
+      padding: 0.5rem 1.5rem;
+      background: var(--primary-color);
+      color: #ffffff;
+      border: 1px solid var(--primary-color);
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+
+      &:hover:not(:disabled) {
+        background: var(--primary-color-alt);
+        border-color: var(--primary-color-alt);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(var(--primary-rgb), 0.2);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+// ============================================
+// Responsive Design
+// ============================================
+@media (max-width: 768px) {
+  .notes-widget-container {
+    min-height: 300px;
+
+    .notes-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+
+      .last-updated {
+        font-size: 0.6875rem;
+      }
+    }
+
+    .notes-footer {
+      flex-direction: column;
+      gap: 0.75rem;
+      align-items: stretch;
+
+      .footer-actions {
+        width: 100%;
+        justify-content: flex-end;
+      }
+
+      .btn-clear,
+      .btn-save {
+        flex: 1;
+      }
+    }
+  }
+}
+
+// ============================================
+// Utility: Focus visible for accessibility
+// ============================================
+.notes-widget-container {
+  .btn-clear:focus-visible,
+  .btn-save:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+  }
+}
+
+button {
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+
+  &.save-button {
+    background: var(--primary-color);
+    color: white;
+
+    &:hover {
+      background: var(--primary-color-alt);
+    }
+  }
+
+  &.cancel-button {
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+
+    &:hover {
+      background: var(--bg-tertiary);
+    }
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--text-secondary);
+
+  .empty-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+    opacity: 0.5;
+  }
+
+  p {
+    font-size: 14px;
+    margin: 0;
+  }
+}
+
+.error-message {
+  background: rgba(244, 67, 54, 0.1);
+  color: var(--error-color);
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-bottom: 16px;
+  border: 1px solid var(--error-color);
+}
+
+.duplicate-warning {
+  background: rgba(255, 152, 0, 0.1);
+  color: var(--warning-color);
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-bottom: 16px;
+  border: 1px solid var(--warning-color);
+}

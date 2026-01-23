@@ -1,0 +1,60 @@
+// ========================================
+// MY STUDENTS - SPECIFIC STYLES
+// ========================================
+// Uses shared components from _teacher-components.scss
+
+.my-students-page {
+  // Main container styles handled by teacher-page-container
+
+  .actions-bar {
+    // Replaced by search-filter-bar in shared components
+    // Keeping specific overrides if needed
+    .stats-summary {
+      color: var(--teacher-text-secondary);
+      font-size: 14px;
+      strong {
+        color: var(--teacher-text-primary);
+        font-size: 16px;
+      }
+    }
+  }
+
+  .students-table-container {
+    // Replaced by teacher-table in shared components
+
+    .student-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .student-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid var(--teacher-border);
+      }
+
+      .student-details {
+        display: flex;
+        flex-direction: column;
+
+        .student-name {
+          font-weight: 600;
+          color: var(--teacher-text-primary);
+          font-size: 14px;
+        }
+
+        .student-login {
+          font-size: 12px;
+          color: var(--teacher-text-secondary);
+        }
+      }
+    }
+
+    .book-name {
+      font-weight: 500;
+      color: var(--teacher-text-secondary);
+    }
+  }
+}

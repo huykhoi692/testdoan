@@ -1,8 +1,11 @@
-id;title;level;description;chapter_id
-1;Subject Markers;INTERMEDIATE;Learn the difference between topic and subject markers.;8
-2;Object Markers;BEGINNER;Object markers indicate what is being acted upon.;3
-3;Location Marker;BEGINNER;The particle indicates where an action takes place.;5
-4;Honorific Speech;ADVANCED;The honorific infix shows respect to the subject.;9
-5;Polite Ending;BEGINNER;The most common polite ending in Korean.;3
-6;Past Tense;INTERMEDIATE;Express past actions using tense markers.;5
-
+id;title;content_markdown;example_usage;order_index;unit_id
+1;Basic Greetings;# Cách chào hỏi cơ bản\n\n## Formal (Trang trọng)\n- Good morning (Chào buổi sáng)\n- Good afternoon (Chào buổi chiều)\n- Good evening (Chào buổi tối)\n\n## Informal (Thân mật)\n- Hi / Hello\n- Hey\n- What's up?;Good morning, Mr. Smith! / Hi John, how's it going?;1;1
+2;Introducing Yourself;# Tự giới thiệu bản thân\n\n## Cấu trúc cơ bản:\n- My name is [name].\n- I'm [name].\n- I'm from [country/city].\n- I work as a [job].\n- I'm [age] years old.;Hello, my name is Anna. I'm from Vietnam. I'm 25 years old and I work as a teacher.;2;1
+3;Present Simple - Form;# Thì Hiện tại đơn\n\n## Cấu trúc:\n**Khẳng định:** S + V(s/es) + O\n**Phủ định:** S + do/does + not + V + O\n**Nghi vấn:** Do/Does + S + V + O?\n\n## Lưu ý:\n- Thêm -s/-es cho ngôi thứ 3 số ít (he, she, it);I work every day. / She works at a bank. / Do you like coffee?;1;4
+4;Present Simple - Usage;# Cách dùng Hiện tại đơn\n\n## Dùng để diễn tả:\n1. **Thói quen:** I wake up at 6 AM.\n2. **Sự thật hiển nhiên:** The sun rises in the east.\n3. **Lịch trình cố định:** The train leaves at 8 PM.;He always drinks coffee in the morning. Water boils at 100°C.;2;4
+5;Present Continuous - Form;# Thì Hiện tại tiếp diễn\n\n## Cấu trúc:\n**Khẳng định:** S + am/is/are + V-ing + O\n**Phủ định:** S + am/is/are + not + V-ing + O\n**Nghi vấn:** Am/Is/Are + S + V-ing + O?;I am studying English. / She is not working today. / Are you listening?;1;5
+6;Present Simple vs Continuous;# So sánh Hiện tại đơn và Tiếp diễn\n\n| Present Simple | Present Continuous |\n|----------------|--------------------|\n| Thói quen | Đang xảy ra |\n| Sự thật | Tạm thời |\n| Lịch trình | Kế hoạch gần |;I work at a bank. (thói quen) vs I'm working from home today. (tạm thời);2;5
+7;Past Simple - Regular Verbs;# Thì Quá khứ đơn - Động từ có quy tắc\n\n## Cấu trúc:\nS + V-ed + O\n\n## Quy tắc thêm -ed:\n- work → worked\n- study → studied (y → ied)\n- stop → stopped (gấp đôi phụ âm);I worked late yesterday. / She studied hard for the exam.;1;6
+8;Past Simple - Irregular Verbs;# Động từ bất quy tắc thường gặp\n\n| Base | Past | Meaning |\n|------|------|--------|\n| go | went | đi |\n| come | came | đến |\n| see | saw | thấy |\n| eat | ate | ăn |\n| have | had | có |;I went to school yesterday. / She had breakfast at 7 AM.;2;6
+9;Business Email Structure;# Cấu trúc Email công việc\n\n## 1. Subject Line (Tiêu đề)\n- Ngắn gọn, rõ ràng\n\n## 2. Greeting (Lời chào)\n- Dear Mr./Ms. [Name],\n\n## 3. Body (Nội dung)\n- Mục đích\n- Chi tiết\n- Yêu cầu\n\n## 4. Closing (Kết thúc)\n- Best regards,;Dear Mr. Johnson, I am writing to inquire about... Best regards, Anna;1;7
+10;Meeting Vocabulary;# Từ vựng họp\n\n## Bắt đầu họp:\n- Let's get started.\n- Shall we begin?\n\n## Trong họp:\n- I agree with that point.\n- Could you clarify?\n\n## Kết thúc:\n- To summarize...\n- Any questions?;Let's get started with today's agenda. Does anyone have questions?;1;8

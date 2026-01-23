@@ -1,0 +1,28 @@
+{
+  "home": {
+    "title": "探索知識",
+    "subtitle": "探索我們豐富的教育資源庫",
+    "search": {
+      "placeholder": "搜尋教材、課程或主題...",
+      "button": "搜尋"
+    },
+    "featured": {
+      "title": "精選書籍",
+      "viewAll": "檢視全部",
+      "details": "詳情"
+    },
+    "logged": {
+      "message": "您目前是用 \"{{username}}\" 帳號登入。"
+    },
+    "question": "要是您對 JHipster 有任何疑問，可以到:",
+    "link": {
+      "homepage": "JHipster 首頁",
+      "stackoverflow": "Stack Overflow 上標有 JHipster 的問題",
+      "bugtracker": "JHipster 議題管理",
+      "chat": "JHipster 公開聊天室",
+      "follow": "在 Twitter 上關注 @jhipster"
+    },
+    "like": "如果您喜歡 JHipster，別忘了給我們星星，馬上連到",
+    "github": "GitHub"
+  }
+}

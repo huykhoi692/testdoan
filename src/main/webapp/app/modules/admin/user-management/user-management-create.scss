@@ -1,0 +1,37 @@
+@import 'admin-forms';
+
+.user-management-create {
+  @include admin-form-styles;
+  @include admin-form-dark-mode;
+
+  // Specific styles for Create page
+  .form-container form .form-group {
+    .password-input {
+      position: relative;
+
+      input {
+        padding-right: 44px;
+      }
+
+      .toggle-password {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #6b7280;
+        cursor: pointer;
+        padding: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.2s;
+
+        &:hover {
+          color: #374151;
+        }
+      }
+    }
+  }
+}

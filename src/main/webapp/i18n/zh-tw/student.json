@@ -1,0 +1,280 @@
+{
+  "langleague": {
+    "apiKey": {
+      "setupTitle": "設定 AI API 金鑰",
+      "setupDescription": "要使用 AI 功能，您需要提供自己的 API 金鑰（Google Gemini 或 OpenAI）。它是免費的，我們只將其儲存在您的瀏覽器中。",
+      "label": "API 金鑰",
+      "placeholder": "在此貼上您的 API 金鑰 (AIza... 或 sk-...)",
+      "formatHint": "支援的格式：Google Gemini (AIza...) 或 OpenAI (sk-...)",
+      "showKey": "顯示金鑰",
+      "hideKey": "隱藏金鑰",
+      "getKeyTitle": "取得您的免費 API 金鑰：",
+      "providers": {
+        "gemini": "Google Gemini API 金鑰",
+        "openai": "OpenAI / ChatGPT API 金鑰"
+      },
+      "recommendation": "💡 推薦：",
+      "recommendationText": "我們推薦使用 Google Gemini，因為它對越南語支援更好，而且完全免費！",
+      "cancel": "取消",
+      "saveButton": "儲存並繼續",
+      "errors": {
+        "empty": "請輸入 API 金鑰",
+        "invalidFormat": "無效的 API 金鑰格式。請檢查後重試。\nGemini 金鑰以 'AIza' 開頭，OpenAI 金鑰以 'sk-' 開頭"
+      }
+    },
+    "student": {
+      "dashboard": {
+        "title": "我的儀表板",
+        "loading": "載入教材中...",
+        "welcome": "歡迎回來，{{name}}！",
+        "stats": {
+          "hours": "學習時長",
+          "books": "已完成教材"
+        },
+        "noBooks": "未找到符合搜尋條件的教材。",
+        "loadMore": "載入更多",
+        "search": {
+          "placeholder": "搜尋教材..."
+        },
+        "filter": {
+          "all": "全部",
+          "enrolled": "已報名",
+          "notEnroll": "未報名"
+        },
+        "book": {
+          "continue": "繼續",
+          "start": "開始"
+        },
+        "streak": {
+          "label": "連續學習天數",
+          "start": "今天開始養成學習習慣！",
+          "active": "太棒了！您已連續學習{{count}}天！",
+          "nextMilestone": "下一個里程碑：{{count}}天",
+          "milestone": {
+            "title": "恭喜！",
+            "message": "🎉 恭喜！您已達成連續學習{{count}}天的成就！",
+            "confirmButton": "太棒了！"
+          }
+        }
+      },
+      "books": {
+        "detail": {
+          "loading": "載入中...",
+          "backToBooks": "返回教材列表",
+          "startLearning": "開始學習",
+          "enrollNow": "立即報名",
+          "units": {
+            "title": "本教材的單元",
+            "empty": "暫無單元"
+          },
+          "relatedBooks": "相關教材"
+        },
+        "messages": {
+          "enrollSuccess": "課程報名成功！",
+          "enrollError": "報名失敗，請重試。"
+        }
+      },
+      "learning": {
+        "unit": "單元",
+        "nextLesson": "下一課",
+        "previousLesson": "上一課",
+        "complete": "完成",
+        "vocabulary": {
+          "unit": "單元",
+          "title": "詞彙",
+          "wordsToLearn": "個單詞需學習",
+          "vocabularyWords": "詞彙列表",
+          "meaning": "釋義：",
+          "example": "例句：",
+          "noVocabulary": "暫無詞彙",
+          "noVocabularyDescription": "教師新增後，詞彙將顯示在此處",
+          "clickToHear": "點擊單詞即可收聽發音",
+          "navigation": {
+            "previous": "上一個",
+            "next": "下一個"
+          }
+        },
+        "grammar": {
+          "title": "語法",
+          "noGrammar": "此單元暫無語法課程。"
+        },
+        "exercise": {
+          "title": "練習",
+          "noExercises": "此單元暫無練習題。",
+          "backToBook": "返回教材列表",
+          "defaultTitle": "練習",
+          "loading": "載入中...",
+          "loadingExercises": "載入練習中...",
+          "question": "問題",
+          "of": "/",
+          "playAudio": "播放音訊",
+          "audioNotSupported": "您的瀏覽器不支援音訊元素。",
+          "correctAnswer": "正確！",
+          "incorrectAnswer": "錯誤",
+          "correctAnswerIs": "正確答案是：",
+          "selectAllCorrect": "選擇所有正確答案：",
+          "typeAnswer": "在此輸入您的答案...",
+          "previous": "上一題",
+          "checkAnswer": "檢查答案",
+          "nextQuestion": "下一題",
+          "finish": "完成",
+          "pleaseAnswer": "請先選擇或輸入答案！",
+          "correct": "正確！",
+          "incorrect": "錯誤，請重試或查看答案。",
+          "explainWithAI": "AI 講解"
+        },
+        "aiTutor": {
+          "button": "AI 講解",
+          "grammarButton": "詢問 AI 導師",
+          "title": "AI 導師講解",
+          "grammarTitle": "AI 語法導師",
+          "thinking": "思考中...",
+          "question": "問題",
+          "close": "關閉",
+          "changeKey": "更換金鑰",
+          "cancel": "取消",
+          "saveAndExplain": "儲存並講解",
+          "setupTitle": "設定 AI 導師",
+          "setupDescription": "要使用 AI 導師功能，您需要提供自己的 Google Gemini API 金鑰。它是免費的，我們只將其儲存在您的瀏覽器中。",
+          "apiKeyLabel": "Gemini API 金鑰",
+          "apiKeyPlaceholder": "在此貼上您的 API 金鑰...",
+          "getFreeKey": "在此取得免費金鑰",
+          "invalidKeyError": "無效的 API 金鑰。請檢查後重試。",
+          "rateLimitError": "⚠️ API 配額已超限。系統已自動重試但仍失敗。請等待幾分鐘後再試，或升級您的 API 計劃。免費套餐有每日限制。",
+          "somethingWentWrong": "出現錯誤。",
+          "grammarPromptPlaceholder": "詢問有關此語法主題的任何問題...\n例如：能給我更多例子嗎？這與...有什麼不同？",
+          "grammarAsk": "提問",
+          "grammarClear": "清除對話"
+        },
+        "flashcard": {
+          "back": "返回",
+          "learning": "學習",
+          "title": "閃卡",
+          "shuffle": "隨機排序",
+          "studyMode": "學習模式",
+          "notes": "筆記",
+          "card": "卡片",
+          "of": "/",
+          "definition": "定義",
+          "answer": "答案",
+          "clickToFlip": "點擊翻轉",
+          "terminology": "本節術語",
+          "noCards": "暫無閃卡",
+          "noCardsDescription": "新增詞彙後，閃卡將顯示在此處"
+        },
+        "flashcardList": {
+          "title": "閃卡",
+          "description": "選擇一個單元來學習閃卡",
+          "loading": "載入中...",
+          "noSets": "暫無可用教材",
+          "enrollDescription": "註冊教材以開始使用閃卡學習",
+          "studyFlashcards": "學習閃卡",
+          "noUnits": "此教材中暫無單元"
+        },
+        "bookLearn": {
+          "progress": "學習進度"
+        },
+        "itemCount": {
+          "words": "{{count}}個單詞",
+          "topics": "{{count}}個主題",
+          "questions": "{{count}}道題",
+          "interactive": "互動式"
+        },
+        "notes": {
+          "title": "我的筆記",
+          "loading": "載入筆記中...",
+          "empty": "此單元暫無筆記。",
+          "emptyDescription": "開始記筆記，幫助你記住重要內容！",
+          "placeholder": "寫筆記...",
+          "placeholderDisabled": "您已有此單元的筆記。點擊編輯可修改。",
+          "addButton": "新增筆記",
+          "updateButton": "更新筆記",
+          "saving": "儲存中...",
+          "updating": "更新中...",
+          "editButton": "編輯",
+          "deleteButton": "刪除",
+          "cancelButton": "取消",
+          "deleteConfirm": "確定要刪除這條筆記嗎？",
+          "duplicateWarning": "您已有此單元的筆記。如需新建，請先刪除現有筆記。",
+          "limitInfo": "每個單元只能有一條筆記。請編輯或刪除現有筆記。",
+          "created": "建立時間：",
+          "updated": "更新時間："
+        }
+      },
+      "games": {
+        "title": "學習遊戲",
+        "subtitle": "寓教於樂！透過遊戲提升語言能力",
+        "backToDashboard": "返回儀表板",
+        "loading": "載入遊戲中...",
+        "noGamesForDifficulty": "該難度級別暫無遊戲",
+        "list": {
+          "vocabularyMatch": {
+            "title": "詞彙配對",
+            "description": "在快節奏的記憶遊戲中將單詞與釋義配對",
+            "time": "5-10分鐘"
+          },
+          "wordScramble": {
+            "title": "單詞拼圖",
+            "description": "重新排列字母組成正確的詞彙",
+            "time": "10-15分鐘"
+          },
+          "grammarQuest": {
+            "title": "語法任務",
+            "description": "透過語法挑戰解鎖成就",
+            "time": "15-20分鐘"
+          },
+          "listeningChallenge": {
+            "title": "聽力挑戰",
+            "description": "在各種語境中聽辨正確的單詞",
+            "time": "10-15分鐘"
+          },
+          "speedQuiz": {
+            "title": "速答題",
+            "description": "在限定時間內盡可能多地回答問題",
+            "time": "5分鐘"
+          },
+          "sentenceBuilder": {
+            "title": "造句遊戲",
+            "description": "用打亂的單詞和短語構建正確的句子",
+            "time": "10-15分鐘"
+          }
+        }
+      },
+      "profile": {
+        "actions": {
+          "changePhoto": "更換照片",
+          "saveChanges": "儲存變更"
+        },
+        "personalInfo": {
+          "fullName": "姓名",
+          "fullNamePlaceholder": "例如：張三",
+          "email": "電子郵箱",
+          "bio": "個人簡介",
+          "bioPlaceholder": "簡單介紹一下自己..."
+        },
+        "preferences": {
+          "theme": "主題設定",
+          "themeLight": "☀️ 淺色",
+          "themeDark": "🌙 深色",
+          "themeSystem": "💻 系統"
+        },
+        "messages": {
+          "success": "個人資料更新成功！",
+          "error": "個人資料更新失敗",
+          "themeChanged": "主題已更新！",
+          "themeError": "主題更換失敗",
+          "photoComingSoon": "照片上傳功能即將推出！"
+        }
+      }
+    }
+  },
+  "student": {
+    "bookList": {
+      "title": "圖書館",
+      "search": {
+        "placeholder": "搜尋教材..."
+      },
+      "startLearning": "開始學習"
+    }
+  }
+}

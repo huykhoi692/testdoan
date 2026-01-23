@@ -1,0 +1,23 @@
+{
+  "home": {
+    "title": "知識を探求",
+    "subtitle": "豊富な教育リソースコレクションを探索しましょう",
+    "search": {
+      "placeholder": "教材、コース、またはトピックを検索...",
+      "button": "検索"
+    },
+    "logged": {
+      "message": "\"{{username}}\"としてログインしています。"
+    },
+    "question": "JHipsterに関するお問い合わせは、こちらまで:",
+    "link": {
+      "homepage": "JHipsterのサイト",
+      "stackoverflow": "Stack Overflow のJHipster",
+      "bugtracker": "JHipsterのバグトラッカー",
+      "chat": "JHipsterの公開チャットルーム",
+      "follow": "Twitterの @jhipster"
+    },
+    "like": "JHipsterを気に入ったら、是非スターをつけてください。",
+    "github": "GitHub"
+  }
+}

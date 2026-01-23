@@ -1,0 +1,40 @@
+{
+  "register": {
+    "title": "회원가입",
+    "form": {
+      "button": "등록",
+      "button.registering": "등록 중...",
+      "email": {
+        "placeholder": "이메일을 입력하세요"
+      }
+    },
+    "messages": {
+      "validate": {
+        "login": {
+          "required": "사용자 이름은 필수입니다.",
+          "minlength": "사용자 이름은 최소 1자 이상이어야 합니다.",
+          "maxlength": "사용자 이름은 최대 50자까지 입력할 수 있습니다.",
+          "pattern": "사용자 이름이 유효하지 않습니다."
+        },
+        "email": {
+          "required": "이메일을 입력해주세요.",
+          "invalid": "유효하지 않은 이메일 주소입니다."
+        },
+        "newpassword": {
+          "required": "비밀번호를 입력해주세요.",
+          "minlength": "비밀번호는 최소 4자 이상이어야 합니다."
+        },
+        "confirmpassword": {
+          "required": "비밀번호 확인을 입력해주세요."
+        }
+      },
+      "success": "<strong>회원가입이 완료되었습니다!</strong> 이메일을 확인하여 계정을 활성화해주세요.",
+      "error": {
+        "fail": "<strong>회원가입에 실패했습니다!</strong> 나중에 다시 시도해주세요.",
+        "userexists": "<strong>이미 사용 중인 사용자 이름입니다!</strong> 다른 이름을 선택해주세요.",
+        "emailexists": "<strong>이미 사용 중인 이메일입니다!</strong> 다른 이메일을 선택해주세요.",
+        "dontmatch": "비밀번호가 일치하지 않습니다."
+      }
+    }
+  }
+}

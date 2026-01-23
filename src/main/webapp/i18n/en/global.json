@@ -1,13 +1,13 @@
 {
   "global": {
-    "title": "Sds",
+    "title": "Langleague",
     "browsehappy": "You are using an <strong>outdated</strong> browser. Please <a href=\"http://browsehappy.com/?locale=en\">upgrade your browser</a> to improve your experience.",
     "menu": {
       "home": "Home",
-      "jhipster-needle-menu-add-element": "JHipster will add additional menu entries here (do not translate!)",
+      "student": "Student",
+      "teacher": "Teacher",
       "entities": {
-        "main": "Entities",
-        "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
+        "main": "Entities"
       },
       "account": {
         "main": "Account",
@@ -27,10 +27,42 @@
         "configuration": "Configuration",
         "logs": "Logs",
         "apidocs": "API",
-        "database": "Database",
-        "jhipster-needle-menu-add-admin-element": "JHipster will add additional menu entries here (do not translate!)"
+        "database": "Database"
       },
-      "language": "Language"
+      "teacher": {
+        "main": "Teacher",
+        "dashboard": "Dashboard",
+        "bookManager": "Book Manager",
+        "studentAnalytics": "Student Analytics"
+      },
+      "language": "Language",
+      "theme": "Theme",
+      "skipToContent": "Skip to main content"
+    },
+    "sidebar": {
+      "hide": "HIDE",
+      "student": {
+        "home": "Home",
+        "myBooks": "My Books",
+        "flashCard": "FlashCard",
+        "games": "Games",
+        "profile": "Profile",
+        "logout": "Log Out"
+      },
+      "teacher": {
+        "dashboard": "Dashboard",
+        "books": "Books",
+        "units": "Units",
+        "students": "Students",
+        "logout": "Log Out"
+      },
+      "admin": {
+        "dashboard": "Dashboard",
+        "books": "Books",
+        "users": "Users",
+        "settings": "Settings",
+        "logout": "Log Out"
+      }
     },
     "form": {
       "username.label": "Username",
@@ -42,7 +74,17 @@
       "confirmpassword.label": "New password confirmation",
       "confirmpassword.placeholder": "Confirm the new password",
       "email.label": "Email",
-      "email.placeholder": "Your email"
+      "email.placeholder": "Your email",
+      "image": {
+        "url": {
+          "placeholder": "Paste image URL..."
+        }
+      },
+      "audio": {
+        "url": {
+          "placeholder": "Paste audio URL..."
+        }
+      }
     },
     "messages": {
       "info": {
@@ -57,26 +99,30 @@
         }
       },
       "error": {
-        "dontmatch": "The password and its confirmation do not match!"
+        "dontmatch": "The password and its confirmation do not match!",
+        "missingUnitId": "Unit ID is missing!"
+      }
+    },
+    "validate": {
+      "newpassword": {
+        "required": "Your password is required.",
+        "minlength": "At least 8 characters.",
+        "maxlength": "Your password cannot be longer than 50 characters.",
+        "strength": "Password strength:",
+        "uppercase": "At least one uppercase letter",
+        "number": "At least one number",
+        "special": "At least one special character"
       },
-      "validate": {
-        "newpassword": {
-          "required": "Your password is required.",
-          "minlength": "Your password is required to be at least 4 characters.",
-          "maxlength": "Your password cannot be longer than 50 characters.",
-          "strength": "Password strength:"
-        },
-        "confirmpassword": {
-          "required": "Your confirmation password is required.",
-          "minlength": "Your confirmation password is required to be at least 4 characters.",
-          "maxlength": "Your confirmation password cannot be longer than 50 characters."
-        },
-        "email": {
-          "required": "Your email is required.",
-          "invalid": "Your email is invalid.",
-          "minlength": "Your email is required to be at least 5 characters.",
-          "maxlength": "Your email cannot be longer than 50 characters."
-        }
+      "confirmpassword": {
+        "required": "Your confirmation password is required.",
+        "minlength": "Your confirmation password is required to be at least 4 characters.",
+        "maxlength": "Your confirmation password cannot be longer than 50 characters."
+      },
+      "email": {
+        "required": "Your email is required.",
+        "invalid": "Your email is invalid.",
+        "minlength": "Your email is required to be at least 5 characters.",
+        "maxlength": "Your email cannot be longer than 50 characters."
       }
     },
     "field": {
@@ -85,20 +131,75 @@
     "ribbon": {
       "dev": "Development"
     },
-    "item-count": "Showing {{first}} - {{second}} of {{total}} items."
+    "item-count": "Showing {{first}} - {{second}} of {{total}} items.",
+    "loading": "Loading...",
+    "selectSection": "Select a section from the sidebar to start learning.",
+    "progressSaved": "Your progress will be saved automatically.",
+    "media": {
+      "invalidAudioType": "Invalid audio file type",
+      "imageUploaded": "Image uploaded successfully",
+      "audioUploaded": "Audio uploaded successfully",
+      "remove": "Remove",
+      "uploadFromComputer": "Upload from computer",
+      "upload": "Upload",
+      "imageSupport": "Supports: JPG, PNG, GIF, Google Drive links.",
+      "audioSupport": "Supports: MP3, WAV, Google Drive links."
+    },
+    "footer": {
+      "slogan": "Empowering language learners worldwide with modern, interactive learning experiences.",
+      "copyright": "All rights reserved",
+      "madeWithLove": "Made with",
+      "byTeam": "by the LangLeague Team",
+      "quickLinks": {
+        "title": "Quick Links",
+        "home": "Home",
+        "books": "Books",
+        "about": "About Us",
+        "help": "Help Center"
+      },
+      "resources": {
+        "title": "Resources",
+        "faq": "FAQ"
+      },
+      "legal": {
+        "title": "Legal",
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Service",
+        "cookies": "Cookie Policy"
+      },
+      "connect": {
+        "title": "Connect With Us"
+      },
+      "social": {
+        "followUs": "Follow us on social media"
+      }
+    },
+    "user": {
+      "role": "Role",
+      "status": "Status"
+    }
+  },
+  "media": {
+    "invalidAudioType": "Invalid audio file type",
+    "imageUploaded": "Image uploaded successfully",
+    "audioUploaded": "Audio uploaded successfully",
+    "remove": "Remove",
+    "uploadFromComputer": "Upload from computer",
+    "upload": "Upload",
+    "imageSupport": "Supports: JPG, PNG, GIF, Google Drive links.",
+    "audioSupport": "Supports: MP3, WAV, Google Drive links."
   },
   "entity": {
     "action": {
-      "addblob": "Add blob",
-      "addimage": "Add image",
       "back": "Back",
       "cancel": "Cancel",
+      "close": "Close",
       "delete": "Delete",
       "edit": "Edit",
       "open": "Open",
       "save": "Save",
       "view": "View",
-      "show": "Show {{otherEntity}}"
+      "upload": "Upload"
     },
     "detail": {
       "field": "Field",
@@ -117,13 +218,7 @@
       "maxbytes": "This field cannot be more than {{ max }} bytes.",
       "pattern": "This field should follow pattern for {{ pattern }}.",
       "number": "This field should be a number.",
-      "datetimelocal": "This field should be a date and time.",
-      "patternLogin": "This field can only contain letters, digits and e-mail addresses."
-    },
-    "filters": {
-      "set": "Following filters are set",
-      "clear": "Clear filter",
-      "clearAll": "Clear all filters"
+      "datetimelocal": "This field should be a date and time."
     }
   },
   "error": {
@@ -136,14 +231,19 @@
     "emailexists": "Email is already in use!",
     "idexists": "A new {{ entityName }} cannot already have an ID",
     "idnull": "Invalid ID",
-    "idinvalid": "Invalid ID",
-    "idnotfound": "ID cannot be found",
-    "file": {
-      "could.not.extract": "Could not extract file",
-      "not.image": "File was expected to be an image but was found to be \"{{ fileType }}\""
+    "invalidpassword": "Password does not meet security requirements. Must be 8-100 characters with at least one uppercase letter, one number, and one special character.",
+    "http": {
+      "400": "Bad Request - Please check your input"
     }
   },
-  "footer": {
-    "copyright": "© 2025 LangLeague. All rights reserved."
+  "footer": "This is your footer",
+  "langleague": {
+    "apiKey": {
+      "security": {
+        "browserOnly": "Your API key is only used in the browser",
+        "noStorage": "We do NOT store your key",
+        "noShare": "Do not share your key with others"
+      }
+    }
   }
 }
